@@ -1,0 +1,78 @@
+name: semantic_release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+      # - name: Download lokalise translations
+      #   run: |
+      #     docker run -v /tmp/lokalise:/opt/dest lokalise/lokalise-cli-2 lokalise2 \
+      #     --token "${{ secrets.lokalise_token }}" \
+      #     --project-id 465185555eee18dd537ca6.39714580 file download \
+      #     --format json \
+      #     --unzip-to /opt/dest \
+      #     --original-filenames=false \
+      #     --export-sort a_z \
+      #     --placeholder-format icu \
+      #     --json-unescaped-slashes=true \
+      #     --indentation 2sp \
+      #     --export-empty-as base \
+      #     --add-newline-eof \
+      #     --replace-breaks=false
+      # - name: Move new translations
+      #   run: |
+      #     cp /tmp/lokalise/locale/* /home/runner/work/alexa_media_player/alexa_media_player/custom_components/alexa_media/translations/
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install python-semantic-release
+      - name: Setup Git
+        run: |
+          git config --global user.name "semantic-release"
+          git config --global user.email "semantic-release@GitHub"
+      # - name: Commit translation files
+      #   run: |
+      #     git commit -m "docs: update localization" -a
+      - name: Python Semantic Release
+        uses: relekang/python-semantic-release@master
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+      - name: Zip tesla dir
+        run: |
+          cd /home/runner/work/tesla/tesla/custom_components/tesla
+          zip tesla.zip -r ./
+      - name: Set release variable
+        run: |
+          echo "release_version=`git describe --abbrev=0`" >> $GITHUB_ENV
+      - name: Sleep
+        # add delay so upload does not kill the release notes from semantic-release
+        run: |
+          sleep 5
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GH_TOKEN }}
+          file: /home/runner/work/tesla/tesla/custom_components/tesla/tesla.zip
+          asset_name: tesla.zip
+          tag: ${{ env.release_version }}
+          overwrite: true
+      - name: Push changes to dev
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: dev

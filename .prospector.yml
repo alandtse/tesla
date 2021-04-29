@@ -1,0 +1,86 @@
+output-format: pylint
+
+strictness: medium
+test-warnings: true
+doc-warnings: true
+member-warnings: false
+inherits:
+  - default
+ignore-paths:
+  - docs
+  - tests
+autodetect: true
+max-line-length: 88
+
+bandit:
+  run: false
+  disable:
+    - B101
+
+dodgy:
+  run: true
+
+frosted:
+  disable:
+    - E103
+    - E306
+
+mccabe:
+  run: false
+  options:
+    max-complexity: 10
+
+pep8:
+  disable:
+    - W602
+    - W603
+  enable:
+    - W601
+  options:
+    max-line-length: 79
+
+pep257:
+  disable:
+    - D100
+    - D101
+    - D202
+    - D203
+    - D212
+    - D213
+    - D407
+
+pyflakes:
+  disable:
+    - F403
+    - F810
+
+pylint:
+  disable:
+    - bad-builtin
+    - too-few-public-methods
+    - django-not-available
+    - unused-argument
+    - unsubscriptable-object
+    - import-error
+  options:
+    max-locals: 15
+    max-returns: 6
+    max-branches: 15
+    max-statements: 60
+    max-parents: 7
+    max-attributes: 7
+    min-public-methods: 1
+    max-public-methods: 20
+    max-module-lines: 1000
+    max-line-length: 99
+
+pyroma:
+  disable:
+    - PYR15
+    - PYR18
+
+mypy:
+  run: false
+  options:
+    ignore-missing-imports: true
+    follow-imports: skip
