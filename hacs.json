@@ -10,7 +10,7 @@
     "switch"
   ],
   "iot_class": "Cloud Polling",
-  "homeassistant": "0.118.0",
+  "homeassistant": "2021.4.0",
   "zip_release": true,
   "filename": "tesla.zip"
 }
