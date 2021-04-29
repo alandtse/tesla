@@ -25,6 +25,7 @@ To the extent the official component adds features unrelated to the login, we wi
 1. Click install.
 2. Reboot Home Assistant.
 3. Hard refresh browser cache.
+4. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
 
 {% endif %}
 
