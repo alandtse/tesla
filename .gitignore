@@ -71,3 +71,4 @@ deps/deps.jl
 !.npmignore
 !/.scrutinizer.yml
 !/.prospector.yml
+!/.devcontainer

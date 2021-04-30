@@ -1,10 +1,10 @@
 {
-  "domain": "tesla",
+  "domain": "tesla_custom",
   "name": "Tesla Custom Integration",
   "config_flow": true,
   "documentation": "https://github.com/alandtse/tesla",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
-  "requirements": ["teslajsonpy==0.18.0"],
+  "requirements": ["teslajsonpy~=0.18"],
   "codeowners": ["@alandtse"],
   "dependencies": ["http"],
   "dhcp": [

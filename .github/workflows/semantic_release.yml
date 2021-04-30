@@ -54,7 +54,7 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
       - name: Zip tesla dir
         run: |
-          cd /home/runner/work/tesla/tesla/custom_components/tesla
+          cd /home/runner/work/tesla/tesla/custom_components/tesla_custom
           zip tesla.zip -r ./
       - name: Set release variable
         run: |
@@ -67,7 +67,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GH_TOKEN }}
-          file: /home/runner/work/tesla/tesla/custom_components/tesla/tesla.zip
+          file: /home/runner/work/tesla/tesla/custom_components/tesla_custom/tesla.zip
           asset_name: tesla.zip
           tag: ${{ env.release_version }}
           overwrite: true

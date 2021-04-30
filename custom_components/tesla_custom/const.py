@@ -2,7 +2,7 @@
 VERSION = "0.1.0"
 CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
-DOMAIN = "tesla"
+DOMAIN = "tesla_custom"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
 DEFAULT_WAKE_ON_START = False

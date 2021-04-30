@@ -1,0 +1,32 @@
+{
+  "image": "ludeeus/container:integration-debian",
+  "name": "Tesla Custom Component development",
+  "context": "..",
+  "appPort": ["9123:8123"],
+  "postCreateCommand": "container install && pip install poetry && poetry config virtualenvs.create false && poetry install",
+  "extensions": [
+    "ms-python.python",
+    "github.vscode-pull-request-github",
+    "ryanluker.vscode-coverage-gutters",
+    "ms-python.vscode-pylance",
+    "littlefoxteam.vscode-python",
+    "bungcip.better-toml",
+    "redhat.vscode-yaml",
+    "eamodio.gitlens",
+    "littlefoxteam.vscode-python-test-adapter"
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "editor.tabSize": 4,
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "python.pythonPath": "/usr/local/python/bin/python",
+    "python.analysis.autoSearchPaths": false,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true
+  }
+}

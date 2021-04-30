@@ -1,1 +1,1 @@
-"""Tests for Home Assistant."""
+"""Tests for Tesla Custom Integration."""

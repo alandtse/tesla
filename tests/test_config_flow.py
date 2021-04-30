@@ -22,12 +22,12 @@ from teslajsonpy import TeslaException
 import voluptuous as vol
 from yarl import URL
 
-from custom_components.tesla.config_flow import (
+from custom_components.tesla_custom.config_flow import (
     TeslaAuthorizationCallbackView,
     TeslaAuthorizationProxyView,
     validate_input,
 )
-from custom_components.tesla.const import (
+from custom_components.tesla_custom.const import (
     AUTH_CALLBACK_PATH,
     AUTH_PROXY_PATH,
     CONF_EXPIRATION,
@@ -48,7 +48,7 @@ TEST_INVALID_EXPIRATION = 0
 # pytestmark = pytest.mark.skip(reason="unable to override core component")
 
 
-@pytest.mark.skip(reason="unable to override core component")
+# @pytest.mark.skip(reason="unable to override core component")
 async def test_warning_form(hass):
     """Test we get the warning form."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +71,7 @@ async def test_warning_form(hass):
     return result
 
 
-@pytest.mark.skip(reason="unable to override core component")
+# @pytest.mark.skip(reason="unable to override core component")
 async def test_reauth_warning_form(hass):
     """Test we get the warning form on reauth."""
     result = await hass.config_entries.flow.async_init(
@@ -94,13 +94,13 @@ async def test_reauth_warning_form(hass):
     return result
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_external_url(hass):
     """Test we get the external url after submitting once."""
     result = await test_warning_form(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.get_url",
+        "custom_components.tesla_custom.config_flow.get_url",
         return_value=HA_URL,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -129,13 +129,13 @@ async def test_external_url(hass):
     return result
 
 
-@pytest.mark.skip(reason="unable to override core component")
+# @pytest.mark.skip(reason="unable to override core component")
 async def test_external_url_no_hass_url_exception(hass):
     """Test we handle case with no detectable hass external url."""
     result = await test_warning_form(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.get_url",
+        "custom_components.tesla_custom.config_flow.get_url",
         side_effect=NoURLAvailableError,
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -156,7 +156,7 @@ async def test_external_url_no_hass_url_exception(hass):
     assert result["description_placeholders"] == {}
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_external_url_callback(hass):
     """Test we get the processing of callback_url."""
     result = await test_external_url(hass)
@@ -181,13 +181,13 @@ async def test_external_url_callback(hass):
     return result
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_finish_oauth(hass):
     """Test config entry after finishing oauth."""
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
             "refresh_token": TEST_TOKEN,
             CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
@@ -221,13 +221,13 @@ async def test_finish_oauth(hass):
     return result
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_invalid_auth(hass):
     """Test we handle invalid auth error."""
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         side_effect=TeslaException(code=HTTP_UNAUTHORIZED),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -246,13 +246,13 @@ async def test_form_invalid_auth(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_login_failed(hass):
     """Test we handle invalid auth error."""
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={},
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -271,13 +271,13 @@ async def test_form_login_failed(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_cannot_connect(hass):
     """Test we handle cannot connect error."""
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         side_effect=TeslaException(code=HTTP_NOT_FOUND),
     ):
         result = await hass.config_entries.flow.async_configure(
@@ -296,7 +296,7 @@ async def test_form_cannot_connect(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_repeat_identifier(hass):
     """Test we handle repeat identifiers.
 
@@ -318,7 +318,7 @@ async def test_form_repeat_identifier(hass):
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
             "refresh_token": TEST_TOKEN,
             CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
@@ -341,7 +341,7 @@ async def test_form_repeat_identifier(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_second_identifier(hass):
     """Test we can create another entry with a different name.
 
@@ -363,7 +363,7 @@ async def test_form_second_identifier(hass):
     assert len(hass.config_entries.async_entries(DOMAIN)) == 2
 
 
-@pytest.mark.skip(reason="unable to override core component")
+@pytest.mark.skip(reason="hass fixture does not support http views")
 async def test_form_reauth(hass):
     """Test we handle reauth."""
     entry = MockConfigEntry(
@@ -381,7 +381,7 @@ async def test_form_reauth(hass):
     result = await test_external_url_callback(hass)
     flow_id = result["flow_id"]
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
             "refresh_token": TEST_TOKEN,
             CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
@@ -408,7 +408,7 @@ async def test_form_reauth(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="unable to override core component")
+# @pytest.mark.skip(reason="unable to override core component")
 async def test_import(hass):
     """Test import step results in warning form."""
     result = await hass.config_entries.flow.async_init(
@@ -516,7 +516,9 @@ async def test_callback_view_invalid_query(hass, aiohttp_client, callback_view):
     resp = await client.get(AUTH_CALLBACK_PATH, params={"flow_id": 1234})
     assert resp.status == 400
 
-    with patch("custom_components.tesla.async_setup_entry", side_effect=KeyError):
+    with patch(
+        "custom_components.tesla_custom.async_setup_entry", side_effect=KeyError
+    ):
         resp = await client.get(AUTH_CALLBACK_PATH, params={"flow_id": 1234})
         assert resp.status == 400
 
@@ -526,7 +528,9 @@ async def test_callback_view_keyerror(hass, aiohttp_client, callback_view):
     """Test callback view with keyerror."""
     client = await aiohttp_client(hass.http.app)
 
-    with patch("custom_components.tesla.async_setup_entry", side_effect=KeyError):
+    with patch(
+        "custom_components.tesla_custom.async_setup_entry", side_effect=KeyError
+    ):
         resp = await client.get(AUTH_CALLBACK_PATH, params={"flow_id": 1234})
         assert resp.status == 400
 
@@ -536,7 +540,9 @@ async def test_callback_view_unknownflow(hass, aiohttp_client, callback_view):
     """Test callback view with unknownflow."""
     client = await aiohttp_client(hass.http.app)
 
-    with patch("custom_components.tesla.async_setup_entry", side_effect=UnknownFlow):
+    with patch(
+        "custom_components.tesla_custom.async_setup_entry", side_effect=UnknownFlow
+    ):
         resp = await client.get(AUTH_CALLBACK_PATH, params={"flow_id": 1234})
         assert resp.status == 400
 
@@ -549,7 +555,7 @@ async def test_callback_view_success(hass, aiohttp_client, callback_view):
 
     client = await aiohttp_client(hass.http.app)
 
-    with patch("custom_components.tesla.async_setup_entry", return_value=True):
+    with patch("custom_components.tesla_custom.async_setup_entry", return_value=True):
         resp = await client.get(AUTH_CALLBACK_PATH, params={"flow_id": flow_id})
         assert resp.status == 200
         assert (
@@ -712,7 +718,7 @@ async def test_validate_input_no_controller(
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
     }
     with patch(
-        "custom_components.tesla.config_flow.TeslaAPI.connect",
+        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
             "refresh_token": TEST_TOKEN,
             CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,

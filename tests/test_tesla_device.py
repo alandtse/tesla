@@ -4,7 +4,8 @@ from unittest.mock import MagicMock, Mock
 import pytest
 from teslajsonpy.exceptions import IncompleteCredentials
 
-from custom_components.tesla.tesla_device import TeslaDevice
+from custom_components.tesla_custom.const import DOMAIN
+from custom_components.tesla_custom.tesla_device import TeslaDevice
 
 
 @pytest.fixture
@@ -63,7 +64,7 @@ def test_tesla_init(tesla_device_mock):
     assert tesla_device_mock.unique_id == "uniq_id"
     assert tesla_device_mock.icon == "mdi:battery"
     assert tesla_device_mock.device_info == {
-        "identifiers": {("tesla", 1)},
+        "identifiers": {(DOMAIN, 1)},
         "manufacturer": "Tesla",
         "model": "car_type",
         "name": "car_name",
@@ -105,7 +106,7 @@ def test_tesla_inherited_init(tesla_inherited_mock):
     assert tesla_inherited_mock.unique_id == "uniq_id"
     assert tesla_inherited_mock.icon == "mdi:battery"
     assert tesla_inherited_mock.device_info == {
-        "identifiers": {("tesla", 1)},
+        "identifiers": {(DOMAIN, 1)},
         "manufacturer": "Tesla",
         "model": "car_type",
         "name": "car_name",
