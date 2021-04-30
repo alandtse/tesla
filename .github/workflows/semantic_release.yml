@@ -55,7 +55,7 @@ jobs:
       - name: Zip tesla dir
         run: |
           cd /home/runner/work/tesla/tesla/custom_components/tesla_custom
-          zip tesla.zip -r ./
+          zip tesla_custom.zip -r ./
       - name: Set release variable
         run: |
           echo "release_version=`git describe --abbrev=0`" >> $GITHUB_ENV
@@ -67,8 +67,8 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GH_TOKEN }}
-          file: /home/runner/work/tesla/tesla/custom_components/tesla_custom/tesla.zip
-          asset_name: tesla.zip
+          file: /home/runner/work/tesla/tesla/custom_components/tesla_custom/tesla_custom.zip
+          asset_name: tesla_custom.zip
           tag: ${{ env.release_version }}
           overwrite: true
       - name: Push changes to dev
