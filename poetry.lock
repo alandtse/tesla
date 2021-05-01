@@ -92,7 +92,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "authcaptureproxy"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Python project to create a proxy to capture authentication information from a webpage. This is useful to capture oauth login details without access to a third-party oauth."
 category = "main"
 optional = false
@@ -101,7 +101,7 @@ python-versions = ">=3.6.1,<4.0.0"
 [package.dependencies]
 aiohttp = ">=3.7.3,<4.0.0"
 beautifulsoup4 = ">=4.9.3,<5.0.0"
-httpx = ">=0.17.1,<0.18.0"
+httpx = ">=0.17.1,<1.0"
 importlib-metadata = ">=3.4.0,<4.0.0"
 multidict = ">=5.1.0,<6.0.0"
 typer = ">=0.3,<1.0"
@@ -1248,7 +1248,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "0.18.0"
+version = "0.18.1"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -1256,10 +1256,10 @@ python-versions = ">=3.6.1,<4.0.0"
 
 [package.dependencies]
 aiohttp = ">=3.7.4,<4.0.0"
-authcaptureproxy = ">=1.0.0,<1.1.0"
+authcaptureproxy = ">=1.0.1,<2.0.0"
 backoff = ">=1.10.0,<2.0.0"
 beautifulsoup4 = ">=4.9.3,<5.0.0"
-httpx = ">=0.17.1,<0.18.0"
+httpx = ">=0.17.1,<1.0"
 wrapt = ">=1.12.1,<2.0.0"
 
 [[package]]
@@ -1407,7 +1407,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "b7a4e906b7297f58a49d83256c648da920f374b2d9d3b2f7472b5b3b9746c648"
+content-hash = "7b3c436257b8e981478558f850227017f611979303d461cf99c52b3c48738a34"
 
 [metadata.files]
 aiohttp = [
@@ -1478,8 +1478,8 @@ attrs = [
     {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
 ]
 authcaptureproxy = [
-    {file = "authcaptureproxy-1.0.0-py3-none-any.whl", hash = "sha256:16ed07fcb5a4b9899b8bd71c9aec80cc1ca6d60a7f338a367c6c18358e8cc232"},
-    {file = "authcaptureproxy-1.0.0.tar.gz", hash = "sha256:2eb2b0b9daf2ce41bcbb560d8e46860339af9cc533bcdacba06c3ee2784dc481"},
+    {file = "authcaptureproxy-1.0.1-py3-none-any.whl", hash = "sha256:ddc3bf39ab7c57902597fae60ae8c1b2f51ed6d52f6581f7a611f224c538ed3e"},
+    {file = "authcaptureproxy-1.0.1.tar.gz", hash = "sha256:17c65ed25268e55e2dac6e8916c70312784d69618a4806b03009deffd6de50fd"},
 ]
 awesomeversion = [
     {file = "awesomeversion-21.2.3-py3-none-any.whl", hash = "sha256:aa4a052f04f28ac866cd3630247005512b4527024122fa987e41045443e0681e"},
@@ -2241,8 +2241,8 @@ termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-0.18.0-py3-none-any.whl", hash = "sha256:ed021019575664d033ef708f91e3af65ec52aede219ded3efa791f6837e00039"},
-    {file = "teslajsonpy-0.18.0.tar.gz", hash = "sha256:d5a81ccbd10d97f8c96118263ac7a39206f375065c1235238c78da1055209242"},
+    {file = "teslajsonpy-0.18.1-py3-none-any.whl", hash = "sha256:17504cb3952d77b79a24fd140b8bb673bb108ee20d61305e784e99df035ec721"},
+    {file = "teslajsonpy-0.18.1.tar.gz", hash = "sha256:8caf4a6a1fcd89b6dd09893a950d58193738547bc1f1c605982c4b44161f57bc"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
