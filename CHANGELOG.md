@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.3 (2021-05-01)
+### Fix
+* Fix token refresh ([`dec9a40`](https://github.com/alandtse/tesla/commit/dec9a4059f80fe8ee00423dbc26277dacb9b9b38))
+
 ## v0.1.2 (2021-04-30)
 ### Fix
 * Fix directory in zip ([`d8b4fc6`](https://github.com/alandtse/tesla/commit/d8b4fc61ebd49f15ff41b41797f2c9fe1a1a5eb2))
