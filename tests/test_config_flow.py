@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from aiohttp import web
 from homeassistant import config_entries, data_entry_flow
+from homeassistant.components import http
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
     CONF_PASSWORD,
@@ -45,10 +46,8 @@ TEST_TOKEN = "test-token"
 TEST_ACCESS_TOKEN = "test-access-token"
 TEST_VALID_EXPIRATION = datetime.datetime.now().timestamp() * 2
 TEST_INVALID_EXPIRATION = 0
-# pytestmark = pytest.mark.skip(reason="unable to override core component")
 
 
-# @pytest.mark.skip(reason="unable to override core component")
 async def test_warning_form(hass):
     """Test we get the warning form."""
     result = await hass.config_entries.flow.async_init(
@@ -71,7 +70,6 @@ async def test_warning_form(hass):
     return result
 
 
-# @pytest.mark.skip(reason="unable to override core component")
 async def test_reauth_warning_form(hass):
     """Test we get the warning form on reauth."""
     result = await hass.config_entries.flow.async_init(
@@ -94,8 +92,7 @@ async def test_reauth_warning_form(hass):
     return result
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_external_url(hass):
+async def test_external_url(hass, callback_view):
     """Test we get the external url after submitting once."""
     result = await test_warning_form(hass)
     flow_id = result["flow_id"]
@@ -129,7 +126,6 @@ async def test_external_url(hass):
     return result
 
 
-# @pytest.mark.skip(reason="unable to override core component")
 async def test_external_url_no_hass_url_exception(hass):
     """Test we handle case with no detectable hass external url."""
     result = await test_warning_form(hass)
@@ -156,10 +152,9 @@ async def test_external_url_no_hass_url_exception(hass):
     assert result["description_placeholders"] == {}
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_external_url_callback(hass):
+async def test_external_url_callback(hass, callback_view):
     """Test we get the processing of callback_url."""
-    result = await test_external_url(hass)
+    result = await test_external_url(hass, callback_view)
     flow_id = result["flow_id"]
     result = await hass.config_entries.flow.async_configure(
         flow_id=flow_id,
@@ -181,10 +176,9 @@ async def test_external_url_callback(hass):
     return result
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_finish_oauth(hass):
+async def test_finish_oauth(hass, callback_view):
     """Test config entry after finishing oauth."""
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -221,10 +215,9 @@ async def test_finish_oauth(hass):
     return result
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_invalid_auth(hass):
+async def test_form_invalid_auth(hass, callback_view):
     """Test we handle invalid auth error."""
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -246,10 +239,9 @@ async def test_form_invalid_auth(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_login_failed(hass):
+async def test_form_login_failed(hass, callback_view):
     """Test we handle invalid auth error."""
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -271,10 +263,9 @@ async def test_form_login_failed(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_cannot_connect(hass):
+async def test_form_cannot_connect(hass, callback_view):
     """Test we handle cannot connect error."""
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -296,8 +287,7 @@ async def test_form_cannot_connect(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_repeat_identifier(hass):
+async def test_form_repeat_identifier(hass, callback_view):
     """Test we handle repeat identifiers.
 
     Repeats are identified if the title and tokens are identical. Otherwise they are
@@ -315,7 +305,7 @@ async def test_form_repeat_identifier(hass):
     )
     entry.add_to_hass(hass)
 
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -341,8 +331,7 @@ async def test_form_repeat_identifier(hass):
     assert result["description_placeholders"] is None
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_second_identifier(hass):
+async def test_form_second_identifier(hass, callback_view):
     """Test we can create another entry with a different name.
 
     Repeats are identified if the title and tokens are identical. Otherwise they are
@@ -359,12 +348,11 @@ async def test_form_second_identifier(hass):
         options=None,
     )
     entry.add_to_hass(hass)
-    await test_finish_oauth(hass)
+    await test_finish_oauth(hass, callback_view)
     assert len(hass.config_entries.async_entries(DOMAIN)) == 2
 
 
-@pytest.mark.skip(reason="hass fixture does not support http views")
-async def test_form_reauth(hass):
+async def test_form_reauth(hass, callback_view):
     """Test we handle reauth."""
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -378,7 +366,7 @@ async def test_form_reauth(hass):
     )
     entry.add_to_hass(hass)
 
-    result = await test_external_url_callback(hass)
+    result = await test_external_url_callback(hass, callback_view)
     flow_id = result["flow_id"]
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
@@ -408,7 +396,6 @@ async def test_form_reauth(hass):
     assert result["description_placeholders"] is None
 
 
-# @pytest.mark.skip(reason="unable to override core component")
 async def test_import(hass):
     """Test import step results in warning form."""
     result = await hass.config_entries.flow.async_init(
@@ -490,16 +477,18 @@ async def test_option_flow_input_floor(hass):
 
 
 @pytest.fixture
-async def callback_view(hass):
+async def callback_view(hass, aiohttp_unused_port):
     """Generate registered callback_view fixture."""
+    await async_setup_component(
+        hass, http.DOMAIN, {http.DOMAIN: {http.CONF_SERVER_PORT: aiohttp_unused_port()}}
+    )
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_start()
 
     hass.http.register_view(TeslaAuthorizationCallbackView)
-    return proxy_view
+    return callback_view
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_callback_view_invalid_query(hass, aiohttp_client, callback_view):
     """Test callback view with invalid query."""
     client = await aiohttp_client(hass.http.app)
@@ -523,7 +512,6 @@ async def test_callback_view_invalid_query(hass, aiohttp_client, callback_view):
         assert resp.status == 400
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_callback_view_keyerror(hass, aiohttp_client, callback_view):
     """Test callback view with keyerror."""
     client = await aiohttp_client(hass.http.app)
@@ -535,7 +523,6 @@ async def test_callback_view_keyerror(hass, aiohttp_client, callback_view):
         assert resp.status == 400
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_callback_view_unknownflow(hass, aiohttp_client, callback_view):
     """Test callback view with unknownflow."""
     client = await aiohttp_client(hass.http.app)
@@ -547,10 +534,9 @@ async def test_callback_view_unknownflow(hass, aiohttp_client, callback_view):
         assert resp.status == 400
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_callback_view_success(hass, aiohttp_client, callback_view):
     """Test callback view with success response."""
-    result = await test_external_url(hass)
+    result = await test_external_url(hass, callback_view)
     flow_id = result["flow_id"]
 
     client = await aiohttp_client(hass.http.app)
@@ -565,8 +551,11 @@ async def test_callback_view_success(hass, aiohttp_client, callback_view):
 
 
 @pytest.fixture
-async def proxy_view(hass):
+async def proxy_view(hass, aiohttp_unused_port):
     """Generate registered proxy_view fixture."""
+    await async_setup_component(
+        hass, http.DOMAIN, {http.DOMAIN: {http.CONF_SERVER_PORT: aiohttp_unused_port()}}
+    )
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_start()
 
@@ -586,7 +575,6 @@ async def proxy_view_with_flow(hass, proxy_view):
     return flow_id
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_invalid_auth(hass, aiohttp_client, proxy_view):
     """Test proxy view request results in auth error."""
 
@@ -597,7 +585,6 @@ async def test_proxy_view_invalid_auth(hass, aiohttp_client, proxy_view):
         assert resp.status in [403, 401]
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_get(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view get request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -608,7 +595,6 @@ async def test_proxy_view_valid_auth_get(hass, aiohttp_client, proxy_view_with_f
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_post(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view post request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -619,7 +605,6 @@ async def test_proxy_view_valid_auth_post(hass, aiohttp_client, proxy_view_with_
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_delete(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view delete request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -630,7 +615,6 @@ async def test_proxy_view_valid_auth_delete(hass, aiohttp_client, proxy_view_wit
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_put(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view put request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -640,7 +624,6 @@ async def test_proxy_view_valid_auth_put(hass, aiohttp_client, proxy_view_with_f
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_patch(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view patch request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -650,7 +633,6 @@ async def test_proxy_view_valid_auth_patch(hass, aiohttp_client, proxy_view_with
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_head(hass, aiohttp_client, proxy_view_with_flow):
     """Test proxy view head request results in valid response."""
     flow_id = proxy_view_with_flow
@@ -660,7 +642,6 @@ async def test_proxy_view_valid_auth_head(hass, aiohttp_client, proxy_view_with_
     assert resp.status == 200
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_valid_auth_options(
     hass, aiohttp_client, proxy_view_with_flow
 ):
@@ -672,7 +653,6 @@ async def test_proxy_view_valid_auth_options(
     assert resp.status == 403
 
 
-@pytest.mark.skip(reason="unable to override core component")
 async def test_proxy_view_invalid_auth_after_reset(
     hass, aiohttp_client, proxy_view, proxy_view_with_flow
 ):
