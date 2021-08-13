@@ -1,7 +1,7 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
-from homeassistant.components.sensor import DEVICE_CLASSES, SensorEntity
+from homeassistant.components.sensor import DEVICE_CLASSES, STATE_CLASSES, SensorEntity
 from homeassistant.const import (
     LENGTH_KILOMETERS,
     LENGTH_MILES,
@@ -79,6 +79,18 @@ class TeslaSensor(TeslaDevice, SensorEntity):
             if self.tesla_device.device_class in DEVICE_CLASSES
             else None
         )
+
+    @property
+    def state_class(self) -> str | None:
+        """Return the state_class of the device."""
+        try:
+            return (
+                self.tesla_device.state_class
+                if self.tesla_device.state_class in STATE_CLASSES
+                else None
+            )
+        except AttributeError:
+            return None
 
     @property
     def extra_state_attributes(self):
