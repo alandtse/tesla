@@ -105,6 +105,7 @@ class TeslaSensor(TeslaDevice, SensorEntity):
                     "charge_current_request": self.tesla_device.charge_current_request,
                     "charger_actual_current": self.tesla_device.charger_actual_current,
                     "charger_voltage": self.tesla_device.charger_voltage,
+                    "charger_power": self.tesla_device.charger_power,
                 }
             )
         return attr
