@@ -22,14 +22,15 @@ To the extent the official component adds features unrelated to the login, we wi
 
 ## Installation
 
-1. Use HACS after adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
+1. In HACS it's part of the default repo, just search and install `Tesla Custom`. Skip to 7.
 2. If no HACS, use the tool of choice to open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 3. If you do not have a `custom_components` directory (folder) there, you need to create it.
 4. In the `custom_components` directory (folder) create a new folder called `tesla_custom`.
 5. Download _all_ the files from the `custom_components/tesla_custom/` directory (folder) in this repository.
 6. Place the files you downloaded in the new directory (folder) you created.
 7. Restart Home Assistant.
-8. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
+8. [Hard refresh the browser][hard-refresh].
+9. In the HomeAssistant UI, go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
 
 <!---->
 
@@ -47,7 +48,7 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [commits-shield]: https://img.shields.io/github/commit-activity/w/alandtse/tesla?style=for-the-badge
 [commits]: https://github.com/alandtse/tesla/commits/main
 [hacs]: https://github.com/custom-components/hacs
-[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [discord]: https://discord.gg/Qa5fW2R
 [discord-shield]: https://img.shields.io/discord/330944238910963714.svg?style=for-the-badge
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
@@ -59,3 +60,4 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [releases]: https://github.com/alandtse/tesla/releases
 [download-all]: https://img.shields.io/github/downloads/alandtse/tesla/total?style=for-the-badge
 [download-latest]: https://img.shields.io/github/downloads/alandtse/tesla/latest/total?style=for-the-badge
+[hard-refresh]: https://fabricdigital.co.nz/blog/how-to-hard-refresh-your-browser-and-clear-cache
