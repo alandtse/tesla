@@ -24,8 +24,8 @@ To the extent the official component adds features unrelated to the login, we wi
 
 1. Click install.
 2. Reboot Home Assistant.
-3. Hard refresh browser cache.
-4. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
+3. [Hard refresh the browser][hard-refresh].
+4. In the HomeAssistant UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
 
 {% endif %}
 
@@ -41,7 +41,7 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [commits-shield]: https://img.shields.io/github/commit-activity/y/alandtse/tesla.svg?style=for-the-badge
 [commits]: https://github.com/alandtse/tesla/commits/main
 [hacs]: https://github.com/custom-components/hacs
-[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [discord]: https://discord.gg/Qa5fW2R
 [discord-shield]: https://img.shields.io/discord/330944238910963714.svg?style=for-the-badge
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
@@ -54,3 +54,4 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [user_profile]: https://github.com/alandtse
 [download-all]: https://img.shields.io/github/downloads/alandtse/tesla/total?style=for-the-badge
 [download-latest]: https://img.shields.io/github/downloads/alandtse/tesla/latest/total?style=for-the-badge
+[hard-refresh]: https://fabricdigital.co.nz/blog/how-to-hard-refresh-your-browser-and-clear-cache
