@@ -7,7 +7,7 @@ license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-teslajsonpy = "~=0.19.0"
+teslajsonpy = "~=0.19.1"
 
 [tool.poetry.dev-dependencies]
 homeassistant = "^2021.3.4"
