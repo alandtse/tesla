@@ -75,7 +75,7 @@ class RangeSwitch(TeslaDevice, SwitchEntity):
 
 
 class UpdateSwitch(TeslaDevice, SwitchEntity):
-    """Representation of a Tesla update switch."""
+    """Representation of a Tesla update switch. Described in UI as polling """
 
     def __init__(self, tesla_device, coordinator):
         """Initialise the switch."""
@@ -85,7 +85,7 @@ class UpdateSwitch(TeslaDevice, SwitchEntity):
     @property
     def name(self):
         """Return the name of the device."""
-        return super().name.replace("charger", "update")
+        return super().name.replace("charger", "polling")
 
     @property
     def unique_id(self) -> str:
@@ -94,13 +94,13 @@ class UpdateSwitch(TeslaDevice, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        _LOGGER.debug("Enable updates: %s %s", self.name, self.tesla_device.id())
+        _LOGGER.debug("Enable polling: %s %s", self.name, self.tesla_device.id())
         self.controller.set_updates(self.tesla_device.id(), True)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        _LOGGER.debug("Disable updates: %s %s", self.name, self.tesla_device.id())
+        _LOGGER.debug("Disable polling: %s %s", self.name, self.tesla_device.id())
         self.controller.set_updates(self.tesla_device.id(), False)
         self.async_write_ha_state()
 
