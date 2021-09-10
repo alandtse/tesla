@@ -64,13 +64,14 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 @callback
-def _async_save_tokens(hass, config_entry, access_token, refresh_token):
+def _async_save_tokens(hass, config_entry, access_token, refresh_token, expiration):
     hass.config_entries.async_update_entry(
         config_entry,
         data={
             **config_entry.data,
             CONF_ACCESS_TOKEN: access_token,
             CONF_TOKEN: refresh_token,
+            CONF_EXPIRATION: expiration
         },
     )
 
@@ -199,7 +200,7 @@ async def async_setup_entry(hass, config_entry):
     )
     config_entry.async_on_unload(_async_create_close_task)
 
-    _async_save_tokens(hass, config_entry, access_token, refresh_token)
+    _async_save_tokens(hass, config_entry, access_token, refresh_token, expiration)
     coordinator = TeslaDataUpdateCoordinator(
         hass, config_entry=config_entry, controller=controller
     )
@@ -277,8 +278,9 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             result = self.controller.get_tokens()
             refresh_token = result["refresh_token"]
             access_token = result["access_token"]
+            expiration = result["expiration"]
             _async_save_tokens(
-                self.hass, self.config_entry, access_token, refresh_token
+                self.hass, self.config_entry, access_token, refresh_token, expiration
             )
             _LOGGER.debug("Saving new tokens in config_entry")
 
