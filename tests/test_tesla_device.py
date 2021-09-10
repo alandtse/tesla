@@ -2,7 +2,6 @@
 from unittest.mock import MagicMock, Mock
 
 import pytest
-from teslajsonpy.exceptions import IncompleteCredentials
 
 from custom_components.tesla_custom.const import DOMAIN
 from custom_components.tesla_custom.tesla_device import TeslaDevice
@@ -33,27 +32,6 @@ def tesla_device_mock(tesla_api_mock):
     """Mock tesla_device instance."""
     coordinator = Mock(last_update_success=True)
     return TeslaDevice(tesla_api_mock, coordinator)
-
-
-@pytest.fixture
-def tesla_inherited_mock(tesla_api_mock):
-    """Mock tesla_device instance to test decorator."""
-
-    class testClass(TeslaDevice):
-        """Test class with two functions."""
-
-        @TeslaDevice.Decorators.check_for_reauth
-        async def need_reauth(self):
-            """Raise incomplete credentials."""
-            raise IncompleteCredentials("TEST")
-
-        @TeslaDevice.Decorators.check_for_reauth
-        async def no_reauth(self):
-            """Return True."""
-            return True
-
-    coordinator = Mock(last_update_success=True)
-    return testClass(tesla_api_mock, coordinator)
 
 
 def test_tesla_init(tesla_device_mock):
