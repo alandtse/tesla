@@ -11,12 +11,12 @@
     },
     "step": {
       "user": {
+        "title": "Tesla - Konfigurasjon",
+        "description": "Bruk 'Auth App for Tesla' på iOS eller 'Tesla Tokens' på Android for å generere et 'refresh token' du kan bruke her.",
         "data": {
-          "password": "Passord",
+          "token": "Refresh Token",
           "username": "E-post"
-        },
-        "description": "Vennligst fyll inn din informasjonen.",
-        "title": "Tesla - Konfigurasjon"
+        }
       }
     }
   },

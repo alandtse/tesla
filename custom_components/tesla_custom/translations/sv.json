@@ -6,7 +6,7 @@
           "password": "L\u00f6senord",
           "username": "E-postadress"
         },
-        "description": "V\u00e4nligen ange din information.",
+        "description": "Använd 'Auth App for Tesla' på iOS eller 'Tesla Tokens' på Android för att generera ett 'refresh token' som du kan använda här.",
         "title": "Tesla - Konfiguration"
       }
     }

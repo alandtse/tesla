@@ -32,7 +32,3 @@ ICONS = {
     "charging rate sensor": "mdi:speedometer",
     "sentry mode switch": "mdi:shield-car",
 }
-AUTH_CALLBACK_PATH = "/auth/tesla/callback"
-AUTH_CALLBACK_NAME = "auth:tesla:callback"
-AUTH_PROXY_PATH = "/auth/tesla/proxy"
-AUTH_PROXY_NAME = "auth:tesla:proxy"
