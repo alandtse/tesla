@@ -24,13 +24,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class TeslaLock(TeslaDevice, LockEntity):
     """Representation of a Tesla door lock."""
 
-    @TeslaDevice.Decorators.check_for_reauth
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
         await self.tesla_device.lock()
 
-    @TeslaDevice.Decorators.check_for_reauth
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)

@@ -10,7 +10,6 @@ from .const import DOMAIN, ICONS
 
 _LOGGER = logging.getLogger(__name__)
 
-
 class TeslaDevice(CoordinatorEntity):
     """Representation of a Tesla device."""
 
