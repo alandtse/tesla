@@ -14,12 +14,13 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-A fork of the [official Tesla integration](https://www.home-assistant.io/integrations/tesla/) in Home Assistant to use an oauth proxy for logins.
+A fork of the [official Tesla integration](https://www.home-assistant.io/integrations/tesla/) in Home Assistant.
 
-This fork uses an oauth proxy instead of screen scraping which was [rejected by HA](https://github.com/home-assistant/core/pull/46558#issuecomment-822858608). The oauth proxy sits as a middleman between Home Assistant and Tesla to intercept login credentials such as your account and password. Due to the way the HTTP server works in Home Assistant, the auth endpoint cannot be turned off although we protect access by requiring knowledge of a ongoing config flow id. However, for maximum security, restart Home Assistant to completely disable the proxy server.
+This is the successor to the core app which was removed due to Tesla login issues. Do not report issues to Home Assistant.
 
-To the extent the official component adds features unrelated to the login, we will attempt to keep up to date. Users are welcome to port any fixes in this custom integration into HA. Please note that this component will not have the same quality or support as the official component. Do not report issues to Home Assistant.
-
+To use the component, you will need an application to generate a Tesla refresh token:
+-  [Tesla Tokens](https://play.google.com/store/apps/details?id=net.leveugle.teslatokens)
+-  [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
 ## Installation
 
 1. Use HACS after adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
@@ -29,7 +30,7 @@ To the extent the official component adds features unrelated to the login, we wi
 5. Download _all_ the files from the `custom_components/tesla_custom/` directory (folder) in this repository.
 6. Place the files you downloaded in the new directory (folder) you created.
 7. Restart Home Assistant.
-8. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
+8. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration".
 
 <!---->
 
