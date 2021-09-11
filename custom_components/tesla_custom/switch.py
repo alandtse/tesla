@@ -1,4 +1,5 @@
 """Support for Tesla charger switches."""
+from custom_components.tesla_custom.const import ICONS
 import logging
 
 from homeassistant.components.switch import SwitchEntity
@@ -75,7 +76,7 @@ class RangeSwitch(TeslaDevice, SwitchEntity):
 
 
 class UpdateSwitch(TeslaDevice, SwitchEntity):
-    """Representation of a Tesla update switch. Described in UI as polling """
+    """Representation of a Tesla update switch. Described in UI as polling."""
 
     def __init__(self, tesla_device, coordinator):
         """Initialise the switch."""
@@ -86,6 +87,11 @@ class UpdateSwitch(TeslaDevice, SwitchEntity):
     def name(self):
         """Return the name of the device."""
         return super().name.replace("charger", "polling")
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return ICONS.get("update switch")
 
     @property
     def unique_id(self) -> str:
