@@ -10,7 +10,7 @@ ignore-paths:
   - docs
   - tests
 autodetect: true
-max-line-length: 88
+max-line-length: 108
 
 bandit:
   run: false
@@ -37,7 +37,7 @@ pep8:
   enable:
     - W601
   options:
-    max-line-length: 79
+    max-line-length: 108
 
 pep257:
   disable:

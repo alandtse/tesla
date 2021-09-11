@@ -25,7 +25,7 @@ ICONS = {
     "parking brake sensor": "mdi:car-brake-parking",
     "charger sensor": "mdi:ev-station",
     "charger switch": "mdi:battery-charging",
-    "update switch": "mdi:update",
+    "update switch": "mdi:car-connected",
     "maxrange switch": "mdi:gauge-full",
     "temperature sensor": "mdi:thermometer",
     "location tracker": "mdi:crosshairs-gps",
