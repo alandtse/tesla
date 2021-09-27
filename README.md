@@ -23,7 +23,7 @@ To use the component, you will need an application to generate a Tesla refresh t
 -  iOS: [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
 ## Installation
 
-1. Use HACS after adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
+1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Tesla".  After adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
 2. If no HACS, use the tool of choice to open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 3. If you do not have a `custom_components` directory (folder) there, you need to create it.
 4. In the `custom_components` directory (folder) create a new folder called `tesla_custom`.
