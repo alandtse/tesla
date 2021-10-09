@@ -4,7 +4,7 @@
   "config_flow": true,
   "documentation": "https://github.com/alandtse/tesla",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
-  "requirements": ["teslajsonpy~=0.20.0"],
+  "requirements": ["teslajsonpy~=0.21.2"],
   "codeowners": ["@alandtse"],
   "dependencies": ["http"],
   "dhcp": [
@@ -22,5 +22,5 @@
     }
   ],
   "iot_class": "cloud_polling",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
