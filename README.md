@@ -21,6 +21,7 @@ This is the successor to the core app which was removed due to Tesla login issue
 To use the component, you will need an application to generate a Tesla refresh token:
 -  Android: [Tesla Tokens](https://play.google.com/store/apps/details?id=net.leveugle.teslatokens)
 -  iOS: [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
+-  TeslaFi: [Tesla v3 API Tokens](https://support.teslafi.com/en/communities/1/topics/16979-tesla-v3-api-tokens)
 ## Installation
 
 1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Tesla".  After adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
