@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.0 (2021-10-11)
+### Feature
+* Add support for Energy Sites ([#58](https://github.com/alandtse/tesla/issues/58)) ([`92e8672`](https://github.com/alandtse/tesla/commit/92e86723c46eb2c0f03314196a8f8a0f8e9b66a4))
+
+### Documentation
+* Include teslafi for tokens ([#54](https://github.com/alandtse/tesla/issues/54)) ([`f6ed61e`](https://github.com/alandtse/tesla/commit/f6ed61e65c3cb2c3183e4903d5cf2fd2cbe99e71))
+* Add HACS Link ([#48](https://github.com/alandtse/tesla/issues/48)) ([`f8c761e`](https://github.com/alandtse/tesla/commit/f8c761e3e6b41b736153866d134b811ac8bc6244))
+* Specify platform for authentication apps ([#43](https://github.com/alandtse/tesla/issues/43)) ([`09fc04f`](https://github.com/alandtse/tesla/commit/09fc04ff2c3489582ebeb1b67fffc8b01c65a818))
+
 ## v1.0.0 (2021-09-11)
 ### Feature
 * Replace oauth proxy login with refresh token ([`9ccb71e`](https://github.com/alandtse/tesla/commit/9ccb71e53266aab1de3cf88e7b3f7bddb19f264e))
