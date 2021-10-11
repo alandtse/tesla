@@ -87,13 +87,21 @@ class TeslaDevice(CoordinatorEntity):
     @property
     def device_info(self):
         """Return the device_info of the device."""
-        return {
-            "identifiers": {(DOMAIN, self.tesla_device.id())},
-            "name": self.tesla_device.car_name(),
-            "manufacturer": "Tesla",
-            "model": self.tesla_device.car_type,
-            "sw_version": self.tesla_device.car_version,
-        }
+        if hasattr(self.tesla_device, "car_name"):
+            return {
+                "identifiers": {(DOMAIN, self.tesla_device.id())},
+                "name": self.tesla_device.car_name(),
+                "manufacturer": "Tesla",
+                "model": self.tesla_device.car_type,
+                "sw_version": self.tesla_device.car_version,
+            }
+        elif hasattr(self.tesla_device, "site_name"):
+            return {
+                "identifiers": {(DOMAIN, self.tesla_device.id())},
+                "name": self.tesla_device.site_name(),
+                "manufacturer": "Tesla",
+            }
+        return None
 
     async def async_added_to_hass(self):
         """Register state update callback."""
