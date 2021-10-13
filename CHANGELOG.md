@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.1 (2021-10-13)
+### Fix
+* Bump teslajsonpy to 1.0.1 ([`f41061c`](https://github.com/alandtse/tesla/commit/f41061c2ee0217a73af71cd0275f48290c05c11e))
+
 ## v1.1.0 (2021-10-11)
 ### Feature
 * Add support for Energy Sites ([#58](https://github.com/alandtse/tesla/issues/58)) ([`92e8672`](https://github.com/alandtse/tesla/commit/92e86723c46eb2c0f03314196a8f8a0f8e9b66a4))
