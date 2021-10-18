@@ -37,3 +37,7 @@ AUTH_CALLBACK_PATH = "/auth/tesla/callback"
 AUTH_CALLBACK_NAME = "auth:tesla:callback"
 AUTH_PROXY_PATH = "/auth/tesla/proxy"
 AUTH_PROXY_NAME = "auth:tesla:proxy"
+
+ATTR_PARAMETERS = "parameters"
+ATTR_PATH_VARS = "path_vars"
+SERVICE_API = "api"
