@@ -1,0 +1,31 @@
+#  SPDX-License-Identifier: Apache-2.0
+api:
+  # Description of the service
+  description: Run an API command using controller.api. https://teslajsonpy.readthedocs.io/en/latest/teslajsonpy/teslajsonpy.html#teslajsonpy.Controller.api
+  # Different fields that your service accepts
+  fields:
+    # Key of the field
+    email:
+      # Description of the field
+      description: Email address (optional if only one account)
+      # Example value that can be passed for this field
+      example: "elon@tesla.com"
+      required: false
+      selector:
+        text:
+    command:
+      # Description of the field
+      description: Command to run. See https://github.com/zabuldon/teslajsonpy/blob/master/teslajsonpy/endpoints.json
+      # Example value that can be passed for this field
+      example: "WAKE_UP"
+      required: true
+      selector:
+        text:
+    parameters:
+      # Description of the field
+      description: Parameters in a dictionary. `path_vars` replace variables in endpoints.json path. All others are passed directly to controller.api. For command parameters see https://tesla-api.timdorr.com/vehicle/commands.
+      # Example value that can be passed for this field
+      example: '{"path_vars": {"vehicle_id":"1"}, "wake_if_asleep":True}'
+      required: true
+      selector:
+        object:
