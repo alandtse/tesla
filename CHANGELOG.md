@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.2 (2021-10-18)
+
+
 ## v1.1.1 (2021-10-13)
 ### Fix
 * Bump teslajsonpy to 1.0.1 ([`f41061c`](https://github.com/alandtse/tesla/commit/f41061c2ee0217a73af71cd0275f48290c05c11e))
