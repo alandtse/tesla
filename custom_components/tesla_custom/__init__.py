@@ -35,6 +35,7 @@ from .const import (
     MIN_SCAN_INTERVAL,
     PLATFORMS,
 )
+from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -133,6 +134,8 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always create a new session so they have separate cookies
     async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
     email = config_entry.title
+    if not hass.data[DOMAIN]:
+        async_setup_services(hass)
     if email in hass.data[DOMAIN] and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]:
         scan_interval = hass.data[DOMAIN][email][CONF_SCAN_INTERVAL]
         hass.config_entries.async_update_entry(
@@ -233,6 +236,8 @@ async def async_unload_entry(hass, config_entry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
         _LOGGER.debug("Unloaded entry for %s", username)
+        if not hass.data[DOMAIN]:
+            async_unload_services(hass)
         return True
     return False
 
