@@ -1290,7 +1290,7 @@ develop = ["sphinx"]
 
 [[package]]
 name = "stevedore"
-version = "3.4.0"
+version = "3.5.0"
 description = "Manage dynamic plugins for Python applications"
 category = "dev"
 optional = false
@@ -1309,7 +1309,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "1.1.1"
+version = "1.1.2"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -1469,7 +1469,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "c0c0b055819177724e76a3d0836f38b2ed39e05f9c3ff1ea24847007be993d02"
+content-hash = "f987ca92b52efc051a515e072fb9f738f4c9ba7d7d10fa2ce5035cc3d7250c6d"
 
 [metadata.files]
 aiohttp = [
@@ -2367,15 +2367,15 @@ stdlib-list = [
     {file = "stdlib_list-0.7.0-py3-none-any.whl", hash = "sha256:0ed79a0badf4f666aad046cde364ccac68ca1438a211ec74b0153e0eb5642a3e"},
 ]
 stevedore = [
-    {file = "stevedore-3.4.0-py3-none-any.whl", hash = "sha256:920ce6259f0b2498aaa4545989536a27e4e4607b8318802d7ddc3a533d3d069e"},
-    {file = "stevedore-3.4.0.tar.gz", hash = "sha256:59b58edb7f57b11897f150475e7bc0c39c5381f0b8e3fa9f5c20ce6c89ec4aa1"},
+    {file = "stevedore-3.5.0-py3-none-any.whl", hash = "sha256:a547de73308fd7e90075bb4d301405bebf705292fa90a90fc3bcf9133f58616c"},
+    {file = "stevedore-3.5.0.tar.gz", hash = "sha256:f40253887d8712eaa2bb0ea3830374416736dc8ec0e22f5a65092c1174c44335"},
 ]
 termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-1.1.1-py3-none-any.whl", hash = "sha256:c7257d68fe475a7ba3c2e218aacdfb0fd661fa1bd11e5d4a80dabc3b56249483"},
-    {file = "teslajsonpy-1.1.1.tar.gz", hash = "sha256:765d50afadb666b08d332781a25d623cbfaa1e3f0d3eca7a008290afbb4208c8"},
+    {file = "teslajsonpy-1.1.2-py3-none-any.whl", hash = "sha256:2f41f7e5b9517ef597770c95f5a139c708355fed6af7240b5de6429166229f6f"},
+    {file = "teslajsonpy-1.1.2.tar.gz", hash = "sha256:917264724d2d5f125381bdff52232836fd913ffd192a5d1027a160131678fddd"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
