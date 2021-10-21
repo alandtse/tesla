@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.0 (2021-10-21)
+### Feature
+* Bump teslajsonpy to 1.2.0 ([`7a1a1b6`](https://github.com/alandtse/tesla/commit/7a1a1b6f60c8cb7e907fcebe9f399597572b7eeb))
+
+### Documentation
+* Add Japanese translations ([#75](https://github.com/alandtse/tesla/issues/75)) ([`b938ab8`](https://github.com/alandtse/tesla/commit/b938ab8b47b41bfc641c846c27e5ecfd19514aec))
+
 ## v1.2.1 (2021-10-19)
 ### Fix
 * Bump teslajsonpy to 1.1.2 ([`697bb3e`](https://github.com/alandtse/tesla/commit/697bb3e4ca4c1823189f204a375f44a18ba1f875))
