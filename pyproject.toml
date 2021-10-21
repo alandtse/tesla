@@ -6,8 +6,8 @@ authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-teslajsonpy = "^1.1.2"
+python = "^3.9"
+teslajsonpy = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 homeassistant = "^2021.3.4"
