@@ -1,5 +1,6 @@
 """Test the Tesla config flow."""
 import datetime
+from http import HTTPStatus
 from unittest.mock import patch
 
 from homeassistant import config_entries, data_entry_flow, setup
@@ -8,7 +9,6 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
-    HTTP_NOT_FOUND,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
@@ -114,7 +114,7 @@ async def test_form_cannot_connect(hass):
 
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
-        side_effect=TeslaException(code=HTTP_NOT_FOUND),
+        side_effect=TeslaException(code=HTTPStatus.NOT_FOUND),
     ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],

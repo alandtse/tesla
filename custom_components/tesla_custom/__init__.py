@@ -2,6 +2,7 @@
 import asyncio
 from collections import defaultdict
 from datetime import timedelta
+from http import HTTPStatus
 import logging
 
 import async_timeout
@@ -12,7 +13,6 @@ from homeassistant.const import (
     CONF_TOKEN,
     CONF_USERNAME,
     EVENT_HOMEASSISTANT_CLOSE,
-    HTTP_UNAUTHORIZED,
 )
 from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
@@ -169,7 +169,7 @@ async def async_setup_entry(hass, config_entry):
         raise ConfigEntryNotReady from ex
     except TeslaException as ex:
         await async_client.aclose()
-        if ex.code == HTTP_UNAUTHORIZED:
+        if ex.code == HTTPStatus.UNAUTHORIZED:
             raise ConfigEntryAuthFailed from ex
         if ex.message in [
             "VEHICLE_UNAVAILABLE",
