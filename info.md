@@ -28,7 +28,7 @@ To use the component, you will need an application to generate a Tesla refresh t
 1. Click install.
 2. Reboot Home Assistant.
 3. Hard refresh browser cache.
-4. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration". If you are replacing core, remove the core integration before installing.
+4. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration".
 
 {% endif %}
 
@@ -57,3 +57,5 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [user_profile]: https://github.com/alandtse
 [download-all]: https://img.shields.io/github/downloads/alandtse/tesla/total?style=for-the-badge
 [download-latest]: https://img.shields.io/github/downloads/alandtse/tesla/latest/total?style=for-the-badge
+[add-integration]: https://my.home-assistant.io/redirect/config_flow_start?domain=tesla_custom
+[add-integration-badge]: https://my.home-assistant.io/badges/config_flow_start.svg
