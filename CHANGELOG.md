@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.2 (2021-11-22)
+### Fix
+* Bump deps ([`ccd2f53`](https://github.com/alandtse/tesla/commit/ccd2f534ab82f4bb400670bf6085e82529336f12))
+
+### Documentation
+* Add add integration link to info.md ([`5dd66ec`](https://github.com/alandtse/tesla/commit/5dd66eca42fc03b08b30f8e52d877952fa37e9a3))
+* Add add-integration badge ([`4ae8227`](https://github.com/alandtse/tesla/commit/4ae822755e13b8e358b84c43d10ddacc04ed2f16))
+
+### Refactor
+* Use http.HTTPStatus instead of const.HTTP_* ([#87](https://github.com/alandtse/tesla/issues/87)) ([`25466ce`](https://github.com/alandtse/tesla/commit/25466ced9a918be549b325e2b066badacde9bb24))
+
 ## v1.3.1 (2021-10-22)
 ### Fix
 * Bump telsajsonpy to 1.2.1 ([`a0723a4`](https://github.com/alandtse/tesla/commit/a0723a4ecdc16c1dc0765f74bc6d965c36a6e158))
