@@ -1,4 +1,5 @@
 """Tesla Config Flow."""
+from http import HTTPStatus
 import logging
 
 from homeassistant import config_entries, core, exceptions
@@ -7,7 +8,6 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
-    HTTP_UNAUTHORIZED,
 )
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
@@ -167,7 +167,7 @@ async def validate_input(hass: core.HomeAssistant, data):
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)
         raise InvalidAuth() from ex
     except TeslaException as ex:
-        if ex.code == HTTP_UNAUTHORIZED or isinstance(ex, IncompleteCredentials):
+        if ex.code == HTTPStatus.UNAUTHORIZED or isinstance(ex, IncompleteCredentials):
             _LOGGER.error("Invalid credentials: %s", ex.message)
             raise InvalidAuth() from ex
         _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
