@@ -31,6 +31,8 @@ ICONS = {
     "location tracker": "mdi:crosshairs-gps",
     "charging rate sensor": "mdi:speedometer",
     "sentry mode switch": "mdi:shield-car",
+    "horn switch": "mdi:bullhorn",
+    "flash light switch": "mdi:car-light-high",
     "solar panel": "mdi:solar-panel",
 }
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"

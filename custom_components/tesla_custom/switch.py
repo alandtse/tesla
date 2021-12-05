@@ -22,6 +22,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
             entities.append(SentryModeSwitch(device, coordinator))
+        elif device.type == "horn switch":
+            entities.append(HornSwitch(device, coordinator))
+        elif device.type == "flash light switch":
+            entities.append(FlashLightSwitch(device, coordinator))            
     async_add_entities(entities, True)
 
 
@@ -141,3 +145,45 @@ class SentryModeSwitch(TeslaDevice, SwitchEntity):
         if self.tesla_device.is_on() is None:
             return None
         return self.tesla_device.is_on()
+
+class HornSwitch(TeslaDevice, SwitchEntity):
+    """Representation of a Tesla horn switch."""
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_on(self, **kwargs):
+        """Send the on command."""
+        _LOGGER.debug("Honk horn on", self.name)
+        await self.tesla_device.honk_horn()
+        self.async_write_ha_state()
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_off(self, **kwargs):
+        """Send the off command."""
+        _LOGGER.debug("Honk horn off", self.name)
+        self.async_write_ha_state()
+
+    @property
+    def is_on(self):
+        """Get whether the switch is in on state."""
+        return False
+
+class FlashLightSwitch(TeslaDevice, SwitchEntity):
+    """Representation of a Tesla flash light switch."""
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_on(self, **kwargs):
+        """Send the on command."""
+        _LOGGER.debug("Flash light on", self.name)
+        await self.tesla_device.flash_light()
+        self.async_write_ha_state()
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_off(self, **kwargs):
+        """Send the off command."""
+        _LOGGER.debug("Flash light off", self.name)
+        self.async_write_ha_state()
+
+    @property
+    def is_on(self):
+        """Get whether the switch is in on state."""
+        return False
