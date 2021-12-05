@@ -103,6 +103,7 @@ class TeslaSensor(TeslaDevice, SensorEntity):
                     "added_range": self.tesla_device.added_range,
                     "charge_energy_added": self.tesla_device.charge_energy_added,
                     "charge_current_request": self.tesla_device.charge_current_request,
+                    "charge_current_request_max": self.tesla_device.charge_current_request_max,
                     "charger_actual_current": self.tesla_device.charger_actual_current,
                     "charger_voltage": self.tesla_device.charger_voltage,
                     "charger_power": self.tesla_device.charger_power,
