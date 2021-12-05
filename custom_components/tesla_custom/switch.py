@@ -21,9 +21,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif device.type == "maxrange switch":
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
-            entities.append(SentryModeSwitch(device, coordinator))
-            entities.append(HornSwitch(device, coordinator))
-            entities.append(FlashLightSwitch(device, coordinator))          
+            entities.append(SentryModeSwitch(device, coordinator))       
     async_add_entities(entities, True)
 
 
@@ -143,85 +141,3 @@ class SentryModeSwitch(TeslaDevice, SwitchEntity):
         if self.tesla_device.is_on() is None:
             return None
         return self.tesla_device.is_on()
-
-class HornSwitch(TeslaDevice, SwitchEntity):
-    """Representation of a Tesla horn switch."""
-
-    def __init__(self, tesla_device, coordinator):
-        """Initialise the switch."""
-        super().__init__(tesla_device, coordinator)
-        self.controller = coordinator.controller
-
-    @property
-    def name(self):
-        """Return the name of the device."""
-        return super().name.replace("sentry mode", "horn")
-
-    @property
-    def icon(self):
-        """Return the icon of the sensor."""
-        return ICONS.get("horn switch")
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique ID."""
-        return super().unique_id.replace("sentry mode", "horn")
-
-    @TeslaDevice.Decorators.check_for_reauth
-    async def async_turn_on(self, **kwargs):
-        """Send the on command."""
-        _LOGGER.debug("Honk horn on: %s", self.name)
-        await self.tesla_device.honk_horn()
-        self.async_write_ha_state()
-
-    @TeslaDevice.Decorators.check_for_reauth
-    async def async_turn_off(self, **kwargs):
-        """Send the off command."""
-        _LOGGER.debug("Honk horn off: %s", self.name)
-        self.async_write_ha_state()
-
-    @property
-    def is_on(self):
-        """Get whether the switch is in on state."""
-        return False
-
-class FlashLightSwitch(TeslaDevice, SwitchEntity):
-    """Representation of a Tesla flash light switch."""
-
-    def __init__(self, tesla_device, coordinator):
-        """Initialise the switch."""
-        super().__init__(tesla_device, coordinator)
-        self.controller = coordinator.controller
-
-    @property
-    def name(self):
-        """Return the name of the device."""
-        return super().name.replace("sentry mode", "flash light")
-
-    @property
-    def icon(self):
-        """Return the icon of the sensor."""
-        return ICONS.get("flash light switch")
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique ID."""
-        return super().unique_id.replace("sentry mode", "flash light")
-
-    @TeslaDevice.Decorators.check_for_reauth
-    async def async_turn_on(self, **kwargs):
-        """Send the on command."""
-        _LOGGER.debug("Flash light: %s", self.name)
-        await self.tesla_device.flash_light()
-        self.async_write_ha_state()
-
-    @TeslaDevice.Decorators.check_for_reauth
-    async def async_turn_off(self, **kwargs):
-        """Send the off command."""
-        _LOGGER.debug("Flash light: %s", self.name)
-        self.async_write_ha_state()
-
-    @property
-    def is_on(self):
-        """Get whether the switch is in on state."""
-        return False
