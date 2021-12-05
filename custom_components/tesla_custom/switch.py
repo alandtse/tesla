@@ -22,6 +22,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
             entities.append(SentryModeSwitch(device, coordinator))
+            entities.append(HornSwitch(device, coordinator))
+            entities.append(FlashLightSwitch(device, coordinator))            
         elif device.type == "horn switch":
             entities.append(HornSwitch(device, coordinator))
         elif device.type == "flash light switch":
@@ -152,14 +154,14 @@ class HornSwitch(TeslaDevice, SwitchEntity):
     @TeslaDevice.Decorators.check_for_reauth
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        _LOGGER.debug("Honk horn on", self.name)
+        _LOGGER.debug("Honk horn on: %s", self.name)
         await self.tesla_device.honk_horn()
         self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        _LOGGER.debug("Honk horn off", self.name)
+        _LOGGER.debug("Honk horn off: %s", self.name)
         self.async_write_ha_state()
 
     @property
@@ -173,14 +175,14 @@ class FlashLightSwitch(TeslaDevice, SwitchEntity):
     @TeslaDevice.Decorators.check_for_reauth
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        _LOGGER.debug("Flash light on", self.name)
+        _LOGGER.debug("Flash light: %s", self.name)
         await self.tesla_device.flash_light()
         self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        _LOGGER.debug("Flash light off", self.name)
+        _LOGGER.debug("Flash light: %s", self.name)
         self.async_write_ha_state()
 
     @property
