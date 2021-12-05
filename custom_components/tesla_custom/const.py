@@ -33,7 +33,7 @@ ICONS = {
     "charging rate sensor": "mdi:speedometer",
     "sentry mode switch": "mdi:shield-car",
     "horn": "mdi:bullhorn",
-    "flash light": "mdi:car-light-high",
+    "flash lights": "mdi:car-light-high",
     "solar panel": "mdi:solar-panel",
 }
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"

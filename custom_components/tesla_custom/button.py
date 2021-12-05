@@ -38,7 +38,7 @@ class Horn(TeslaDevice, ButtonEntity):
 
 
 class FlashLights(TeslaDevice, ButtonEntity):
-    """Representation of a Tesla flash light button."""
+    """Representation of a Tesla flash lights button."""
 
     def __init__(self, tesla_device, coordinator):
         """Initialise the button."""
