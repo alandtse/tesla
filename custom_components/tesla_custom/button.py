@@ -49,4 +49,4 @@ class FlashLights(TeslaDevice, ButtonEntity):
     async def async_press(self, **kwargs):
         """Send the command."""
         _LOGGER.debug("Flash lights: %s", self.name)
-        await self.tesla_device.flash_light()
+        await self.tesla_device.flash_lights()
