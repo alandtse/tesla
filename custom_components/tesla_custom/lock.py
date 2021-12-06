@@ -29,12 +29,14 @@ class TeslaLock(TeslaDevice, LockEntity):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
         await self.tesla_device.lock()
+        self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
         await self.tesla_device.unlock()
+        self.async_write_ha_state()
 
     @property
     def is_locked(self):
