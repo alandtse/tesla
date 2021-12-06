@@ -736,7 +736,7 @@ virtualenv = ">=20.0.8"
 
 [[package]]
 name = "prospector"
-version = "1.5.2"
+version = "1.5.3"
 description = ""
 category = "dev"
 optional = false
@@ -1311,7 +1311,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "1.3.0"
+version = "1.4.0"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -2112,8 +2112,8 @@ pre-commit = [
     {file = "pre_commit-2.16.0.tar.gz", hash = "sha256:fe9897cac830aa7164dbd02a4e7b90cae49630451ce88464bca73db486ba9f65"},
 ]
 prospector = [
-    {file = "prospector-1.5.2-py3-none-any.whl", hash = "sha256:862cd49c6004a20757ae81531f1b99b484778eec987f88c2bfe83ce9f9a6e293"},
-    {file = "prospector-1.5.2.tar.gz", hash = "sha256:423bd504362b2fcdd322f8c79101eb17664174c287dee9ff65288ea9236192d9"},
+    {file = "prospector-1.5.3-py3-none-any.whl", hash = "sha256:8e7fd739d6e907b2875b44291d2c7c7481eca8d187576963dc785e6c053b48d4"},
+    {file = "prospector-1.5.3.tar.gz", hash = "sha256:4908034ad9b705942a481b301d9b77664af07b722c53de38c97c8647561f266c"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
@@ -2430,8 +2430,8 @@ termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-1.3.0-py3-none-any.whl", hash = "sha256:c866116d29d71f8fd5b47cad9623994ed4db5c6b73a52e954c1cf28464e9e7b1"},
-    {file = "teslajsonpy-1.3.0.tar.gz", hash = "sha256:4ba64b39d90c944fa79591bcfc03fa9136cfe1cf782e15d596003ae98d01e4a7"},
+    {file = "teslajsonpy-1.4.0-py3-none-any.whl", hash = "sha256:024e73cdb65472019a06cc954f75b4c16c186bc3adbc0343a4fcc87b69b4316b"},
+    {file = "teslajsonpy-1.4.0.tar.gz", hash = "sha256:ad55a2bdde627471888e3aa9bf57dec1123802d57da8e69b9eba05a30e22d414"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
