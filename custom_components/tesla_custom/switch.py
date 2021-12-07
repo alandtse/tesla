@@ -21,7 +21,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif device.type == "maxrange switch":
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
-            entities.append(SentryModeSwitch(device, coordinator))       
+            entities.append(SentryModeSwitch(device, coordinator))
     async_add_entities(entities, True)
 
 

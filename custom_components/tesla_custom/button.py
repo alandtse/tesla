@@ -2,12 +2,16 @@
 from custom_components.tesla_custom.const import ICONS
 import logging
 
-from homeassistant.components.button import ButtonEntity
+_LOGGER = logging.getLogger(__name__)
+
+try:
+    from homeassistant.components.button import ButtonEntity
+except ImportError as error:
+    _LOGGER.error("ButtonEntity not available: %s", error)
 
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
 
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
