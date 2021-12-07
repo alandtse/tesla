@@ -13,7 +13,6 @@ from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
 
 
-
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Tesla button by config_entry."""
     coordinator = hass.data[TESLA_DOMAIN][config_entry.entry_id]["coordinator"]
@@ -22,7 +21,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if device.type == "horn":
             entities.append(Horn(device, coordinator))
         elif device.type == "flash lights":
-            entities.append(FlashLights(device, coordinator))          
+            entities.append(FlashLights(device, coordinator))
     async_add_entities(entities, True)
 
 
