@@ -89,7 +89,6 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
             await self.tesla_device.set_temperature(temperature)
             self.async_write_ha_state()
 
-
     @TeslaDevice.Decorators.check_for_reauth
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
