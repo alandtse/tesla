@@ -9,6 +9,7 @@ import async_timeout
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
@@ -21,6 +22,7 @@ from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
 from teslajsonpy import Controller as TeslaAPI
+from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 import voluptuous as vol
 
@@ -149,6 +151,7 @@ async def async_setup_entry(hass, config_entry):
             refresh_token=config[CONF_TOKEN],
             access_token=config[CONF_ACCESS_TOKEN],
             expiration=config.get(CONF_EXPIRATION, 0),
+            auth_domain=config.get(CONF_DOMAIN, AUTH_DOMAIN),
             update_interval=config_entry.options.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
             ),
