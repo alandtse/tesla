@@ -163,7 +163,7 @@ async def validate_input(hass: core.HomeAssistant, data):
         )
         result = await controller.connect(test_login=True)
         config[CONF_TOKEN] = result["refresh_token"]
-        config[CONF_ACCESS_TOKEN] = result["access_token"]
+        config[CONF_ACCESS_TOKEN] = result[CONF_ACCESS_TOKEN]
         config[CONF_EXPIRATION] = result[CONF_EXPIRATION]
         config[CONF_USERNAME] = data[CONF_USERNAME]
         config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
