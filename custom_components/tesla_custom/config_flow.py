@@ -5,6 +5,7 @@ import logging
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
@@ -14,6 +15,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 import httpx
 from teslajsonpy import Controller as TeslaAPI, TeslaException
+from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials
 import voluptuous as vol
 
@@ -97,6 +99,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(CONF_USERNAME, default=self.username): str,
                 vol.Required(CONF_TOKEN): str,
+                vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): str,
             }
         )
 
@@ -155,13 +158,15 @@ async def validate_input(hass: core.HomeAssistant, data):
             email=data[CONF_USERNAME],
             refresh_token=data[CONF_TOKEN],
             update_interval=DEFAULT_SCAN_INTERVAL,
-            expiration=config.get(CONF_EXPIRATION, 0),
+            expiration=data.get(CONF_EXPIRATION, 0),
+            auth_domain=data.get(CONF_DOMAIN, AUTH_DOMAIN),
         )
         result = await controller.connect(test_login=True)
         config[CONF_TOKEN] = result["refresh_token"]
-        config[CONF_ACCESS_TOKEN] = result["access_token"]
+        config[CONF_ACCESS_TOKEN] = result[CONF_ACCESS_TOKEN]
         config[CONF_EXPIRATION] = result[CONF_EXPIRATION]
         config[CONF_USERNAME] = data[CONF_USERNAME]
+        config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)
