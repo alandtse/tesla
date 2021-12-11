@@ -6,11 +6,13 @@ from unittest.mock import patch
 from homeassistant import config_entries, data_entry_flow, setup
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from custom_components.tesla_custom.const import (
@@ -63,6 +65,7 @@ async def test_form(hass):
         CONF_TOKEN: TEST_TOKEN,
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
+        CONF_DOMAIN: AUTH_DOMAIN,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1

@@ -87,6 +87,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         if temperature:
             _LOGGER.debug("%s: Setting temperature to %s", self.name, temperature)
             await self.tesla_device.set_temperature(temperature)
+            self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_set_hvac_mode(self, hvac_mode):
@@ -96,6 +97,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
             await self.tesla_device.set_status(False)
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self.tesla_device.set_status(True)
+        self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_set_preset_mode(self, preset_mode: str) -> None:
@@ -103,6 +105,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         _LOGGER.debug("%s: Setting preset_mode to: %s", self.name, preset_mode)
         try:
             await self.tesla_device.set_preset_mode(preset_mode)
+            self.async_write_ha_state()
         except UnknownPresetMode as ex:
             _LOGGER.error("%s", ex.message)
 

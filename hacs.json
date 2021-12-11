@@ -7,7 +7,8 @@
     "climate",
     "binary_sensor",
     "device_tracker",
-    "switch"
+    "switch",
+    "button"
   ],
   "iot_class": "Cloud Polling",
   "homeassistant": "2021.4.0",
