@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.0 (2021-12-11)
+### Feature
+* Add horn and flash lights buttons ([#114](https://github.com/alandtse/tesla/issues/114)) ([`1c39e63`](https://github.com/alandtse/tesla/commit/1c39e63b458fc70298ad7c16521a7612fcb8dd29))
+* Expose charge_current_request_max attribute ([#110](https://github.com/alandtse/tesla/issues/110)) ([`a589539`](https://github.com/alandtse/tesla/commit/a5895394f2dc5006cb53a1d66083e6f10ab12fe3))
+
+### Fix
+* Allow specifying auth_domain ([`22817bd`](https://github.com/alandtse/tesla/commit/22817bd88b16f50f1635c613b3a8a893b06b14af))
+* Update ha state on command success ([`6ede864`](https://github.com/alandtse/tesla/commit/6ede864dbb0e6f51622a29099e32c468bb069b96))
+
+### Refactor
+* Clean up code ([`cba719f`](https://github.com/alandtse/tesla/commit/cba719f6bffbb85d61f3c88825c88649c65a59bd))
+* Simplify is_locked ([`5dcaee6`](https://github.com/alandtse/tesla/commit/5dcaee62504ae5ec9e3278f06161a9368f4f2f59))
+
 ## v1.3.2 (2021-11-22)
 ### Fix
 * Bump deps ([`ccd2f53`](https://github.com/alandtse/tesla/commit/ccd2f534ab82f4bb400670bf6085e82529336f12))
