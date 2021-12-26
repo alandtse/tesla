@@ -28,9 +28,11 @@ from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
+    CONF_VINS_TO_EXCLUDE,
     DATA_LISTENER,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
+    DEFAULT_VINS_TO_EXCLUDE,
     DOMAIN,
     MIN_SCAN_INTERVAL,
     PLATFORMS,
@@ -71,6 +73,7 @@ async def async_setup(hass, base_config):
         options = options or {
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
             CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+            CONF_VINS_TO_EXCLUDE: DEFAULT_VINS_TO_EXCLUDE,
         }
         for entry in hass.config_entries.async_entries(DOMAIN):
             if email != entry.title:
@@ -110,6 +113,15 @@ async def async_setup(hass, base_config):
         hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval}
     return True
 
+def get_excluded_vins(config_entry):
+    """Get the vin list and then filter out bad user input"""
+    excludeVINList = config_entry.options.get(
+        CONF_VINS_TO_EXCLUDE, DEFAULT_VINS_TO_EXCLUDE
+    )
+    if excludeVINList == "":
+        return None
+
+    return list(filter(None, excludeVINList.split(",")))
 
 async def async_setup_entry(hass, config_entry):
     """Set up Tesla as config entry."""
@@ -142,7 +154,8 @@ async def async_setup_entry(hass, config_entry):
         result = await controller.connect(
             wake_if_asleep=config_entry.options.get(
                 CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
-            )
+            ),
+            filtered_vins=get_excluded_vins(config_entry)
         )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]

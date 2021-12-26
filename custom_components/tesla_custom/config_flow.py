@@ -22,8 +22,10 @@ import voluptuous as vol
 from .const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
+    CONF_VINS_TO_EXCLUDE,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
+    DEFAULT_VINS_TO_EXCLUDE,
     MIN_SCAN_INTERVAL,
 )
 from .const import DOMAIN  # pylint: disable=unused-import
@@ -100,6 +102,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_USERNAME, default=self.username): str,
                 vol.Required(CONF_TOKEN): str,
                 vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): str,
+                vol.Optional(CONF_VINS_TO_EXCLUDE, default=DEFAULT_VINS_TO_EXCLUDE): str,
             }
         )
 
@@ -138,6 +141,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
                     ),
                 ): bool,
+                vol.Optional(
+                    CONF_VINS_TO_EXCLUDE,
+                    default=self.config_entry.options.get(
+                        CONF_VINS_TO_EXCLUDE, DEFAULT_VINS_TO_EXCLUDE
+                    ),
+                ): str,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
