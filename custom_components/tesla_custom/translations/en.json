@@ -15,7 +15,8 @@
           "mfa": "MFA Code (optional)",
           "password": "Password",
           "username": "Email",
-          "token": "Refresh Token"
+          "token": "Refresh Token",
+          "include_vins": "VINs to include, enter a SPACE to include all VINs"
         },
         "description": "Use 'Auth App for Tesla' on iOS or 'Tesla Tokens' on Android\r\n to create a refresh token and enter it below.",
         "title": "Tesla - Configuration"
@@ -27,7 +28,8 @@
       "init": {
         "data": {
           "enable_wake_on_start": "Force cars awake on startup",
-          "scan_interval": "Seconds between polling"
+          "scan_interval": "Seconds between polling",
+          "include_vins": "VINs to include, enter a SPACE to include all VINs"
         }
       }
     }

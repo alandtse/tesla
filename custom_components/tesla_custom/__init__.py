@@ -28,11 +28,11 @@ from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
-    CONF_VINS_TO_EXCLUDE,
+    CONF_VINS_TO_INCLUDE,
     DATA_LISTENER,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
-    DEFAULT_VINS_TO_EXCLUDE,
+    DEFAULT_VINS_TO_INCLUDE,
     DOMAIN,
     MIN_SCAN_INTERVAL,
     PLATFORMS,
@@ -73,7 +73,7 @@ async def async_setup(hass, base_config):
         options = options or {
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
             CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
-            CONF_VINS_TO_EXCLUDE: DEFAULT_VINS_TO_EXCLUDE,
+            CONF_VINS_TO_INCLUDE: DEFAULT_VINS_TO_INCLUDE,
         }
         for entry in hass.config_entries.async_entries(DOMAIN):
             if email != entry.title:
@@ -86,6 +86,7 @@ async def async_setup(hass, base_config):
     email = config[CONF_USERNAME]
     token = config[CONF_TOKEN]
     scan_interval = config[CONF_SCAN_INTERVAL]
+    vins_to_include = config[CONF_VINS_TO_INCLUDE]
     if email in _async_configured_emails(hass):
         try:
             info = await validate_input(hass, config)
@@ -99,7 +100,7 @@ async def async_setup(hass, base_config):
                 CONF_TOKEN: info[CONF_TOKEN],
                 CONF_EXPIRATION: info[CONF_EXPIRATION],
             },
-            options={CONF_SCAN_INTERVAL: scan_interval},
+            options={CONF_SCAN_INTERVAL: scan_interval, CONF_VINS_TO_INCLUDE: vins_to_include},
         )
     else:
         hass.async_create_task(
@@ -110,18 +111,20 @@ async def async_setup(hass, base_config):
             )
         )
         hass.data.setdefault(DOMAIN, {})
-        hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval}
+        hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval, CONF_VINS_TO_INCLUDE: vins_to_include}
     return True
 
-def get_excluded_vins(config_entry):
-    """Get the vin list and then filter out bad user input"""
-    excludeVINList = config_entry.options.get(
-        CONF_VINS_TO_EXCLUDE, DEFAULT_VINS_TO_EXCLUDE
+
+def get_included_vins(config_entry):
+    """Get the vin list split it out, then filter out bad user input"""
+    included_vin_list = config_entry.options.get(
+        CONF_VINS_TO_INCLUDE, DEFAULT_VINS_TO_INCLUDE
     )
-    if excludeVINList == "":
+    if included_vin_list == "":
         return None
 
-    return list(filter(None, excludeVINList.split(",")))
+    return list(filter(None, included_vin_list.split(",")))
+
 
 async def async_setup_entry(hass, config_entry):
     """Set up Tesla as config entry."""
@@ -135,8 +138,9 @@ async def async_setup_entry(hass, config_entry):
         async_setup_services(hass)
     if email in hass.data[DOMAIN] and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]:
         scan_interval = hass.data[DOMAIN][email][CONF_SCAN_INTERVAL]
+        include_vins = hass.data[DOMAIN][email][CONF_VINS_TO_INCLUDE]
         hass.config_entries.async_update_entry(
-            config_entry, options={CONF_SCAN_INTERVAL: scan_interval}
+            config_entry, options={CONF_SCAN_INTERVAL: scan_interval, CONF_VINS_TO_INCLUDE: include_vins}
         )
         hass.data[DOMAIN].pop(email)
     try:
@@ -151,11 +155,12 @@ async def async_setup_entry(hass, config_entry):
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
             ),
         )
+        vins = get_included_vins(config_entry)
         result = await controller.connect(
             wake_if_asleep=config_entry.options.get(
                 CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
             ),
-            filtered_vins=get_excluded_vins(config_entry)
+            filtered_vins=vins
         )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
@@ -252,7 +257,6 @@ async def update_listener(hass, config_entry):
             old_update_interval,
             controller.update_interval,
         )
-
 
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Tesla data."""

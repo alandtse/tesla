@@ -2,12 +2,12 @@
 VERSION = "1.4.0"
 CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
-CONF_VINS_TO_EXCLUDE = "exclude_vins"
+CONF_VINS_TO_INCLUDE = "include_vins"
 DOMAIN = "tesla_custom"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
 DEFAULT_WAKE_ON_START = False
-DEFAULT_VINS_TO_EXCLUDE = ""
+DEFAULT_VINS_TO_INCLUDE = " "
 ERROR_URL_NOT_DETECTED = "url_not_detected"
 MIN_SCAN_INTERVAL = 60
 

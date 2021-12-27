@@ -18,10 +18,10 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from custom_components.tesla_custom.const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
-    CONF_VINS_TO_EXCLUDE,
+    CONF_VINS_TO_INCLUDE,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
-    DEFAULT_VINS_TO_EXCLUDE,
+    DEFAULT_VINS_TO_INCLUDE,
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
@@ -55,7 +55,7 @@ async def test_form(hass):
         "custom_components.tesla_custom.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         result2 = await hass.config_entries.flow.async_configure(
-            result["flow_id"], {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: "test@email.com"}
+            result["flow_id"], {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: "test@email.com", CONF_VINS_TO_INCLUDE: DEFAULT_VINS_TO_INCLUDE}
         )
         await hass.async_block_till_done()
 
@@ -64,10 +64,10 @@ async def test_form(hass):
     assert result2["data"] == {
         CONF_USERNAME: "test@email.com",
         CONF_TOKEN: TEST_TOKEN,
-        CONF_TOKEN: TEST_TOKEN,
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         CONF_DOMAIN: AUTH_DOMAIN,
+        CONF_VINS_TO_INCLUDE: DEFAULT_VINS_TO_INCLUDE
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -227,10 +227,31 @@ async def test_option_flow(hass):
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True, CONF_VINS_TO_EXCLUDE: "12341243,12354124"},
+        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True, CONF_VINS_TO_INCLUDE: "12341243,12354124"},
     )
     assert result["type"] == "create_entry"
-    assert result["data"] == {CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True, CONF_VINS_TO_EXCLUDE: "12341243,12354124"}
+    assert result["data"] == {
+        CONF_SCAN_INTERVAL: 350,
+        CONF_WAKE_ON_START: True,
+        CONF_VINS_TO_INCLUDE: ["12341243", "12354124"]
+    }
+
+async def test_option_flow_removes_vins(hass):
+    """Test config flow options."""
+    entry = MockConfigEntry(domain=DOMAIN, data={}, options={CONF_VINS_TO_INCLUDE: ["notatesla"]})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+
+    assert result["type"] == "form"
+    assert result["step_id"] == "init"
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True},
+    )
+    assert result["type"] == "create_entry"
+    assert result["data"] == {CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True, CONF_VINS_TO_INCLUDE: []}
 
 
 async def test_option_flow_defaults(hass):
@@ -250,7 +271,7 @@ async def test_option_flow_defaults(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
-        CONF_VINS_TO_EXCLUDE: DEFAULT_VINS_TO_EXCLUDE,
+        CONF_VINS_TO_INCLUDE: DEFAULT_VINS_TO_INCLUDE,
     }
 
 
@@ -271,5 +292,5 @@ async def test_option_flow_input_floor(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
-        CONF_VINS_TO_EXCLUDE: DEFAULT_VINS_TO_EXCLUDE,
+        CONF_VINS_TO_INCLUDE: DEFAULT_VINS_TO_INCLUDE,
     }

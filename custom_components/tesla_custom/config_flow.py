@@ -22,10 +22,10 @@ import voluptuous as vol
 from .const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
-    CONF_VINS_TO_EXCLUDE,
+    CONF_VINS_TO_INCLUDE,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
-    DEFAULT_VINS_TO_EXCLUDE,
+    DEFAULT_VINS_TO_INCLUDE,
     MIN_SCAN_INTERVAL,
 )
 from .const import DOMAIN  # pylint: disable=unused-import
@@ -63,16 +63,18 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
 
+            options = {CONF_VINS_TO_INCLUDE: user_input.get(CONF_VINS_TO_INCLUDE, DEFAULT_VINS_TO_INCLUDE)}
+
             if not errors:
                 if existing_entry:
                     self.hass.config_entries.async_update_entry(
-                        existing_entry, data=info
+                        existing_entry, data=info, options=options
                     )
                     await self.hass.config_entries.async_reload(existing_entry.entry_id)
                     return self.async_abort(reason="reauth_successful")
 
                 return self.async_create_entry(
-                    title=user_input[CONF_USERNAME], data=info
+                    title=user_input[CONF_USERNAME], data=info, options=options
                 )
 
         return self.async_show_form(
@@ -99,10 +101,10 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Fetch schema with defaults."""
         return vol.Schema(
             {
-                vol.Required(CONF_USERNAME, default=self.username): str,
-                vol.Required(CONF_TOKEN): str,
-                vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): str,
-                vol.Optional(CONF_VINS_TO_EXCLUDE, default=DEFAULT_VINS_TO_EXCLUDE): str,
+                vol.Required(CONF_USERNAME, default=self.username): cv.string,
+                vol.Required(CONF_TOKEN): cv.string,
+                vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): cv.string,
+                vol.Required(CONF_VINS_TO_INCLUDE, DEFAULT_VINS_TO_INCLUDE): cv.string,
             }
         )
 
@@ -141,12 +143,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
                     ),
                 ): bool,
-                vol.Optional(
-                    CONF_VINS_TO_EXCLUDE,
-                    default=self.config_entry.options.get(
-                        CONF_VINS_TO_EXCLUDE, DEFAULT_VINS_TO_EXCLUDE
-                    ),
-                ): str,
+                vol.Required(CONF_VINS_TO_INCLUDE, default=self.config_entry.options.get(
+                        CONF_VINS_TO_INCLUDE, DEFAULT_VINS_TO_INCLUDE
+                    )): str,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
