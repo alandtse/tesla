@@ -32,6 +32,7 @@ from .const import (
     DATA_LISTENER,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
+    DEFAULT_POLLING_POLICY,
     DOMAIN,
     MIN_SCAN_INTERVAL,
     PLATFORMS,
@@ -139,7 +140,10 @@ async def async_setup_entry(hass, config_entry):
             update_interval=config_entry.options.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
             ),
-            polling_policy=config[CONF_POLLING_POLICY],
+            polling_policy=config.get(
+                CONF_POLLING_POLICY,
+                DEFAULT_POLLING_POLICY
+            ),
         )
         result = await controller.connect(
             wake_if_asleep=config_entry.options.get(
