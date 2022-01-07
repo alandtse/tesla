@@ -22,9 +22,14 @@ import voluptuous as vol
 from .const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
+    CONF_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
+    DEFAULT_POLLING_POLICY,
     MIN_SCAN_INTERVAL,
+    ATTR_POLLING_POLICY_NORMAL,
+    ATTR_POLLING_POLICY_CONNECTED,
+    ATTR_POLLING_POLICY_ALWAYS,
 )
 from .const import DOMAIN  # pylint: disable=unused-import
 
@@ -138,6 +143,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
                     ),
                 ): bool,
+                vol.Required(
+                    CONF_POLLING_POLICY,
+                    default=self.config_entry.options.get(
+                        CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
+                    ),
+                ): vol.In([ATTR_POLLING_POLICY_NORMAL, ATTR_POLLING_POLICY_CONNECTED, ATTR_POLLING_POLICY_ALWAYS]),
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
@@ -160,6 +171,7 @@ async def validate_input(hass: core.HomeAssistant, data):
             update_interval=DEFAULT_SCAN_INTERVAL,
             expiration=data.get(CONF_EXPIRATION, 0),
             auth_domain=data.get(CONF_DOMAIN, AUTH_DOMAIN),
+            polling_policy=data[CONF_POLLING_POLICY],
         )
         result = await controller.connect(test_login=True)
         config[CONF_TOKEN] = result["refresh_token"]
@@ -167,6 +179,7 @@ async def validate_input(hass: core.HomeAssistant, data):
         config[CONF_EXPIRATION] = result[CONF_EXPIRATION]
         config[CONF_USERNAME] = data[CONF_USERNAME]
         config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
+        config[CONF_POLLING_POLICY] = data[CONF_POLLING_POLICY]
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)

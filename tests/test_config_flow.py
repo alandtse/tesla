@@ -18,8 +18,10 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from custom_components.tesla_custom.const import (
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
+    CONF_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
+    DEFAULT_POLLING_POLICY,
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
@@ -66,6 +68,7 @@ async def test_form(hass):
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         CONF_DOMAIN: AUTH_DOMAIN,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -228,7 +231,11 @@ async def test_option_flow(hass):
         user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True},
     )
     assert result["type"] == "create_entry"
-    assert result["data"] == {CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True}
+    assert result["data"] == {
+        CONF_SCAN_INTERVAL: 350, 
+        CONF_WAKE_ON_START: True,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
+    }
 
 
 async def test_option_flow_defaults(hass):
@@ -248,6 +255,7 @@ async def test_option_flow_defaults(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
 
 
@@ -268,4 +276,5 @@ async def test_option_flow_input_floor(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
