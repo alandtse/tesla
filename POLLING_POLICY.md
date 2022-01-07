@@ -59,7 +59,7 @@ Internally, Home Assistant calls this "scan_interval", hence the slightly confus
 
 This allows you to dynamically adjust the `polling_interval` based on criteria such as the battery SOC, where the car is parked etc. to ensure you get the most updated information when you need it, while at the same time making sure that the car can enter sleep mode when you need to preserve energy.
 
-Note that changing the `polling_interval` using the service call wil _not_ affect the value set in the configuration of the integration.  So after a restart of Home Assistant, `polling_interval` is set back to the configured value, not the last value set by the service call.  To ensure the least chance of keeping the car awake unintentionally, we suggest setting the `polling_interval` to a reasonably high value (or leaving it as default) in the configuration, and lowering it using the service call only when needed.  That way, e.g. a restart of Home Assistant will not suddenly drain you battery while parked somewhere remote.
+Note that changing the `polling_interval` using the service call wil _not_ affect the value set in the configuration of the integration.  So after a restart of Home Assistant, `polling_interval` is set back to the configured value, not the last value set by the service call.  To ensure the least chance of keeping the car awake unintentionally, we suggest setting the `polling_interval` to a reasonably high value (or leaving it as default) in the configuration, and lowering it using the service call only when needed.  That way, e.g. a restart of Home Assistant will not suddenly drain your battery while parked somewhere remote.
 
 ## Sleeping and waking up
 
