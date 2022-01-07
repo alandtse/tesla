@@ -179,7 +179,9 @@ async def validate_input(hass: core.HomeAssistant, data):
         config[CONF_EXPIRATION] = result[CONF_EXPIRATION]
         config[CONF_USERNAME] = data[CONF_USERNAME]
         config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
-        config[CONF_POLLING_POLICY] = data[CONF_POLLING_POLICY]
+        config[CONF_POLLING_POLICY] = data.get(
+            CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
+        )
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)
