@@ -47,8 +47,10 @@ The `polling_interval` can be set using a service call:
 ```
 service: tesla_custom.polling_interval
 data:
-  polling_interval: 120
+  scan_interval: 120
 ```
+
+Internally, Home Assistant calls this "scan_interval", hence the slightly confusing naming of the parameter.
 
 This allows you to dynamically adjust the `polling_interval` based on criteria such as where the car is parked, battery SOC etc. to ensure you get the most updated information when you need it, while at the same time ensuring that the car can enter sleep mode when you need to preserve energy.
 
