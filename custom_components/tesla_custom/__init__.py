@@ -141,8 +141,7 @@ async def async_setup_entry(hass, config_entry):
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
             ),
             polling_policy=config.get(
-                CONF_POLLING_POLICY,
-                DEFAULT_POLLING_POLICY
+                CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
         )
         result = await controller.connect(
