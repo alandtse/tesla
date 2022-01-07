@@ -72,6 +72,3 @@ deps/deps.jl
 !/.scrutinizer.yml
 !/.prospector.yml
 !/.devcontainer
-
-# Ignored, to keep it local
-.pre-commit-config.yaml
