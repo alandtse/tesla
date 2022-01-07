@@ -158,3 +158,4 @@ def async_setup_services(hass) -> None:
 def async_unload_services(hass) -> None:
     """Unload Tesla services."""
     hass.services.async_remove(DOMAIN, SERVICE_API)
+    hass.services.async_remove(DOMAIN, SERVICE_SCAN_INTERVAL)
