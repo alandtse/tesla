@@ -274,6 +274,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(30):
+                _LOGGER.debug("Running controller.update()")
                 return await self.controller.update()
         except IncompleteCredentials:
             await self.hass.config_entries.async_reload(self.config_entry.entry_id)
