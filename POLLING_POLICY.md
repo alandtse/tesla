@@ -104,13 +104,17 @@ And either
 - HVAC is on or ...
 - The car is connected to a charger (even if it is not actively charging)
 
-This will allow you to get more recent data from your car for e.g. statistical purposes as long as a charger is connected.  Since this might keep the car awake and use more energy than allowing the car to sleep, it might incur a real cost as the car will need to charge more, and more often. 
+This will allow you to get more recent data from your car for e.g. statistical purposes as long as a charger is connected.  Since this might keep the car awake and use more energy than allowing the car to sleep, a real cost might incur as the car will need to charge more, and more often. 
+
+If the car has been parked for more than 10 minutes, and is not connected to a charger, the same throttle as for the normal policy will set the interval back to 660 seconds.
 
 ### Polling Policy: Always
 
 With Polling Policy set to "always" it will poll the car every `polling_interval` seconds as long as the following criteria is met:
 
 - The car is awake
+
+There are not checks here to see if the car has been parked for a long time or if a charger is connected.  So this setting can potentially keep the car awake forever.
 
 ## Potential Battery impacts
 
