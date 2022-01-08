@@ -171,7 +171,9 @@ async def validate_input(hass: core.HomeAssistant, data):
             update_interval=DEFAULT_SCAN_INTERVAL,
             expiration=data.get(CONF_EXPIRATION, 0),
             auth_domain=data.get(CONF_DOMAIN, AUTH_DOMAIN),
-            polling_policy=data[CONF_POLLING_POLICY],
+            polling_policy=data.get(
+                CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
+            )
         )
         result = await controller.connect(test_login=True)
         config[CONF_TOKEN] = result["refresh_token"]
