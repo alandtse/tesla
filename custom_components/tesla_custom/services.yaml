@@ -34,7 +34,7 @@ polling_interval:
   description: Set polling interval for updating fresh data from an awake car
   fields:
     scan_interval:
-      description: Number of seconds between each poll.  See https://github.com/alandtse/tesla/POLLING_POLICY.md for possible impacts
+      description: Number of seconds between each poll.  See https://github.com/alandtse/tesla/wiki/Polling-policy more information.
       example: 660
       required: true
       default: 660
