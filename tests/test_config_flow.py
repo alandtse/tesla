@@ -225,10 +225,18 @@ async def test_option_flow(hass):
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True},
+        user_input={
+            CONF_SCAN_INTERVAL: 350, 
+            CONF_WAKE_ON_START: True,
+            CONF_POLLING_POLICY: "connected",
+        },
     )
     assert result["type"] == "create_entry"
-    assert result["data"] == {CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True}
+    assert result["data"] == {
+        CONF_SCAN_INTERVAL: 350, 
+        CONF_WAKE_ON_START: True,
+        CONF_POLLING_POLICY: "connected",
+    }
 
 
 async def test_option_flow_defaults(hass):
@@ -248,6 +256,7 @@ async def test_option_flow_defaults(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
 
 
@@ -268,4 +277,5 @@ async def test_option_flow_input_floor(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
