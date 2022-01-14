@@ -65,7 +65,6 @@ async def test_form(hass):
     assert result2["data"] == {
         CONF_USERNAME: "test@email.com",
         CONF_TOKEN: TEST_TOKEN,
-        CONF_TOKEN: TEST_TOKEN,
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         CONF_DOMAIN: AUTH_DOMAIN,
