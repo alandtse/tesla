@@ -16,6 +16,7 @@ from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from custom_components.tesla_custom.const import (
+    ATTR_POLLING_POLICY_CONNECTED,
     CONF_EXPIRATION,
     CONF_WAKE_ON_START,
     CONF_POLLING_POLICY,
@@ -68,7 +69,6 @@ async def test_form(hass):
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         CONF_DOMAIN: AUTH_DOMAIN,
-        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -228,13 +228,17 @@ async def test_option_flow(hass):
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True},
+        user_input={
+            CONF_SCAN_INTERVAL: 350, 
+            CONF_WAKE_ON_START: True,
+            CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
+        },
     )
     assert result["type"] == "create_entry"
     assert result["data"] == {
         CONF_SCAN_INTERVAL: 350, 
         CONF_WAKE_ON_START: True,
-        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
+        CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
     }
 
 
