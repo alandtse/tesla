@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.0 (2022-01-15)
+### Feature
+* Add set polling policy in configuration ([#127](https://github.com/alandtse/tesla/issues/127)) ([`2814149`](https://github.com/alandtse/tesla/commit/28141491eb8c5c3e53792ea900f91a1fc77c087c))
+* Add polling interval service ([#128](https://github.com/alandtse/tesla/issues/128)) ([`3b2d8bc`](https://github.com/alandtse/tesla/commit/3b2d8bc4be6ba6d00e15356f94eed4c2d4dde9e1))
+
+### Documentation
+* Add chromium-tesla-token-generator to app list ([#123](https://github.com/alandtse/tesla/issues/123)) ([`33663fb`](https://github.com/alandtse/tesla/commit/33663fb9942d7d6f0ef4a119446132527a090e10))
+
 ## v1.4.0 (2021-12-11)
 ### Feature
 * Add horn and flash lights buttons ([#114](https://github.com/alandtse/tesla/issues/114)) ([`1c39e63`](https://github.com/alandtse/tesla/commit/1c39e63b458fc70298ad7c16521a7612fcb8dd29))
