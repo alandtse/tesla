@@ -27,8 +27,10 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
+    CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DATA_LISTENER,
+    DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     DOMAIN,
@@ -71,6 +73,7 @@ async def async_setup(hass, base_config):
         options = options or {
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
             CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+            CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
         }
         for entry in hass.config_entries.async_entries(DOMAIN):
             if email != entry.title:
@@ -137,6 +140,9 @@ async def async_setup_entry(hass, config_entry):
             auth_domain=config.get(CONF_DOMAIN, AUTH_DOMAIN),
             update_interval=config_entry.options.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+            ),
+            polling_policy=config_entry.options.get(
+                CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
         )
         result = await controller.connect(
@@ -274,6 +280,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(30):
+                _LOGGER.debug("Running controller.update()")
                 return await self.controller.update()
         except IncompleteCredentials:
             await self.hass.config_entries.async_reload(self.config_entry.entry_id)
