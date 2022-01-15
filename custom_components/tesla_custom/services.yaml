@@ -29,3 +29,18 @@ api:
       required: true
       selector:
         object:
+
+polling_interval:
+  description: Set polling interval for updating fresh data from an awake car
+  fields:
+    scan_interval:
+      description: Number of seconds between each poll.  See https://github.com/alandtse/tesla/wiki/Polling-policy more information.
+      example: 660
+      required: true
+      default: 660
+      selector:
+        number:
+          min: 0
+          max: 3600
+          step: 30
+          unit_of_measurement: "s"
