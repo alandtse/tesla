@@ -1,7 +1,8 @@
 """Const file for Tesla cars."""
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
+CONF_POLLING_POLICY = "polling_policy"
 DOMAIN = "tesla_custom"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
@@ -43,4 +44,9 @@ AUTH_PROXY_NAME = "auth:tesla:proxy"
 
 ATTR_PARAMETERS = "parameters"
 ATTR_PATH_VARS = "path_vars"
+ATTR_POLLING_POLICY_NORMAL = "normal"
+ATTR_POLLING_POLICY_CONNECTED = "connected"
+ATTR_POLLING_POLICY_ALWAYS = "always"
+DEFAULT_POLLING_POLICY = ATTR_POLLING_POLICY_NORMAL
 SERVICE_API = "api"
+SERVICE_SCAN_INTERVAL = "polling_interval"

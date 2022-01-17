@@ -20,8 +20,13 @@ from teslajsonpy.exceptions import IncompleteCredentials
 import voluptuous as vol
 
 from .const import (
+    ATTR_POLLING_POLICY_ALWAYS,
+    ATTR_POLLING_POLICY_CONNECTED,
+    ATTR_POLLING_POLICY_NORMAL,
     CONF_EXPIRATION,
+    CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     MIN_SCAN_INTERVAL,
@@ -138,6 +143,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
                     ),
                 ): bool,
+                vol.Required(
+                    CONF_POLLING_POLICY,
+                    default=self.config_entry.options.get(
+                        CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
+                    ),
+                ): vol.In(
+                    [
+                        ATTR_POLLING_POLICY_NORMAL,
+                        ATTR_POLLING_POLICY_CONNECTED,
+                        ATTR_POLLING_POLICY_ALWAYS,
+                    ]
+                ),
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
@@ -160,6 +177,7 @@ async def validate_input(hass: core.HomeAssistant, data):
             update_interval=DEFAULT_SCAN_INTERVAL,
             expiration=data.get(CONF_EXPIRATION, 0),
             auth_domain=data.get(CONF_DOMAIN, AUTH_DOMAIN),
+            polling_policy=data.get(CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY),
         )
         result = await controller.connect(test_login=True)
         config[CONF_TOKEN] = result["refresh_token"]

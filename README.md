@@ -19,13 +19,15 @@ A fork of the [official Tesla integration](https://www.home-assistant.io/integra
 This is the successor to the core app which was removed due to Tesla login issues. Do not report issues to Home Assistant.
 
 To use the component, you will need an application to generate a Tesla refresh token:
--  Android: [Tesla Tokens](https://play.google.com/store/apps/details?id=net.leveugle.teslatokens)
--  iOS: [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
--  TeslaFi: [Tesla v3 API Tokens](https://support.teslafi.com/en/communities/1/topics/16979-tesla-v3-api-tokens)
--  Chromium/Edge: [Chromium Tesla Token Generator](https://github.com/DoctorMcKay/chromium-tesla-token-generator)
+
+- Android: [Tesla Tokens](https://play.google.com/store/apps/details?id=net.leveugle.teslatokens)
+- iOS: [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
+- TeslaFi: [Tesla v3 API Tokens](https://support.teslafi.com/en/communities/1/topics/16979-tesla-v3-api-tokens)
+- Chromium/Edge: [Chromium Tesla Token Generator](https://github.com/DoctorMcKay/chromium-tesla-token-generator)
+
 ## Installation
 
-1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Tesla".  After adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
+1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Tesla". After adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
 2. If no HACS, use the tool of choice to open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 3. If you do not have a `custom_components` directory (folder) there, you need to create it.
 4. In the `custom_components` directory (folder) create a new folder called `tesla_custom`.
@@ -35,9 +37,10 @@ To use the component, you will need an application to generate a Tesla refresh t
 8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration".
 
 <!---->
-## Usage
-The `Tesla` integration offers integration with the [Tesla](https://auth.tesla.com/login) cloud service and provides presence detection as well as sensors such as charger state and temperature.
 
+## Usage
+
+The `Tesla` integration offers integration with the [Tesla](https://auth.tesla.com/login) cloud service and provides presence detection as well as sensors such as charger state and temperature.
 
 This integration provides the following platforms:
 
@@ -48,22 +51,25 @@ This integration provides the following platforms:
 - Climate - HVAC control. Allow you to control (turn on/off, set target temperature) your Tesla's HVAC system. Also enables preset modes to enable or disable max defrost mode `defrost` or `normal` operation mode.
 - Switches - Charger and max range switch allow you to start/stop charging and set max range charging. Polling switch allows you to disable polling of vehicles to conserve battery. Sentry mode switch enables or disable Sentry mode.
 - Buttons - Horn and Flash lights
+
 ## Options
 
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
 
-* Seconds between polling - referred to below as the `polling_interval`.
+- Seconds between polling - referred to below as the `polling_interval`.
 
-* Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
+- Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
+
+- Polling policy - When do we actively poll the car to get updates, and when do we try to allow the car to sleep. See [the Wiki](https://github.com/alandtse/tesla/wiki/Polling-policy) for more information.
 
 ## Potential Battery impacts
 
 Here are some things to consider and understand when implementing the Tesla component and its potential effect on your car's battery.
 
-- The `polling_interval` determines when to check if the car is awake and new information is available, but the Tesla integration will not wake up a sleeping car during this polling.  By default, the polling will occur every 660 seconds. Polling a car too frequently can keep the car awake and drain the battery. Different firmware versions and measurements of Tesla cars can take from 11 to 15 minutes for sleep mode to occur. There is no official information on sleep mode timings so your mileage may vary and you should experiment with different polling times for an optimal experience.
+- The `polling_interval` determines when to check if the car is awake and new information is available, but the Tesla integration will not wake up a sleeping car during this polling. By default, the polling will occur every 660 seconds. Polling a car too frequently can keep the car awake and drain the battery. Different firmware versions and measurements of Tesla cars can take from 11 to 15 minutes for sleep mode to occur. There is no official information on sleep mode timings so your mileage may vary and you should experiment with different polling times for an optimal experience.
 - The car will, however, be woken up when a command is actively sent to the car, such as door unlock or turning on the HVAC. It will then also fetch updated information while the car is awake based on the `polling_interval`.
 - The car can intentionally be woken up to fetch recent information by sending a harmless command, for example, a lock command. This can be used in an automation to, for example, ensure that updated information is available every morning. (Note that the command must be valid for that specific car model. So locking the frunk of a Model 3 will not wake up that car).
-- You can also toggle the `polling switch` on/off to  disable polling of the vehicle completely via automations or the Lovelace UI.
+- You can also toggle the `polling switch` on/off to disable polling of the vehicle completely via automations or the Lovelace UI.
 
 ## Contributions are welcome!
 
