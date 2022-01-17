@@ -27,7 +27,8 @@
       "init": {
         "data": {
           "enable_wake_on_start": "Force cars awake on startup",
-          "scan_interval": "Seconds between polling"
+          "scan_interval": "Seconds between polling",
+          "polling_policy": "Polling policy. See https://github.com/alandtse/tesla/wiki/Polling-policy"
         }
       }
     }
