@@ -18,6 +18,7 @@ from homeassistant.const import (
 from .const import (
     ATTR_PARAMETERS,
     ATTR_PATH_VARS,
+    ATTR_VIN,
     DOMAIN,
     SERVICE_API,
     SERVICE_SCAN_INTERVAL,
@@ -38,7 +39,8 @@ API_SCHEMA = vol.Schema(
 SCAN_INTERVAL_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_EMAIL): vol.All(cv.string, vol.Length(min=1)),
-        vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(vol.Coerce(int), vol.Range(min=0, max=3600)),
+        vol.Optional(ATTR_VIN): vol.All(cv.string, vol.Length(min=1)),
+        vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(vol.Coerce(int), vol.Range(min=-1, max=3600)),
     }
 )
 
@@ -114,6 +116,7 @@ def async_setup_services(hass) -> None:
 
         Arguments:
             call.CONF_EMAIL {str: ""} -- email, optional
+            call.ATTR_VIN {str: ""} -- vehicle VIN, optional
             call.CONF_SCAN_INTERVAL {int: 660} -- New scan interval
 
         Returns:
@@ -137,21 +140,24 @@ def async_setup_services(hass) -> None:
         if controller is None:
             raise ValueError(f"No Tesla controllers found for email {email}")
 
+        vin = service_data.get(ATTR_VIN, "")
         update_interval = service_data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         _LOGGER.debug(
-            "Service %s called with email: %s interval %s",
+            "Service %s called with email: %s vin %s interval %s",
             SERVICE_SCAN_INTERVAL,
             email,
+            vin,
             update_interval,
         )
-        old_update_interval = controller.update_interval
-        controller.update_interval = update_interval
-        if old_update_interval != controller.update_interval:
+        old_update_interval = controller.get_update_interval_vin(vin=vin)
+        if old_update_interval != update_interval:
             _LOGGER.debug(
-                "Changing update_interval from %s to %s",
+                "Changing update_interval from %s to %s for %s",
                 old_update_interval,
-                controller.update_interval,
+                update_interval,
+                vin
             )
+            controller.set_update_interval_vin(vin=vin, value=update_interval)
         return True
 
 @callback

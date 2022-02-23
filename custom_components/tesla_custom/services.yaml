@@ -33,6 +33,22 @@ api:
 polling_interval:
   description: Set polling interval for updating fresh data from an awake car
   fields:
+    email:
+      # Description of the field
+      description: Email address (optional if only one account)
+      # Example value that can be passed for this field
+      example: "elon@tesla.com"
+      required: false
+      selector:
+        text:
+    vin:
+      # Description of the field
+      description: Vehicle VIN (if not provided then default polling interval will be updated)
+      # Example value that can be passed for this field
+      example: "5YJSA11111111111"
+      required: false
+      selector:
+        text:
     scan_interval:
       description: Number of seconds between each poll.  See https://github.com/alandtse/tesla/wiki/Polling-policy more information.
       example: 660
@@ -40,7 +56,7 @@ polling_interval:
       default: 660
       selector:
         number:
-          min: 0
+          min: -1
           max: 3600
           step: 30
           unit_of_measurement: "s"
