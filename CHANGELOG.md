@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.0 (2022-02-23)
+### Feature
+* Add set by vin to update polling interval service ([#149](https://github.com/alandtse/tesla/issues/149)) ([`f278680`](https://github.com/alandtse/tesla/commit/f278680fe2db3eed6fc4d80d8abfa69f352e5516))
+* Allow minimum dataCoordinator update interval at 10 seconds ([#148](https://github.com/alandtse/tesla/issues/148)) ([`0d87757`](https://github.com/alandtse/tesla/commit/0d87757ddd5d216043bd83d350492951a6f5ab80))
+
+### Documentation
+* Document polling policy ([#135](https://github.com/alandtse/tesla/issues/135)) ([`004f265`](https://github.com/alandtse/tesla/commit/004f265ec0c6e25ce2d04cdeea9964cf1d1cac4e))
+
 ## v1.5.0 (2022-01-15)
 ### Feature
 * Add set polling policy in configuration ([#127](https://github.com/alandtse/tesla/issues/127)) ([`2814149`](https://github.com/alandtse/tesla/commit/28141491eb8c5c3e53792ea900f91a1fc77c087c))
