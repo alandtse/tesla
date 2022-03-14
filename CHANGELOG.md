@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.1 (2022-03-14)
+### Fix
+* Disable forced updated for device trackers ([#158](https://github.com/alandtse/tesla/issues/158)) ([`407d44e`](https://github.com/alandtse/tesla/commit/407d44e117706b0907dd20919194e22c18782028))
+
+### Documentation
+* Note how to turn on climate via a scene ([#155](https://github.com/alandtse/tesla/issues/155)) ([`6da0204`](https://github.com/alandtse/tesla/commit/6da0204660bb861588d8e335eedee9407ed550cd))
+
 ## v1.6.0 (2022-02-23)
 ### Feature
 * Add set by vin to update polling interval service ([#149](https://github.com/alandtse/tesla/issues/149)) ([`f278680`](https://github.com/alandtse/tesla/commit/f278680fe2db3eed6fc4d80d8abfa69f352e5516))
