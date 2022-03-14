@@ -26,6 +26,11 @@ class TeslaDeviceEntity(TeslaDevice, TrackerEntity):
     """A class representing a Tesla device."""
 
     @property
+    def force_update(self):
+        """Disable forced updated since we are polling via the coordinator updates."""
+        return False
+
+    @property
     def latitude(self) -> float | None:
         """Return latitude value of the device."""
         location = self.tesla_device.get_location()
