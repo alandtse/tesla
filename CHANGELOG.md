@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.2 (2022-03-23)
+### Fix
+* Bump teslajsonpy to 1.9.0 ([`269e08c`](https://github.com/alandtse/tesla/commit/269e08cbbb7ca01e076c5e86a872c01f46b36376))
+
 ## v1.6.1 (2022-03-14)
 ### Fix
 * Disable forced updated for device trackers ([#158](https://github.com/alandtse/tesla/issues/158)) ([`407d44e`](https://github.com/alandtse/tesla/commit/407d44e117706b0907dd20919194e22c18782028))
