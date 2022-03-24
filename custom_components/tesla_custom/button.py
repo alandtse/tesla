@@ -66,7 +66,7 @@ class TriggerHomelink(TeslaDevice, ButtonEntity):
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
-        return self.tesla_device.available()
+        return super().available and self.tesla_device.available()
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_press(self, **kwargs):
