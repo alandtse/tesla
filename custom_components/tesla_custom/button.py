@@ -62,17 +62,25 @@ class TriggerHomelink(TeslaDevice, ButtonEntity):
         """Initialise the button."""
         super().__init__(tesla_device, coordinator)
         self.controller = coordinator.controller
+        self.__waiting = False
 
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
-        return super().available and self.tesla_device.available()
+        return (
+            super().available and self.tesla_device.available() and not self.__waiting
+        )
 
     @TeslaDevice.Decorators.check_for_reauth
     async def async_press(self, **kwargs):
         """Send the command."""
         _LOGGER.debug("Trigger homelink: %s", self.name)
+        self.__waiting = True
+        self.async_write_ha_state()
         try:
             await self.tesla_device.trigger_homelink()
         except HomelinkError as ex:
             _LOGGER.error("%s", ex.message)
+        finally:
+            self.__waiting = False
+            self.async_write_ha_state()
