@@ -25,6 +25,7 @@ def tesla_api_mock():
     tesla_api_mock.battery_charging.return_value = True
     tesla_api_mock.attrs = {}
     tesla_api_mock.refresh.return_value = True
+    tesla_api_mock.enabled_by_default = True
     return tesla_api_mock
 
 
