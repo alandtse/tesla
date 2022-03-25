@@ -101,13 +101,13 @@ class UpdateSwitch(TeslaDevice, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         _LOGGER.debug("Enable polling: %s %s", self.name, self.tesla_device.id())
-        self.controller.set_updates(self.tesla_device.id(), True)
+        self.controller.set_updates(car_id=self.tesla_device.id(), value=True)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         _LOGGER.debug("Disable polling: %s %s", self.name, self.tesla_device.id())
-        self.controller.set_updates(self.tesla_device.id(), False)
+        self.controller.set_updates(car_id=self.tesla_device.id(), value=False)
         self.async_write_ha_state()
 
     @property
