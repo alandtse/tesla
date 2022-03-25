@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.0 (2022-03-25)
+### Feature
+* Force update when enabling polling switch ([`0aca7a8`](https://github.com/alandtse/tesla/commit/0aca7a8d3acbf3794415ce085c5695f5496129f2))
+
+### Fix
+* Fix polling switch enable api call ([`42f01d4`](https://github.com/alandtse/tesla/commit/42f01d4eb8db44cc98f50179b7e59b27455872d6))
+
 ## v1.6.2 (2022-03-23)
 ### Fix
 * Bump teslajsonpy to 1.9.0 ([`269e08c`](https://github.com/alandtse/tesla/commit/269e08cbbb7ca01e076c5e86a872c01f46b36376))

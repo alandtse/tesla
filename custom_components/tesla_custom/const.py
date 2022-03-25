@@ -1,5 +1,5 @@
 """Const file for Tesla cars."""
-VERSION = "1.6.2"
+VERSION = "1.7.0"
 CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
 CONF_POLLING_POLICY = "polling_policy"
