@@ -63,6 +63,17 @@ The following sensors provide all available vehicle data as attributes. These se
 - Drive State data sensor
 - GUI Settings data sensor
 
+The following sensors provide all available vehicle data as attributes. These sensors are disabled by default and need to be enabled in HASS first. It is also recommended to exclude these sensors from [recorder](https://www.home-assistant.io/integrations/recorder/).
+
+- Climate data sensor
+- Charge data sensor
+- Vehicle state data sensor
+- Software update data sensor
+- Speed Limit data sensor
+- Vehicle Config data sensor
+- Drive State data sensor
+- GUI Settings data sensor
+
 ## Options
 
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
