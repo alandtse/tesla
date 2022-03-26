@@ -45,12 +45,23 @@ The `Tesla` integration offers integration with the [Tesla](https://auth.tesla.c
 This integration provides the following platforms:
 
 - Binary sensors - such as update available, parking, and charger connection.
-- Sensors - such as Battery level, Inside/Outside temperature, odometer, estimated range, and charging rate.
+- Sensors - such as Battery level, Inside/Outside temperature, odometer, estimated range, charging rate, and vehicle data
 - Device tracker - to track location of your car
 - Locks - Door lock, rear trunk lock, front trunk (frunk) lock and charger door lock. Enables you to control Tesla's door, trunks and charger door lock.
 - Climate - HVAC control. Allow you to control (turn on/off, set target temperature) your Tesla's HVAC system. Also enables preset modes to enable or disable max defrost mode `defrost` or `normal` operation mode. **NOTE:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
 - Switches - Charger and max range switch allow you to start/stop charging and set max range charging. Polling switch allows you to disable polling of vehicles to conserve battery. Sentry mode switch enables or disable Sentry mode.
 - Buttons - Horn and Flash lights
+
+The following sensors provide all available vehicle data as attributes. These sensors are disabled by default and need to be enabled in HASS first. It is also recommended to exclude these sensors from [recorder](https://www.home-assistant.io/integrations/recorder/).
+
+- Climate data sensor
+- Charge data sensor
+- Vehicle state data sensor
+- Software update data sensor
+- Speed Limit data sensor
+- Vehicle Config data sensor
+- Drive State data sensor
+- GUI Settings data sensor
 
 ## Options
 
