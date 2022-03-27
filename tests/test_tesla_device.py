@@ -25,6 +25,7 @@ def tesla_api_mock():
     tesla_api_mock.battery_charging.return_value = True
     tesla_api_mock.attrs = {}
     tesla_api_mock.refresh.return_value = True
+    tesla_api_mock.enabled_by_default = True
     return tesla_api_mock
 
 
@@ -74,6 +75,7 @@ def test_tesla_init(tesla_device_mock):
         "battery_charging": True,
         "battery_level": 100,
     }
+    assert tesla_device_mock.entity_registry_enabled_default is True
 
 
 async def test_tesla_added_to_hass(tesla_device_mock):
@@ -116,6 +118,7 @@ def test_tesla_inherited_init(tesla_inherited_mock):
         "battery_charging": True,
         "battery_level": 100,
     }
+    assert tesla_inherited_mock.entity_registry_enabled_default is True
 
 
 async def test_tesla_inherited_reauth_raised(tesla_inherited_mock):
