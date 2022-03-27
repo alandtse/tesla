@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.0 (2022-03-27)
+### Feature
+* Add trigger homelink button (disabled by default) ([#168](https://github.com/alandtse/tesla/issues/168)) ([`0a39370`](https://github.com/alandtse/tesla/commit/0a39370b40cdedaf60e88018defd2bf52afc6ea5))
+
+### Fix
+* Create json sensors for vehicle data ([`d13f828`](https://github.com/alandtse/tesla/commit/d13f828c0088560df62208b7b05e26497481d78b))
+
+### Breaking
+* Online sensor will no longer have json vehicle data. Any scripts that relied on that json data will need to use the new vehicle data sensors. They will need to be enabled. ([`d13f828`](https://github.com/alandtse/tesla/commit/d13f828c0088560df62208b7b05e26497481d78b))
+
 ## v1.7.0 (2022-03-25)
 ### Feature
 * Force update when enabling polling switch ([`0aca7a8`](https://github.com/alandtse/tesla/commit/0aca7a8d3acbf3794415ce085c5695f5496129f2))
