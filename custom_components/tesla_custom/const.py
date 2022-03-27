@@ -35,6 +35,7 @@ ICONS = {
     "sentry mode switch": "mdi:shield-car",
     "horn": "mdi:bullhorn",
     "flash lights": "mdi:car-light-high",
+    "trigger homelink": "mdi:garage",
     "solar panel": "mdi:solar-panel",
 }
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
