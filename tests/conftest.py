@@ -14,5 +14,10 @@
 #
 # See here for more info: https://docs.pytest.org/en/latest/fixture.html (note that
 # pytest includes fixtures OOB which you can use as defined on this page)
+import pytest
 
 pytest_plugins = "pytest_homeassistant_custom_component"
+@pytest.fixture(autouse=True)
+def auto_enable_custom_integrations(enable_custom_integrations):
+    """Enable custom integrations"""
+    yield
