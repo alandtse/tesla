@@ -56,6 +56,9 @@ class TeslaDevice(CoordinatorEntity):
         self._unique_id: str = slugify(self.tesla_device.uniq_name)
         self._attributes: str = self.tesla_device.attrs.copy()
         self.config_entry_id: Optional[str] = None
+        self._attr_entity_registry_enabled_default = (
+            self.tesla_device.enabled_by_default
+        )
 
     @property
     def name(self):
