@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.1 (2022-04-05)
+### Fix
+* Bump teslajsonpy to 2.0.1 ([`bab521c`](https://github.com/alandtse/tesla/commit/bab521c42bbfc62a11c5bbc0c25c5d6e5bd64e29))
+
 ## v2.0.0 (2022-03-27)
 ### Feature
 * Add trigger homelink button (disabled by default) ([#168](https://github.com/alandtse/tesla/issues/168)) ([`0a39370`](https://github.com/alandtse/tesla/commit/0a39370b40cdedaf60e88018defd2bf52afc6ea5))
