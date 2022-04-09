@@ -18,6 +18,7 @@ PLATFORMS = [
     "device_tracker",
     "switch",
     "button",
+    "select",
 ]
 
 ICONS = {
