@@ -43,7 +43,7 @@ class HeatedSeatSelect(TeslaDevice, SelectEntity):
         current_value = self.tesla_device.get_seat_heat_level()
 
         if current_value is None:
-            return None
+            return OPTIONS[0]
         return OPTIONS[current_value]
 
     @property
