@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.2 (2022-04-23)
+### Fix
+* Address sensor breaking change ([`abc98f9`](https://github.com/alandtse/tesla/commit/abc98f9757be9eec6249c5144e42334c3e6f5c3f))
+
 ## v2.0.1 (2022-04-05)
 ### Fix
 * Bump teslajsonpy to 2.0.1 ([`bab521c`](https://github.com/alandtse/tesla/commit/bab521c42bbfc62a11c5bbc0c25c5d6e5bd64e29))
