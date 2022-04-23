@@ -5,6 +5,7 @@ from homeassistant.components.select import SelectEntity
 
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
+from .helpers import wait_for_climate
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class HeatedSeatSelect(TeslaDevice, SelectEntity):
         """Change the selected option."""
         level: int = OPTIONS.index(option)
 
+        await wait_for_climate(self.hass, self.config_entry_id)
         _LOGGER.debug("Setting %s to %s", self.name, level)
         await self.tesla_device.set_seat_heat_level(level)
         self.async_write_ha_state()

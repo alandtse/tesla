@@ -1,15 +1,12 @@
 """Support for Tesla charger switches."""
 from custom_components.tesla_custom.const import ICONS
 import logging
-import asyncio
-import async_timeout
 
 from homeassistant.components.switch import SwitchEntity
 
-from .climate import HVAC_MODE_HEAT_COOL
-
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
+from .helpers import wait_for_climate
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +35,7 @@ class HeatedSteeringWheelSwitch(TeslaDevice, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         _LOGGER.debug("Turn on Heating Steering Wheel: %s", self.name)
-        await self.wait_for_climate()
+        await wait_for_climate(self.hass, self.config_entry_id)
         await self.tesla_device.set_steering_wheel_heat(True)
         self.async_write_ha_state()
 
@@ -54,31 +51,10 @@ class HeatedSteeringWheelSwitch(TeslaDevice, SwitchEntity):
         """Get whether the switch is in on state."""
         return self.tesla_device.get_steering_wheel_heat()
 
-    async def wait_for_climate(self):
-        """Wait for Aircon."""
-
-        entry_data = self.hass.data[TESLA_DOMAIN][self.config_entry_id]
-        climate_devices = entry_data["devices"].get("climate", [])
-
-        if len(climate_devices) > 0:
-            climate_device = climate_devices[0]
-        else:
-            return False
-
-        async with async_timeout.timeout(30):
-            while True:
-                hvac_mode = climate_device.is_hvac_enabled()
-
-                if hvac_mode is True:
-                    _LOGGER.debug("HVAC Enabled")
-                    return True
-                else:
-                    _LOGGER.info("Enabing Climate to activate Heated Steering Wheel")
-                    await climate_device.set_status(True)
-
-                await asyncio.sleep(1)
-
-        return False
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return ICONS.get("heated steering wheel")
 
 
 class ChargerSwitch(TeslaDevice, SwitchEntity):
