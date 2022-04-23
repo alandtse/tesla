@@ -20,6 +20,7 @@ from .helpers import get_device
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
+import pprint
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -143,6 +144,15 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         # this does not cause an api call, but instead enabled the undering device
         # to read from the shared climate data cache in the teslajsonpy library.
 
+        # First, we need to force the controller to update, as the refresh functions asume it
+        # has been uddated.
+        # We have to manually update the controller becuase changing the HVAC state only updates its state in Home assistant,
+        # and not the underlying cache in cliamte_parms. This does mean we talk to Tesla, but we only do so Once.
+
+        await self.tesla_device._controller.update(
+            self.tesla_device._id, wake_if_asleep=False, force=True
+        )
+
         climate_devices = [
             ["switch", "heated steering switch"],
             ["select", "heated seat left"],
@@ -153,6 +163,8 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         ]
 
         for c_device in climate_devices:
+            _LOGGER.debug("Refreshing Device: %s.%s", c_device[0], c_device[1])
+
             device = await get_device(
                 self.hass, self.config_entry_id, c_device[0], c_device[1]
             )
@@ -160,4 +172,6 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
                 class_name = device.__class__.__name__
                 attr_str = f"_{class_name}__manual_update_time"
                 setattr(device, attr_str, 0)
-                await device.async_update(force=True, wake_if_asleep=False)
+
+                # Does not cause an API call.
+                device.refresh()
