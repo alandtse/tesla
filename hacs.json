@@ -11,7 +11,7 @@
     "button"
   ],
   "iot_class": "Cloud Polling",
-  "homeassistant": "2021.4.0",
+  "homeassistant": "2021.9.0",
   "zip_release": true,
   "filename": "tesla_custom.zip"
 }
