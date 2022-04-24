@@ -15,6 +15,7 @@ from teslajsonpy.exceptions import UnknownPresetMode
 
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
+from .helpers import get_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -97,6 +98,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
             await self.tesla_device.set_status(False)
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self.tesla_device.set_status(True)
+        await self.update_climate_related_devices()
         self.async_write_ha_state()
 
     @TeslaDevice.Decorators.check_for_reauth
@@ -124,3 +126,51 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         Requires SUPPORT_PRESET_MODE.
         """
         return self.tesla_device.preset_modes
+
+    async def update_climate_related_devices(self):
+        """Reset the Manual Update time on climate related devices.
+
+        This way, their states are correctly reflected if they are dependant on the Climate state.
+        """
+
+        # This is really gross, and i kinda hate it.
+        # but its the only way i could figure out how to force an update on the underlying device
+        # thats in the teslajsonpy library.
+        # This could be fixed by doing a pr in the underlying library,
+        # but is ok for now.
+
+        # This works by reseting the last update time in the underlying device.
+        # this does not cause an api call, but instead enabled the undering device
+        # to read from the shared climate data cache in the teslajsonpy library.
+
+        # First, we need to force the controller to update, as the refresh functions asume it
+        # has been uddated.
+        # We have to manually update the controller becuase changing the HVAC state only updates its state in Home assistant,
+        # and not the underlying cache in cliamte_parms. This does mean we talk to Tesla, but we only do so Once.
+
+        await self.tesla_device._controller.update(
+            self.tesla_device._id, wake_if_asleep=False, force=True
+        )
+
+        climate_devices = [
+            ["switch", "heated steering switch"],
+            ["select", "heated seat left"],
+            ["select", "heated seat right"],
+            ["select", "heated seat rear_left"],
+            ["select", "heated seat rear_center"],
+            ["select", "heated seat rear_right"],
+        ]
+
+        for c_device in climate_devices:
+            _LOGGER.debug("Refreshing Device: %s.%s", c_device[0], c_device[1])
+
+            device = await get_device(
+                self.hass, self.config_entry_id, c_device[0], c_device[1]
+            )
+            if device is not None:
+                class_name = device.__class__.__name__
+                attr_str = f"_{class_name}__manual_update_time"
+                setattr(device, attr_str, 0)
+
+                # Does not cause an API call.
+                device.refresh()
