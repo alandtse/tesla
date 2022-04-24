@@ -2,7 +2,7 @@
   "domain": "tesla_custom",
   "name": "Tesla Custom Integration",
   "config_flow": true,
-  "documentation": "https://github.com/alandtse/tesla",
+  "documentation": "https://github.com/alandtse/tesla/wiki",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "requirements": ["teslajsonpy==2.0.2"],
   "codeowners": ["@alandtse"],
