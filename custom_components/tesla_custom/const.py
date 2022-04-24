@@ -18,6 +18,7 @@ PLATFORMS = [
     "device_tracker",
     "switch",
     "button",
+    "select",
 ]
 
 ICONS = {
@@ -37,6 +38,7 @@ ICONS = {
     "flash lights": "mdi:car-light-high",
     "trigger homelink": "mdi:garage",
     "solar panel": "mdi:solar-panel",
+    "heated steering wheel": "mdi:steering",
 }
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
 AUTH_CALLBACK_NAME = "auth:tesla:callback"

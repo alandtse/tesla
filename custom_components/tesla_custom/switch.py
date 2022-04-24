@@ -6,6 +6,7 @@ from homeassistant.components.switch import SwitchEntity
 
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
+from .helpers import wait_for_climate
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +23,38 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
             entities.append(SentryModeSwitch(device, coordinator))
+        elif device.type == "heated steering switch":
+            entities.append(HeatedSteeringWheelSwitch(device, coordinator))
     async_add_entities(entities, True)
+
+
+class HeatedSteeringWheelSwitch(TeslaDevice, SwitchEntity):
+    """Representation of a Tesla Heated Steering Wheel switch."""
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_on(self, **kwargs):
+        """Send the on command."""
+        _LOGGER.debug("Turn on Heating Steering Wheel: %s", self.name)
+        await wait_for_climate(self.hass, self.config_entry_id)
+        await self.tesla_device.set_steering_wheel_heat(True)
+        self.async_write_ha_state()
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_off(self, **kwargs):
+        """Send the off command."""
+        _LOGGER.debug("Turn off Heating Steering Wheel: %s", self.name)
+        await self.tesla_device.set_steering_wheel_heat(False)
+        self.async_write_ha_state()
+
+    @property
+    def is_on(self):
+        """Get whether the switch is in on state."""
+        return self.tesla_device.get_steering_wheel_heat()
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return ICONS.get("heated steering wheel")
 
 
 class ChargerSwitch(TeslaDevice, SwitchEntity):
