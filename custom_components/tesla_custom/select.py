@@ -30,6 +30,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class HeatedSeatSelect(TeslaDevice, SelectEntity):
     """Representation of a Tesla Heated Seat Select."""
 
+    @TeslaDevice.Decorators.check_for_reauth
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
         level: int = OPTIONS.index(option)
