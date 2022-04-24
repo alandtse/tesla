@@ -20,7 +20,6 @@ from .helpers import get_device
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
-import pprint
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
