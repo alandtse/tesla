@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.0 (2022-04-24)
+### Feature
+* Add support for Heated Steering Wheel and Seats ([#188](https://github.com/alandtse/tesla/issues/188)) ([`c052539`](https://github.com/alandtse/tesla/commit/c0525396acaa3f8548632e8bef3c8c5210f25387))
+
+### Fix
+* Bump dependencies ([`7dc5779`](https://github.com/alandtse/tesla/commit/7dc57792bd8df00c1b5ab7a58b32fe043eb08a83))
+
 ## v2.0.2 (2022-04-23)
 ### Fix
 * Address sensor breaking change ([`abc98f9`](https://github.com/alandtse/tesla/commit/abc98f9757be9eec6249c5144e42334c3e6f5c3f))
