@@ -1372,7 +1372,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "2.0.2"
+version = "2.0.3"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -1531,7 +1531,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "ae83f795ddbf3f0f6bf55123e88a1b61dc363e97834ab167c2f20c5bb4016faf"
+content-hash = "9abc20cd5c52459b25e51bf51a583b76d993aa317be8853e15b034bb6dee8324"
 
 [metadata.files]
 aiohttp = [
@@ -2500,8 +2500,8 @@ termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-2.0.2-py3-none-any.whl", hash = "sha256:5d4becd99670449b8fa2316043210607075866c2dde53d38d4fca9af712e897e"},
-    {file = "teslajsonpy-2.0.2.tar.gz", hash = "sha256:ee5b2c9a8c4c81a44d827e795b2637e447cded47c6564a74ecd29a773fd86f6d"},
+    {file = "teslajsonpy-2.0.3-py3-none-any.whl", hash = "sha256:f7cfb6661fdfe5d463c0737a628a3d6a14911c5adb20b45fe93370e4e8e0bc05"},
+    {file = "teslajsonpy-2.0.3.tar.gz", hash = "sha256:09eabcad4d300a4a865640a4b3a709ccc9b65e9777cf4a5f78a1102e053476d7"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
