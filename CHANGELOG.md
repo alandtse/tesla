@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.1 (2022-04-24)
+### Fix
+* Bump teslajsonpy to 2.0.3 ([`5ca3899`](https://github.com/alandtse/tesla/commit/5ca3899491ef10535e963d511855f7cfba63c3ed))
+
+### Documentation
+* Change HA documentation link to wiki ([`98650f4`](https://github.com/alandtse/tesla/commit/98650f4c8656b5476bc2f48dded1786d110b1ffe))
+
 ## v2.1.0 (2022-04-24)
 ### Feature
 * Add support for Heated Steering Wheel and Seats ([#188](https://github.com/alandtse/tesla/issues/188)) ([`c052539`](https://github.com/alandtse/tesla/commit/c0525396acaa3f8548632e8bef3c8c5210f25387))
