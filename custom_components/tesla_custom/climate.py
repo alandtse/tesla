@@ -11,15 +11,28 @@ from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS, TEMP_FAHRENHEIT
+from homeassistant.util import slugify
+
 from teslajsonpy.exceptions import UnknownPresetMode
 
 from . import DOMAIN as TESLA_DOMAIN
 from .tesla_device import TeslaDevice
-from .helpers import get_device
+from .helpers import get_device, enable_entity
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
+
+CLIMATE_DEVICES = [
+    ["switch", "heated steering switch", "steering_wheel_heater"],
+    ["select", "heated seat left", "seat_heater_left"],
+    ["select", "heated seat right", "seat_heater_right"],
+    ["select", "heated seat rear_left", "seat_heater_rear_left"],
+    ["select", "heated seat rear_center", "seat_heater_rear_center"],
+    ["select", "heated seat rear_right", "seat_heater_rear_right"],
+    ["select", "heated seat third_row_left", "seat_heater_third_row_left"],
+    ["select", "heated seat third_row_right", "seat_heater_third_row_right"],
+]
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -40,6 +53,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class TeslaThermostat(TeslaDevice, ClimateEntity):
     """Representation of a Tesla climate."""
+
+    def __init__(self, tesla_device, coordinator):
+        """Initialize of the sensor."""
+        super().__init__(tesla_device, coordinator)
+        self._entities_enabled = False
 
     @property
     def supported_features(self):
@@ -127,6 +145,43 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         """
         return self.tesla_device.preset_modes
 
+    def refresh(self) -> None:
+        """Refresh data."""
+
+        super().refresh()
+
+        if self._entities_enabled:
+            # Already enabled all required entities before.
+            return
+
+        vin = self.tesla_device.vin()
+
+        # Get all the climate parameters so we can determine what is supported by this vin.
+        climate_params = self.tesla_device._controller.get_climate_params(vin=vin)
+        if climate_params is None or len(climate_params) == 0:
+            # No data available
+            _LOGGER.debug("No data available for vin %s", vin)
+            return
+
+        # Loop through the climate devices
+        for c_device in CLIMATE_DEVICES:
+            if climate_params.get(c_device[2], None) is None:
+                # This climate device is not available.
+                _LOGGER.debug(
+                    "Device %s (%s) not available for vin %s",
+                    c_device[1],
+                    c_device[2],
+                    vin,
+                )
+                continue
+
+            # Determine unique id for this entity.
+            unique_id = slugify(
+                f"Tesla Model {str(vin[3]).upper()} {vin[-6:]} {c_device[1]}"
+            )
+            enable_entity(self.hass, c_device[0], TESLA_DOMAIN, unique_id)
+        self._entities_enabled = True
+
     async def update_climate_related_devices(self):
         """Reset the Manual Update time on climate related devices.
 
@@ -152,16 +207,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
             self.tesla_device._id, wake_if_asleep=False, force=True
         )
 
-        climate_devices = [
-            ["switch", "heated steering switch"],
-            ["select", "heated seat left"],
-            ["select", "heated seat right"],
-            ["select", "heated seat rear_left"],
-            ["select", "heated seat rear_center"],
-            ["select", "heated seat rear_right"],
-        ]
-
-        for c_device in climate_devices:
+        for c_device in CLIMATE_DEVICES:
             _LOGGER.debug("Refreshing Device: %s.%s", c_device[0], c_device[1])
 
             device = await get_device(
