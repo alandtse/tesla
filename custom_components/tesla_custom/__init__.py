@@ -191,23 +191,18 @@ async def async_setup_entry(hass, config_entry):
     coordinator = TeslaDataUpdateCoordinator(
         hass, config_entry=config_entry, controller=controller
     )
+
+    cars = await controller.get_vehicles()
+
     # Fetch initial data so we have data when entities subscribe
     entry_data = hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
-        "devices": defaultdict(list),
+        "cars": cars,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")
 
     await coordinator.async_config_entry_first_refresh()
-
-    all_devices = controller.get_homeassistant_components()
-
-    if not all_devices:
-        return False
-
-    for device in all_devices:
-        entry_data["devices"][device.hass_type].append(device)
 
     hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
 
@@ -250,7 +245,7 @@ async def update_listener(hass, config_entry):
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Tesla data."""
 
-    def __init__(self, hass, *, config_entry, controller):
+    def __init__(self, hass, *, config_entry, controller: TeslaAPI):
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
