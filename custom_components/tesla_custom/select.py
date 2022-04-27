@@ -2,6 +2,7 @@
 import logging
 
 from homeassistant.components.select import SelectEntity
+from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .base import TeslaBaseEntity
@@ -28,13 +29,13 @@ SEAT_ID_MAP = {
 }
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities = []
     for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
         for seat_name in SEAT_ID_MAP.keys():
-            entities.append(HeatedSeatSelect(car, coordinator, seat_name))
+            entities.append(HeatedSeatSelect(hass, car, coordinator, seat_name))
 
     async_add_entities(entities, True)
 
@@ -43,16 +44,23 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
     """Representation of a Tesla Heated Seat Select."""
 
     def __init__(
-        self, car: dict, coordinator: TeslaDataUpdateCoordinator, seat_name: str
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
+        seat_name: str,
     ):
         """Initialize a heated seat for the vehicle."""
-        super().__init__(car, coordinator)
+        super().__init__(hass, car, coordinator)
 
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
 
         # For 3rd row disable by default
-        if self._seat_name in ["third_row_left", "third_row_right"]:
+        if (
+            self._seat_name in ["third_row_left", "third_row_right"]
+            and self.car.config.get("third_row_seats") is not None
+        ):
             self._enabled_by_default = False
 
     async def async_select_option(self, option: str, **kwargs):
@@ -71,6 +79,7 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
         if data and data["response"]["result"]:
             self.car.climate[self._seat_key] = level
 
+        await self.update_controller(force=True)
         self.async_write_ha_state()
 
     @property

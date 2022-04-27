@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from homeassistant.const import ATTR_BATTERY_CHARGING, ATTR_BATTERY_LEVEL
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import async_get_registry
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
@@ -19,10 +19,13 @@ _LOGGER = logging.getLogger(__name__)
 class TeslaBaseEntity(CoordinatorEntity):
     """Representation of a Tesla device."""
 
-    def __init__(self, car: dict, coordinator: TeslaDataUpdateCoordinator):
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ):
         """Initialise the Tesla device."""
         super().__init__(coordinator)
         self._coordinator = coordinator
+        self.hass = hass
 
         self.car = TeslaCar(car, coordinator)
 
@@ -55,6 +58,19 @@ class TeslaBaseEntity(CoordinatorEntity):
             )
 
         return self._unique_id
+
+    async def update_controller(self, *, wake_if_asleep=False, force=True):
+        """Get the latest data from Tesla.
+
+        This does a controller update,
+        then a coordinator update.
+        """
+
+        await self._coordinator.controller.update(
+            self.car.id, wake_if_asleep=wake_if_asleep, force=force
+        )
+        await self._coordinator.async_refresh()
+        self.refresh()
 
     def refresh(self) -> None:
         """Refresh the vehicle data.
@@ -95,11 +111,25 @@ class TeslaBaseEntity(CoordinatorEntity):
             "sw_version": self.car.version,
         }
 
+    @property
+    def assumed_state(self) -> bool:
+        # pylint: disable=protected-access
+        """Return whether the data is from an online vehicle."""
+        return not self._coordinator.controller.car_online[self.car.vin] and (
+            self._coordinator.controller._last_update_time[self.car.vin]
+            - self._coordinator.controller._last_wake_up_time[self.car.vin]
+            > self._coordinator.controller.update_interval
+        )
+
+    @property
+    def attribution(self) -> bool:
+        """Return Data Attribution."""
+        return "Data provided by Tesla"
+
     async def async_added_to_hass(self):
         """Register state update callback."""
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
         registry = await async_get_registry(self.hass)
-        _LOGGER.debug("Test")
         # self.config_entry_id = registry.entities.get(self.entity_id).config_entry_id
 
 
