@@ -2,13 +2,6 @@
 
 <!--next-version-placeholder-->
 
-## v2.1.2 (2022-04-30)
-
-### Feature
-
-- Add support for 3rd row Heated Seats ([#205](https://github.com/alandtse/tesla/issues/205)) ([`merge commit`](https://github.com/alandtse/tesla/commit/c0525396acaa3f8548632e8bef3c8c5210f25387))
-- Only enable Heated seats and Heated Steering Wheel entities that are supported by vehicle
-
 ## v2.1.1 (2022-04-24)
 
 ### Fix
