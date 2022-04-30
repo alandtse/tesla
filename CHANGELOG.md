@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.0 (2022-04-30)
+### Feature
+* Enable heated seat and steering wheel entities automatically ([#205](https://github.com/alandtse/tesla/issues/205)) ([`ed975f3`](https://github.com/alandtse/tesla/commit/ed975f35fb7c6d33f2dc4b96a6862374279fe091))
+
 ## v2.1.1 (2022-04-24)
 
 ### Fix
