@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.1 (2022-05-02)
+### Fix
+* Check vin before adjusting climate devices ([#208](https://github.com/alandtse/tesla/issues/208)) ([`5c81955`](https://github.com/alandtse/tesla/commit/5c819554ef3d81446066262b4435066d17cf7a96))
+
 ## v2.2.0 (2022-04-30)
 ### Feature
 * Enable heated seat and steering wheel entities automatically ([#205](https://github.com/alandtse/tesla/issues/205)) ([`ed975f3`](https://github.com/alandtse/tesla/commit/ed975f35fb7c6d33f2dc4b96a6862374279fe091))
