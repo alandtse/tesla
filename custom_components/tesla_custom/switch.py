@@ -35,7 +35,10 @@ class HeatedSteeringWheelSwitch(TeslaDevice, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         _LOGGER.debug("Turn on Heating Steering Wheel: %s", self.name)
-        await wait_for_climate(self.hass, self.config_entry_id)
+
+        vin = self.tesla_device.vin()
+        await wait_for_climate(self.hass, self.config_entry_id, vin)
+
         await self.tesla_device.set_steering_wheel_heat(True)
         self.async_write_ha_state()
 
