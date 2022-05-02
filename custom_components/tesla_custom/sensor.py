@@ -8,105 +8,166 @@ from homeassistant.const import (
     TEMP_CELSIUS,
     TEMP_FAHRENHEIT,
 )
+from homeassistant.core import HomeAssistant
 from homeassistant.util.distance import convert
 
-from . import DOMAIN as TESLA_DOMAIN
-from .tesla_device import TeslaDevice
+from .const import DOMAIN
+from .base import TeslaBaseEntity
+from . import TeslaDataUpdateCoordinator
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Set up the Tesla binary_sensors by config_entry."""
-    coordinator = hass.data[TESLA_DOMAIN][config_entry.entry_id]["coordinator"]
+async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
+    """Set up the Tesla Sensors by config_entry."""
+    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+
     entities = []
-    for device in hass.data[TESLA_DOMAIN][config_entry.entry_id]["devices"]["sensor"]:
-        if device.type == "temperature sensor":
-            entities.append(TeslaSensor(device, coordinator, "inside"))
-            entities.append(TeslaSensor(device, coordinator, "outside"))
-        else:
-            entities.append(TeslaSensor(device, coordinator))
+    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+        entities.append(TeslaBattery(hass, car, coordinator))
+        entities.append(TeslaChargerRate(hass, car, coordinator))
+
     async_add_entities(entities, True)
 
 
-class TeslaSensor(TeslaDevice, SensorEntity):
-    """Representation of Tesla sensors."""
+# async def async_setup_entry(hass, config_entry, async_add_entities):
+#     """Set up the Tesla binary_sensors by config_entry."""
+#     coordinator = hass.data[TESLA_DOMAIN][config_entry.entry_id]["coordinator"]
+#     entities = []
+#     for device in hass.data[TESLA_DOMAIN][config_entry.entry_id]["devices"]["sensor"]:
+#         if device.type == "temperature sensor":
+#             entities.append(TeslaSensor(device, coordinator, "inside"))
+#             entities.append(TeslaSensor(device, coordinator, "outside"))
+#         else:
+#             entities.append(TeslaSensor(device, coordinator))
+#     async_add_entities(entities, True)
 
-    def __init__(self, tesla_device, coordinator, sensor_type=None):
-        """Initialize of the sensor."""
-        super().__init__(tesla_device, coordinator)
-        self.type = sensor_type
-        if self.type:
-            self._name = f"{super().name} ({self.type})"
-            self._unique_id = f"{super().unique_id}_{self.type}"
 
-    @property
-    def native_value(self) -> float | None:
-        """Return the native_value of the sensor."""
-        if self.tesla_device.type == "temperature sensor":
-            if self.type == "outside":
-                return self.tesla_device.get_outside_temp()
-            return self.tesla_device.get_inside_temp()
-        if self.tesla_device.type in ["range sensor", "mileage sensor"]:
-            units = self.tesla_device.measurement
-            if units == "LENGTH_MILES":
-                return self.tesla_device.get_value()
-            return round(
-                convert(self.tesla_device.get_value(), LENGTH_MILES, LENGTH_KILOMETERS),
-                2,
-            )
-        if self.tesla_device.type == "charging rate sensor":
-            return self.tesla_device.charging_rate
-        return self.tesla_device.get_value()
+class TeslaBattery(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Battery Sensor."""
 
-    @property
-    def native_unit_of_measurement(self) -> str | None:
-        """Return the native_unit_of_measurement of the device."""
-        units = self.tesla_device.measurement
-        if units == "F":
-            return TEMP_FAHRENHEIT
-        if units == "C":
-            return TEMP_CELSIUS
-        if units == "LENGTH_MILES":
-            return LENGTH_MILES
-        if units == "LENGTH_KILOMETERS":
-            return LENGTH_KILOMETERS
-        return units
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "battery sensor"
+        self._attr_device_class = "battery"
+        self._attr_state_class = "measurement"
+        self._attr_icon = "mdi:battery"
+
+    @staticmethod
+    def has_battery() -> bool:
+        """Return whether the device has a battery."""
+        return True
 
     @property
-    def device_class(self) -> str | None:
-        """Return the device_class of the device."""
-        return (
-            self.tesla_device.device_class
-            if self.tesla_device.device_class in DEVICE_CLASSES
-            else None
-        )
+    def native_value(self) -> int:
+        """Return the battery level."""
+        return self.car.charging.get("battery_level")
+
+
+class TeslaChargerRate(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Charging Rate."""
+
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "charging rate sensor"
+        self._attr_state_class = "measurement"
+        self._attr_icon = "mdi:speedometer"
+
+    @staticmethod
+    def has_battery() -> bool:
+        """Return whether the device has a battery."""
+        return True
 
     @property
-    def state_class(self) -> str | None:
-        """Return the state_class of the device."""
-        try:
-            return (
-                self.tesla_device.state_class
-                if self.tesla_device.state_class in STATE_CLASSES
-                else None
-            )
-        except AttributeError:
-            return None
+    def native_value(self) -> int:
+        """Return the battery level."""
+        return self.car.charging.get("battery_level")
 
-    @property
-    def extra_state_attributes(self):
-        """Return the state attributes of the device."""
-        attr = self._attributes.copy()
-        if self.tesla_device.type == "charging rate sensor":
-            attr.update(
-                {
-                    "time_left": self.tesla_device.time_left,
-                    "added_range": self.tesla_device.added_range,
-                    "charge_energy_added": self.tesla_device.charge_energy_added,
-                    "charge_current_request": self.tesla_device.charge_current_request,
-                    "charge_current_request_max": self.tesla_device.charge_current_request_max,
-                    "charger_actual_current": self.tesla_device.charger_actual_current,
-                    "charger_voltage": self.tesla_device.charger_voltage,
-                    "charger_power": self.tesla_device.charger_power,
-                }
-            )
-        return attr
+
+# class TeslaSensor(TeslaDevice, SensorEntity):
+#     """Representation of Tesla sensors."""
+
+#     def __init__(self, tesla_device, coordinator, sensor_type=None):
+#         """Initialize of the sensor."""
+#         super().__init__(tesla_device, coordinator)
+#         self.type = sensor_type
+#         if self.type:
+#             self._name = f"{super().name} ({self.type})"
+#             self._unique_id = f"{super().unique_id}_{self.type}"
+
+#     @property
+#     def native_value(self) -> float | None:
+#         """Return the native_value of the sensor."""
+#         if self.tesla_device.type == "temperature sensor":
+#             if self.type == "outside":
+#                 return self.tesla_device.get_outside_temp()
+#             return self.tesla_device.get_inside_temp()
+#         if self.tesla_device.type in ["range sensor", "mileage sensor"]:
+#             units = self.tesla_device.measurement
+#             if units == "LENGTH_MILES":
+#                 return self.tesla_device.get_value()
+#             return round(
+#                 convert(self.tesla_device.get_value(), LENGTH_MILES, LENGTH_KILOMETERS),
+#                 2,
+#             )
+#         if self.tesla_device.type == "charging rate sensor":
+#             return self.tesla_device.charging_rate
+#         return self.tesla_device.get_value()
+
+#     @property
+#     def native_unit_of_measurement(self) -> str | None:
+#         """Return the native_unit_of_measurement of the device."""
+#         units = self.tesla_device.measurement
+#         if units == "F":
+#             return TEMP_FAHRENHEIT
+#         if units == "C":
+#             return TEMP_CELSIUS
+#         if units == "LENGTH_MILES":
+#             return LENGTH_MILES
+#         if units == "LENGTH_KILOMETERS":
+#             return LENGTH_KILOMETERS
+#         return units
+
+#     @property
+#     def device_class(self) -> str | None:
+#         """Return the device_class of the device."""
+#         return (
+#             self.tesla_device.device_class
+#             if self.tesla_device.device_class in DEVICE_CLASSES
+#             else None
+#         )
+
+#     @property
+#     def state_class(self) -> str | None:
+#         """Return the state_class of the device."""
+#         try:
+#             return (
+#                 self.tesla_device.state_class
+#                 if self.tesla_device.state_class in STATE_CLASSES
+#                 else None
+#             )
+#         except AttributeError:
+#             return None
+
+#     @property
+#     def extra_state_attributes(self):
+#         """Return the state attributes of the device."""
+#         attr = self._attributes.copy()
+#         if self.tesla_device.type == "charging rate sensor":
+#             attr.update(
+#                 {
+#                     "time_left": self.tesla_device.time_left,
+#                     "added_range": self.tesla_device.added_range,
+#                     "charge_energy_added": self.tesla_device.charge_energy_added,
+#                     "charge_current_request": self.tesla_device.charge_current_request,
+#                     "charge_current_request_max": self.tesla_device.charge_current_request_max,
+#                     "charger_actual_current": self.tesla_device.charger_actual_current,
+#                     "charger_voltage": self.tesla_device.charger_voltage,
+#                     "charger_power": self.tesla_device.charger_power,
+#                 }
+#             )
+#         return attr

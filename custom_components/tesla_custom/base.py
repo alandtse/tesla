@@ -89,11 +89,12 @@ class TeslaBaseEntity(CoordinatorEntity):
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
         attr = self._attributes
-        if self.car.charging != {}:
-            attr[ATTR_BATTERY_LEVEL] = self.car.charging.get("battery_level")
-            attr[ATTR_BATTERY_CHARGING] = (
-                self.car.charging.get("charging_state") == "Charging"
-            )
+        ### This can probably be removed. it was a stub from this
+        # if self.car.charging != {}:
+        #     attr[ATTR_BATTERY_LEVEL] = self.car.charging.get("battery_level")
+        #     attr[ATTR_BATTERY_CHARGING] = (
+        #         self.car.charging.get("charging_state") == "Charging"
+        #     )
         return attr
 
     @property
