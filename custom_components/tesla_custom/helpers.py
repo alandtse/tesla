@@ -19,6 +19,7 @@ async def get_device(
     config_entry_id: str,
     device_category: str,
     device_type: str,
+    vin: str,
 ):
     """Get a tesla Device for a Config Entry ID."""
 
@@ -26,7 +27,7 @@ async def get_device(
     devices = entry_data["devices"].get(device_category, [])
 
     for device in devices:
-        if device.type == device_type:
+        if device.type == device_type and device.vin() == vin:
             return device
 
     return None
@@ -68,14 +69,14 @@ def enable_entity(
 
 
 async def wait_for_climate(
-    hass: HomeAssistant, config_entry_id: str, timeout: int = 30
+    hass: HomeAssistant, config_entry_id: str, vin: str, timeout: int = 30
 ):
     """Wait for HVac.
 
     Optional Timeout. defaults to 30 seconds
     """
     climate_device = await get_device(
-        hass, config_entry_id, "climate", "HVAC (climate) system"
+        hass, config_entry_id, "climate", "HVAC (climate) system", vin
     )
 
     if climate_device is None:
