@@ -28,7 +28,7 @@ async def get_device(
 
     for device in devices:
         # pylint: disable=protected-access
-        if device.type == device_type and device._vin == vin:
+        if device.type == device_type and device.vin() == vin:
             return device
 
     return None

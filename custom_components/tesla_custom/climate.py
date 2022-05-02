@@ -157,6 +157,7 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         vin = self.tesla_device.vin()
 
         # Get all the climate parameters so we can determine what is supported by this vin.
+        # pylint: disable=protected-access
         climate_params = self.tesla_device._controller.get_climate_params(vin=vin)
         if climate_params is None or len(climate_params) == 0:
             # No data available
@@ -203,15 +204,18 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
         # We have to manually update the controller becuase changing the HVAC state only updates its state in Home assistant,
         # and not the underlying cache in cliamte_parms. This does mean we talk to Tesla, but we only do so Once.
 
+        # pylint: disable=protected-access
         await self.tesla_device._controller.update(
             self.tesla_device._id, wake_if_asleep=False, force=True
         )
+
+        vin = self.tesla_device.vin()
 
         for c_device in CLIMATE_DEVICES:
             _LOGGER.debug("Refreshing Device: %s.%s", c_device[0], c_device[1])
 
             device = await get_device(
-                self.hass, self.config_entry_id, c_device[0], c_device[1]
+                self.hass, self.config_entry_id, c_device[0], c_device[1], vin
             )
             if device is not None:
                 class_name = device.__class__.__name__

@@ -35,8 +35,8 @@ class HeatedSeatSelect(TeslaDevice, SelectEntity):
         """Change the selected option."""
         level: int = OPTIONS.index(option)
 
-        # pylint: disable=protected-access
-        await wait_for_climate(self.hass, self.config_entry_id, self.tesla_device._vin)
+        vin = self.tesla_device.vin()
+        await wait_for_climate(self.hass, self.config_entry_id, vin)
         _LOGGER.debug("Setting %s to %s", self.name, level)
         await self.tesla_device.set_seat_heat_level(level)
         self.async_write_ha_state()
