@@ -4,9 +4,15 @@
   "config_flow": true,
   "documentation": "https://github.com/alandtse/tesla/wiki",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
-  "requirements": ["teslajsonpy==2.0.3"],
-  "codeowners": ["@alandtse"],
-  "dependencies": ["http"],
+  "requirements": [
+    "git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==2.2.0"
+  ],
+  "codeowners": [
+    "@alandtse"
+  ],
+  "dependencies": [
+    "http"
+  ],
   "dhcp": [
     {
       "hostname": "tesla_*",

@@ -29,7 +29,7 @@ class TeslaUpdate(TeslaBaseEntity, UpdateEntity):
     """Tesla Update Entity."""
 
     def __init__(
-        self, hass: HomeAssistant, car: Any, coordinator: TeslaDataUpdateCoordinator
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
     ) -> None:
         """Initialize the Update Entity."""
         super().__init__(hass, car, coordinator)

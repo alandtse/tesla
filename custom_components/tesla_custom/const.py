@@ -11,9 +11,9 @@ ERROR_URL_NOT_DETECTED = "url_not_detected"
 MIN_SCAN_INTERVAL = 10
 
 PLATFORMS = [
-    "sensor",
+    # "sensor",
     # "lock",
-    # "climate",
+    "climate",
     # "binary_sensor",
     # "device_tracker",
     # "switch",

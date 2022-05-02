@@ -15,6 +15,8 @@ from . import TeslaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+DEFAULT_DEVICE = "device"
+
 
 class TeslaBaseEntity(CoordinatorEntity):
     """Representation of a Tesla device."""
@@ -29,7 +31,10 @@ class TeslaBaseEntity(CoordinatorEntity):
 
         self.car = TeslaCar(car, coordinator)
 
-        self.type: str = "device"
+        # reset the device type. If its not already set, it sets it to the
+        # default device.
+        self.type: str = getattr(self, "type", DEFAULT_DEVICE)
+
         self.attrs: Dict[str, str] = {}
         self._enabled_by_default: bool = True
         self.config_entry_id = None
@@ -59,12 +64,23 @@ class TeslaBaseEntity(CoordinatorEntity):
 
         return self._unique_id
 
-    async def update_controller(self, *, wake_if_asleep=False, force=True):
+    async def update_controller(
+        self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
+    ):
         """Get the latest data from Tesla.
 
         This does a controller update,
         then a coordinator update.
+        This also triggers a async_write_ha_state
+
+        Setting the Blocking param to False will create a background task for the update.
         """
+
+        if blocking is False:
+            await self.hass.async_create_task(
+                self.update_controller(wake_if_asleep=wake_if_asleep, force=force)
+            )
+            return
 
         await self._coordinator.controller.update(
             self.car.id, wake_if_asleep=wake_if_asleep, force=force
@@ -132,6 +148,19 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
         registry = await async_get_registry(self.hass)
         # self.config_entry_id = registry.entities.get(self.entity_id).config_entry_id
+
+    async def _send_command(
+        self, name: str, *, path_vars: dict, wake_if_asleep: bool = False, **kwargs
+    ):
+        """Wrapper for Sending Commands to the Tesla API.
+
+        Just cleans up command functions throughout the codebase.
+        """
+        data = await self._coordinator.controller.api(
+            name, path_vars=path_vars, wake_if_asleep=wake_if_asleep, **kwargs
+        )
+
+        return data
 
 
 class TeslaCar:
