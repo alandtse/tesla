@@ -162,6 +162,11 @@ class TeslaBaseEntity(CoordinatorEntity):
 
         return data
 
+    @property
+    def available(self) -> str:
+        """Return the Availability of Data."""
+        return self.car.state != {}
+
 
 class TeslaCar:
     """Data Holder for all Car Data.
@@ -177,6 +182,7 @@ class TeslaCar:
         self.config = {}
         self.climate = {}
         self.charging = {}
+        self.gui = {}
 
     def set_car_data(self, new_data: dict) -> None:
         """Update Car Data."""
@@ -188,6 +194,7 @@ class TeslaCar:
         self.config = self.coordinator.controller.get_config_params(vin=self.vin)
         self.climate = self.coordinator.controller.get_climate_params(vin=self.vin)
         self.charging = self.coordinator.controller.get_charging_params(vin=self.vin)
+        self.gui = self.coordinator.controller.get_gui_params(vin=self.vin)
 
     @property
     def sentry_mode_available(self) -> bool:

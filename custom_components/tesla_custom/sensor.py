@@ -1,15 +1,22 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
-from homeassistant.components.sensor import DEVICE_CLASSES, STATE_CLASSES, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass,
+    SensorEntity,
+)
 from homeassistant.const import (
     LENGTH_KILOMETERS,
     LENGTH_MILES,
     TEMP_CELSIUS,
     TEMP_FAHRENHEIT,
+    ENERGY_KILO_WATT_HOUR,
+    PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.util.distance import convert
+from homeassistant.helpers.icon import icon_for_battery_level
 
 from .const import DOMAIN
 from .base import TeslaBaseEntity
@@ -24,6 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
         entities.append(TeslaBattery(hass, car, coordinator))
         entities.append(TeslaChargerRate(hass, car, coordinator))
+        entities.append(TeslaChargerEnergy(hass, car, coordinator))
+        entities.append(TeslaMileage(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -50,8 +59,9 @@ class TeslaBattery(TeslaBaseEntity, SensorEntity):
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
         self.type = "battery sensor"
-        self._attr_device_class = "battery"
-        self._attr_state_class = "measurement"
+        self._attr_device_class = SensorDeviceClass.BATTERY
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = PERCENTAGE
         self._attr_icon = "mdi:battery"
 
     @staticmethod
@@ -64,6 +74,16 @@ class TeslaBattery(TeslaBaseEntity, SensorEntity):
         """Return the battery level."""
         return self.car.charging.get("battery_level")
 
+    @property
+    def icon(self):
+        """Return the icon for the battery."""
+
+        charging = self.car.charging.get("charging_state") == "Charging"
+
+        return icon_for_battery_level(
+            battery_level=self.native_value, charging=charging
+        )
+
 
 class TeslaChargerRate(TeslaBaseEntity, SensorEntity):
     """Representation of the Tesla Charging Rate."""
@@ -74,100 +94,126 @@ class TeslaChargerRate(TeslaBaseEntity, SensorEntity):
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charging rate sensor"
-        self._attr_state_class = "measurement"
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:speedometer"
 
-    @staticmethod
-    def has_battery() -> bool:
-        """Return whether the device has a battery."""
-        return True
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return Native Unit of Measurement.
+
+        Get from Car setting
+        """
+        return self.car.gui.get("gui_distance_units", "mi/hr")
 
     @property
     def native_value(self) -> int:
-        """Return the battery level."""
-        return self.car.charging.get("battery_level")
+        """Return the battery Charge Rate."""
+        charge_rate = self.car.charging.get("charge_rate")
+
+        # If we don't have anything, just return None.
+        if charge_rate is None:
+            return charge_rate
+
+        if self.unit_of_measurement == "km/hr":
+            charge_rate = round(
+                convert(charge_rate, LENGTH_MILES, LENGTH_KILOMETERS), 2
+            )
+
+        return charge_rate
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes of the device."""
+
+        # we're going to be ref'ing this alot, so lets make a local var.
+
+        c_data = self.car.charging
+
+        added_range = c_data.get("charge_miles_added_ideal")
+
+        if self.car.gui.get("gui_range_display") == "Rated":
+            added_range = c_data.get("charge_miles_added_rated")
+
+        if self.unit_of_measurement == "km/hr":
+            added_range = round(
+                convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS), 2
+            )
+
+        data = {
+            "time_left": c_data.get("time_to_full_charge"),
+            "added_range": added_range,
+            "charge_energy_added": c_data.get("charge_energy_added"),
+            "charge_current_request": c_data.get("charge_current_request"),
+            "charge_current_request_max": c_data.get("charge_current_request_max"),
+            "charger_actual_current": c_data.get("charger_actual_current"),
+            "charger_voltage": c_data.get("charger_voltage"),
+            "charger_power": c_data.get("charger_power"),
+            "charger_phases": c_data.get("charger_phases"),
+            "charge_limit_soc": c_data.get("charge_limit_soc"),
+        }
+        self.attrs.update(data)
+        return self.attrs
 
 
-# class TeslaSensor(TeslaDevice, SensorEntity):
-#     """Representation of Tesla sensors."""
+class TeslaChargerEnergy(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Energy Added."""
 
-#     def __init__(self, tesla_device, coordinator, sensor_type=None):
-#         """Initialize of the sensor."""
-#         super().__init__(tesla_device, coordinator)
-#         self.type = sensor_type
-#         if self.type:
-#             self._name = f"{super().name} ({self.type})"
-#             self._unique_id = f"{super().unique_id}_{self.type}"
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "energy added sensor"
+        self._attr_device_class = SensorDeviceClass.ENERGY
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+        self._attr_icon = "mdi:lightning-bolt"
 
-#     @property
-#     def native_value(self) -> float | None:
-#         """Return the native_value of the sensor."""
-#         if self.tesla_device.type == "temperature sensor":
-#             if self.type == "outside":
-#                 return self.tesla_device.get_outside_temp()
-#             return self.tesla_device.get_inside_temp()
-#         if self.tesla_device.type in ["range sensor", "mileage sensor"]:
-#             units = self.tesla_device.measurement
-#             if units == "LENGTH_MILES":
-#                 return self.tesla_device.get_value()
-#             return round(
-#                 convert(self.tesla_device.get_value(), LENGTH_MILES, LENGTH_KILOMETERS),
-#                 2,
-#             )
-#         if self.tesla_device.type == "charging rate sensor":
-#             return self.tesla_device.charging_rate
-#         return self.tesla_device.get_value()
+    @property
+    def native_value(self) -> int:
+        """Return the Charge Energy Added."""
+        charge_energy_added = self.car.charging.get("charge_energy_added")
 
-#     @property
-#     def native_unit_of_measurement(self) -> str | None:
-#         """Return the native_unit_of_measurement of the device."""
-#         units = self.tesla_device.measurement
-#         if units == "F":
-#             return TEMP_FAHRENHEIT
-#         if units == "C":
-#             return TEMP_CELSIUS
-#         if units == "LENGTH_MILES":
-#             return LENGTH_MILES
-#         if units == "LENGTH_KILOMETERS":
-#             return LENGTH_KILOMETERS
-#         return units
+        return charge_energy_added
 
-#     @property
-#     def device_class(self) -> str | None:
-#         """Return the device_class of the device."""
-#         return (
-#             self.tesla_device.device_class
-#             if self.tesla_device.device_class in DEVICE_CLASSES
-#             else None
-#         )
 
-#     @property
-#     def state_class(self) -> str | None:
-#         """Return the state_class of the device."""
-#         try:
-#             return (
-#                 self.tesla_device.state_class
-#                 if self.tesla_device.state_class in STATE_CLASSES
-#                 else None
-#             )
-#         except AttributeError:
-#             return None
+class TeslaMileage(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Energy Added."""
 
-#     @property
-#     def extra_state_attributes(self):
-#         """Return the state attributes of the device."""
-#         attr = self._attributes.copy()
-#         if self.tesla_device.type == "charging rate sensor":
-#             attr.update(
-#                 {
-#                     "time_left": self.tesla_device.time_left,
-#                     "added_range": self.tesla_device.added_range,
-#                     "charge_energy_added": self.tesla_device.charge_energy_added,
-#                     "charge_current_request": self.tesla_device.charge_current_request,
-#                     "charge_current_request_max": self.tesla_device.charge_current_request_max,
-#                     "charger_actual_current": self.tesla_device.charger_actual_current,
-#                     "charger_voltage": self.tesla_device.charger_voltage,
-#                     "charger_power": self.tesla_device.charger_power,
-#                 }
-#             )
-#         return attr
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "mileage sensor"
+        self._attr_device_class = None
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_icon = "mdi:odometer"
+
+    @property
+    def native_value(self) -> int:
+        """Return the Charge Energy Added."""
+        odometer_value = self.car.state.get("odometer")
+
+        if odometer_value is None:
+            return None
+
+        if self.native_unit_of_measurement == LENGTH_KILOMETERS:
+            odometer_value = round(
+                convert(odometer_value, LENGTH_MILES, LENGTH_KILOMETERS), 2
+            )
+
+        return odometer_value
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return Native Unit of Measurement.
+
+        Get from Car setting
+        """
+        gui_uom = self.car.gui.get("gui_distance_units", "mi/hr")
+
+        if gui_uom == "mi/hr":
+            return LENGTH_MILES
+
+        return LENGTH_KILOMETERS
