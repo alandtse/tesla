@@ -3,6 +3,7 @@ import logging
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 
 from .const import DOMAIN
 from .base import TeslaBaseEntity
@@ -11,11 +12,17 @@ from .helpers import wait_for_climate
 
 _LOGGER = logging.getLogger(__name__)
 
-OPTIONS = [
+HEATER_OPTIONS = [
     "Off",
     "Low",
     "Medium",
     "High",
+]
+
+CABIN_OPTIONS = [
+    "Off",
+    "No A/C",
+    "On",
 ]
 
 SEAT_ID_MAP = {
@@ -34,7 +41,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities = []
     for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
-        for seat_name in SEAT_ID_MAP.keys():
+        entities.append(TeslaCabinOverheatProtection(hass, car, coordinator))
+
+        for seat_name in SEAT_ID_MAP:
             entities.append(HeatedSeatSelect(hass, car, coordinator, seat_name))
 
     async_add_entities(entities, True)
@@ -65,11 +74,11 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
-        level: int = OPTIONS.index(option)
+        level: int = HEATER_OPTIONS.index(option)
 
         # await wait_for_climate(self.hass, self.config_entry_id)
         _LOGGER.debug("Setting %s to %s", self.name, level)
-        data = await self._coordinator.controller.api(
+        data = await self._send_command(
             "REMOTE_SEAT_HEATER_REQUEST",
             path_vars={"vehicle_id": self.car.id},
             heater=SEAT_ID_MAP[self._seat_name],
@@ -88,8 +97,8 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
         current_value = self.car.climate.get(self._seat_key)
 
         if current_value is None:
-            return OPTIONS[0]
-        return OPTIONS[current_value]
+            return HEATER_OPTIONS[0]
+        return HEATER_OPTIONS[current_value]
 
     @property
     def _seat_key(self):
@@ -98,4 +107,50 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
     @property
     def options(self):
         """Return a set of selectable options."""
-        return OPTIONS
+        return HEATER_OPTIONS
+
+
+class TeslaCabinOverheatProtection(TeslaBaseEntity, SelectEntity):
+    """Representation of a Tesla Heated Seat Select."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
+    ):
+        """Initialize a heated seat for the vehicle."""
+        super().__init__(hass, car, coordinator)
+
+        self.type = "cabin overheat protection"
+        self._attr_options = CABIN_OPTIONS
+        self._attr_entity_category = EntityCategory.CONFIG
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+
+        if option == "Off":
+            body_on = False
+            fan_only = False
+        elif option == "No A/C":
+            body_on = True
+            fan_only = True
+        elif option == "On":
+            body_on = True
+            fan_only = False
+
+        data = await self._send_command(
+            "SET_CABIN_OVERHEAT_PROTECTION",
+            path_vars={"vehicle_id": self.car.id},
+            on=body_on,
+            fan_only=fan_only,
+            wake_if_asleep=True,
+        )
+        if data and data["response"]["result"]:
+            self.car.climate["cabin_overheat_protection"] = option
+            self.async_write_ha_state()
+
+    @property
+    def current_option(self):
+        """Return the selected entity option to represent the entity state."""
+        return self.car.climate.get("cabin_overheat_protection")

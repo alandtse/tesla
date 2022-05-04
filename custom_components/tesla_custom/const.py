@@ -20,6 +20,7 @@ PLATFORMS = [
     # "button",
     "select",
     "update",
+    "number",
 ]
 
 ICONS = {
