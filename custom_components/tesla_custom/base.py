@@ -103,7 +103,6 @@ class TeslaBaseEntity(CoordinatorEntity):
         This assumes the controller has already been updated. This should be
         called by inherited classes so the overall vehicle information is updated.
         """
-        self.car.refresh()
         self.async_write_ha_state()
 
     @property
@@ -184,25 +183,39 @@ class TeslaCar:
         self.coordinator: TeslaDataUpdateCoordinator = coordinator
         self.raw: dict = car
 
-        self.state = {}
-        self.config = {}
-        self.climate = {}
-        self.charging = {}
-        self.gui = {}
-        self.drive = {}
-
     def set_car_data(self, new_data: dict) -> None:
         """Update Car Data."""
         self.raw = new_data
 
-    def refresh(self):
-        """Refresh Car Data from the controller."""
-        self.state = self.coordinator.controller.get_state_params(vin=self.vin)
-        self.config = self.coordinator.controller.get_config_params(vin=self.vin)
-        self.climate = self.coordinator.controller.get_climate_params(vin=self.vin)
-        self.charging = self.coordinator.controller.get_charging_params(vin=self.vin)
-        self.gui = self.coordinator.controller.get_gui_params(vin=self.vin)
-        self.drive = self.coordinator.controller.get_drive_params(vin=self.vin)
+    @property
+    def state(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_state_params(vin=self.vin)
+
+    @property
+    def config(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_config_params(vin=self.vin)
+
+    @property
+    def charging(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_charging_params(vin=self.vin)
+
+    @property
+    def climate(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_climate_params(vin=self.vin)
+
+    @property
+    def gui(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_gui_params(vin=self.vin)
+
+    @property
+    def drive(self) -> dict:
+        """Return State Data."""
+        return self.coordinator.controller.get_drive_params(vin=self.vin)
 
     @property
     def sentry_mode_available(self) -> bool:
