@@ -56,6 +56,16 @@ class TeslaBaseEntity(CoordinatorEntity):
         return self._name
 
     @property
+    def car_name(self) -> str:
+        """Return the car name of this Vehicle."""
+        return (
+            self.car.display_name
+            if self.car.display_name is not None
+            and self.car.display_name != self.car.vin[-6:]
+            else f"Tesla Model {str(self.car.vin[3]).upper()}"
+        )
+
+    @property
     def unique_id(self) -> str:
         if self._unique_id is None:
             self._unique_id = slugify(
@@ -95,11 +105,6 @@ class TeslaBaseEntity(CoordinatorEntity):
         """
         self.car.refresh()
         self.async_write_ha_state()
-
-    @property
-    def icon(self):
-        """Return the icon of the sensor."""
-        return None
 
     @property
     def extra_state_attributes(self):
@@ -156,6 +161,7 @@ class TeslaBaseEntity(CoordinatorEntity):
 
         Just cleans up command functions throughout the codebase.
         """
+        _LOGGER.debug("Sending Command: %s", name)
         data = await self._coordinator.controller.api(
             name, path_vars=path_vars, wake_if_asleep=wake_if_asleep, **kwargs
         )
@@ -183,6 +189,7 @@ class TeslaCar:
         self.climate = {}
         self.charging = {}
         self.gui = {}
+        self.drive = {}
 
     def set_car_data(self, new_data: dict) -> None:
         """Update Car Data."""
@@ -195,6 +202,7 @@ class TeslaCar:
         self.climate = self.coordinator.controller.get_climate_params(vin=self.vin)
         self.charging = self.coordinator.controller.get_charging_params(vin=self.vin)
         self.gui = self.coordinator.controller.get_gui_params(vin=self.vin)
+        self.drive = self.coordinator.controller.get_drive_params(vin=self.vin)
 
     @property
     def sentry_mode_available(self) -> bool:

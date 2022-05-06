@@ -33,6 +33,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaChargerRate(hass, car, coordinator))
         entities.append(TeslaChargerEnergy(hass, car, coordinator))
         entities.append(TeslaMileage(hass, car, coordinator))
+        entities.append(TeslaRange(hass, car, coordinator))
+        entities.append(TeslaTemp(hass, car, coordinator))
+        entities.append(TeslaTemp(hass, car, coordinator, inside=True))
 
     async_add_entities(entities, True)
 
@@ -188,7 +191,7 @@ class TeslaMileage(TeslaBaseEntity, SensorEntity):
         self.type = "mileage sensor"
         self._attr_device_class = None
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_icon = "mdi:odometer"
+        self._attr_icon = "mdi:counter"
 
     @property
     def native_value(self) -> int:
@@ -217,3 +220,91 @@ class TeslaMileage(TeslaBaseEntity, SensorEntity):
             return LENGTH_MILES
 
         return LENGTH_KILOMETERS
+
+
+class TeslaRange(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Energy Added."""
+
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "range sensor"
+        self._attr_device_class = None
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:gauge"
+
+    @property
+    def native_value(self) -> int:
+        """Return the Charge Energy Added."""
+        range_value = self.car.charging.get("battery_range")
+
+        if self.car.gui.get("gui_range_display") == "Rated":
+            range_value = self.car.charging.get("ideal_battery_range")
+
+        if range_value is None:
+            return None
+
+        if self.native_unit_of_measurement == LENGTH_KILOMETERS:
+            range_value = round(
+                convert(range_value, LENGTH_MILES, LENGTH_KILOMETERS), 2
+            )
+
+        return range_value
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return Native Unit of Measurement.
+
+        Get from Car setting
+        """
+        gui_uom = self.car.gui.get("gui_distance_units", "mi/hr")
+
+        if gui_uom == "mi/hr":
+            return LENGTH_MILES
+
+        return LENGTH_KILOMETERS
+
+
+class TeslaTemp(TeslaBaseEntity, SensorEntity):
+    """Representation of the Tesla Energy Added."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
+        *,
+        inside=False,
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "temperature sensor"
+        self.inside = inside
+
+        if inside is True:
+            self.type += " (inside)"
+        else:
+            self.type += " (outside)"
+
+        self._attr_device_class = SensorDeviceClass.TEMPERATURE
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:thermometer"
+
+    @property
+    def native_value(self) -> int:
+        """Return the Charge Energy Added."""
+
+        if self.inside is True:
+            return self.car.climate.get("inside_temp")
+
+        return self.car.climate.get("outside_temp")
+
+    @property
+    def native_unit_of_measurement(self):
+        """Return the unit of measurement.
+
+        Tesla API always returns in Celsius.
+        """
+        return TEMP_CELSIUS
