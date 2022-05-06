@@ -3,24 +3,24 @@ from __future__ import annotations
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
-    SensorStateClass,
     SensorEntity,
+    SensorStateClass,
 )
 from homeassistant.const import (
+    ENERGY_KILO_WATT_HOUR,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
+    PERCENTAGE,
     TEMP_CELSIUS,
     TEMP_FAHRENHEIT,
-    ENERGY_KILO_WATT_HOUR,
-    PERCENTAGE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.util.distance import convert
 from homeassistant.helpers.icon import icon_for_battery_level
+from homeassistant.util.distance import convert
 
-from .const import DOMAIN
-from .base import TeslaBaseEntity
 from . import TeslaDataUpdateCoordinator
+from .base import TeslaBaseEntity
+from .const import DOMAIN
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):

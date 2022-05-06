@@ -4,25 +4,21 @@ SPDX-License-Identifier: Apache-2.0
 """
 
 import logging
-from homeassistant.const import CONF_EMAIL
 
-from teslajsonpy import Controller
+from homeassistant.const import ATTR_COMMAND, CONF_EMAIL, CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
+from teslajsonpy import Controller
 import voluptuous as vol
 
-from homeassistant.const import (
-    ATTR_COMMAND,
-    CONF_SCAN_INTERVAL,
-)
 from .const import (
     ATTR_PARAMETERS,
     ATTR_PATH_VARS,
     ATTR_VIN,
+    DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     SERVICE_API,
     SERVICE_SCAN_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)

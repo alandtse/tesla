@@ -5,9 +5,9 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
-from .const import DOMAIN
-from .base import TeslaBaseEntity
 from . import TeslaDataUpdateCoordinator
+from .base import TeslaBaseEntity
+from .const import DOMAIN
 from .helpers import wait_for_climate
 
 _LOGGER = logging.getLogger(__name__)

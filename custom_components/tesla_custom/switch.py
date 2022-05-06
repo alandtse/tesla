@@ -1,14 +1,13 @@
 """Support for Tesla charger switches."""
 import logging
 
-from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
+from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
-
-from .const import DOMAIN
-from .base import TeslaBaseEntity
 from . import TeslaDataUpdateCoordinator
+from .base import TeslaBaseEntity
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -10,8 +10,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 from teslajsonpy.exceptions import IncompleteCredentials
 
-from .const import DOMAIN, ICONS
 from . import TeslaDataUpdateCoordinator
+from .const import DOMAIN, ICONS
 
 _LOGGER = logging.getLogger(__name__)
 

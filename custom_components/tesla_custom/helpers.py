@@ -2,13 +2,13 @@
 
 A collection of functions which may be used accross entities
 """
-from .const import DOMAIN as TESLA_DOMAIN
-
 import asyncio
-import async_timeout
 import logging
 
+import async_timeout
 from homeassistant.core import HomeAssistant
+
+from .const import DOMAIN as TESLA_DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
