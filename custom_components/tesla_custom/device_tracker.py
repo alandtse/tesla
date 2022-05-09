@@ -1,12 +1,10 @@
 """Support for tracking Tesla cars."""
 import logging
 
-from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
-from homeassistant.helpers.entity import EntityCategory
-
-
+from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaBaseEntity
