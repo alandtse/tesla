@@ -81,7 +81,7 @@ class TeslaBaseEntity(CoordinatorEntity):
 
         This does a controller update,
         then a coordinator update.
-        This also triggers a async_write_ha_state
+        the coordinator triggers a call to the refresh function.
 
         Setting the Blocking param to False will create a background task for the update.
         """
@@ -96,10 +96,12 @@ class TeslaBaseEntity(CoordinatorEntity):
             self.car.id, wake_if_asleep=wake_if_asleep, force=force
         )
         await self._coordinator.async_refresh()
-        self.refresh()
 
     def refresh(self) -> None:
         """Refresh the vehicle data.
+
+        This is called by the DataUpdateCoodinator when new data is available.
+
         This assumes the controller has already been updated. This should be
         called by inherited classes so the overall vehicle information is updated.
         """
@@ -109,12 +111,6 @@ class TeslaBaseEntity(CoordinatorEntity):
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
         attr = self._attributes
-        ### This can probably be removed. it was a stub from this
-        # if self.car.charging != {}:
-        #     attr[ATTR_BATTERY_LEVEL] = self.car.charging.get("battery_level")
-        #     attr[ATTR_BATTERY_CHARGING] = (
-        #         self.car.charging.get("charging_state") == "Charging"
-        #     )
         return attr
 
     @property
@@ -150,8 +146,6 @@ class TeslaBaseEntity(CoordinatorEntity):
     async def async_added_to_hass(self):
         """Register state update callback."""
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
-        registry = await async_get_registry(self.hass)
-        # self.config_entry_id = registry.entities.get(self.entity_id).config_entry_id
 
     async def _send_command(
         self, name: str, *, path_vars: dict, wake_if_asleep: bool = False, **kwargs
