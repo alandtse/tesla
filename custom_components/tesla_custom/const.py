@@ -14,7 +14,7 @@ PLATFORMS = [
     "sensor",
     "lock",
     "climate",
-    # "binary_sensor",
+    "binary_sensor",
     # "device_tracker",
     "switch",
     "button",
