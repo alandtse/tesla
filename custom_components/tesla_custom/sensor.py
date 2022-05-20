@@ -12,7 +12,6 @@ from homeassistant.const import (
     LENGTH_MILES,
     PERCENTAGE,
     TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
@@ -38,19 +37,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaTemp(hass, car, coordinator, inside=True))
 
     async_add_entities(entities, True)
-
-
-# async def async_setup_entry(hass, config_entry, async_add_entities):
-#     """Set up the Tesla binary_sensors by config_entry."""
-#     coordinator = hass.data[TESLA_DOMAIN][config_entry.entry_id]["coordinator"]
-#     entities = []
-#     for device in hass.data[TESLA_DOMAIN][config_entry.entry_id]["devices"]["sensor"]:
-#         if device.type == "temperature sensor":
-#             entities.append(TeslaSensor(device, coordinator, "inside"))
-#             entities.append(TeslaSensor(device, coordinator, "outside"))
-#         else:
-#             entities.append(TeslaSensor(device, coordinator))
-#     async_add_entities(entities, True)
 
 
 class TeslaBattery(TeslaBaseEntity, SensorEntity):

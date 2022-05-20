@@ -119,7 +119,8 @@ async def async_setup_entry(hass, config_entry):
     # pylint: disable=too-many-locals
     hass.data.setdefault(DOMAIN, {})
     config = config_entry.data
-    # Because users can have multiple accounts, we always create a new session so they have separate cookies
+    # Because users can have multiple accounts, we always
+    # create a new session so they have separate cookies
     async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
     email = config_entry.title
     if not hass.data[DOMAIN]:

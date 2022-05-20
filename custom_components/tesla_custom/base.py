@@ -1,17 +1,12 @@
 """Support for Tesla cars."""
-from functools import wraps
 import logging
-from typing import Any, Dict, Optional
 
-from homeassistant.const import ATTR_BATTERY_CHARGING, ATTR_BATTERY_LEVEL
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import async_get_registry
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
-from teslajsonpy.exceptions import IncompleteCredentials
 
 from . import TeslaDataUpdateCoordinator
-from .const import DOMAIN, ICONS
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +30,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         # default device.
         self.type: str = getattr(self, "type", DEFAULT_DEVICE)
 
-        self.attrs: Dict[str, str] = {}
+        self.attrs: dict[str, str] = {}
         self._enabled_by_default: bool = True
         self.config_entry_id = None
 
@@ -132,9 +127,9 @@ class TeslaBaseEntity(CoordinatorEntity):
     def assumed_state(self) -> bool:
         # pylint: disable=protected-access
         """Return whether the data is from an online vehicle."""
-        return not self._coordinator.controller.car_online[self.car.vin] and (
-            self._coordinator.controller._last_update_time[self.car.vin]
-            - self._coordinator.controller._last_wake_up_time[self.car.vin]
+        return not self._coordinator.controller.is_car_online(vin=self.car.vin) and (
+            self._coordinator.controller.get_last_update_time(vin=self.car.vin)
+            - self._coordinator.controller.get_last_wake_up_time(vin=self.car.vin)
             > self._coordinator.controller.update_interval
         )
 
