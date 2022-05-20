@@ -1,8 +1,6 @@
 {
   "name": "Tesla Custom Component development",
   "image": "ghcr.io/ludeeus/devcontainer/integration:stable",
-  "postCreateCommand": "container install && make init",
-  "context": "..",
   "appPort": [
     "9123:8123"
   ],

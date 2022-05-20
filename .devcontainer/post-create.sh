@@ -24,3 +24,12 @@ fi
 echo "Install home assistant"
 container install
 
+# Setup the Dev Stuff
+
+pip install poetry
+# We're in Docker, so we don't need a VENV
+poetry config virtualenvs.create false
+poetry install --no-interaction
+
+# Keep this inline with any requirements that are in manifest.json
+pip install git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==2.2.0
