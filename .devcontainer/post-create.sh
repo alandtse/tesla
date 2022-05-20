@@ -24,3 +24,9 @@ fi
 echo "Install home assistant"
 container install
 
+# Setup the Dev Stuff
+
+pip install poetry
+# We're in Docker, so we don't need a VENV
+poetry config virtualenvs.create false
+poetry install --no-interaction
