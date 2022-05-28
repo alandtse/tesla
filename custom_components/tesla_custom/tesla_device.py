@@ -97,7 +97,7 @@ class TeslaDevice(CoordinatorEntity):
         """Return the device_info of the device."""
         if hasattr(self.tesla_device, "car_name"):
             return {
-                "identifiers": {device_identifier(tesla_device)},
+                "identifiers": {device_identifier(self.tesla_device)},
                 "name": self.tesla_device.car_name(),
                 "manufacturer": "Tesla",
                 "model": self.tesla_device.car_type,
@@ -105,7 +105,7 @@ class TeslaDevice(CoordinatorEntity):
             }
         elif hasattr(self.tesla_device, "site_name"):
             return {
-                "identifiers": {device_identifier(tesla_device)},
+                "identifiers": {device_identifier(self.tesla_device)},
                 "name": self.tesla_device.site_name(),
                 "manufacturer": "Tesla",
             }
