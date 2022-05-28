@@ -17,6 +17,9 @@ _LOGGER = logging.getLogger(__name__)
 
 def device_identifier(tesla_device) -> Tuple[str, int]:
     """Return the identifier for a tesla device."""
+    # Note that Home Assistant types this to be
+    # tuple[str, str] but since that would involve
+    # migrating, it is not changed here.
     return (DOMAIN, tesla_device.id())
 
 
