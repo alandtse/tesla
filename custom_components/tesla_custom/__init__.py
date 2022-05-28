@@ -293,7 +293,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
 async def async_remove_config_entry_device(
     hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
 ) -> bool:
-    """Remove homekit_controller config entry from a device."""
+    """Remove tesla_custom config entry from a device."""
     controller: TeslaAPI = hass.data[DOMAIN][config_entry.entry_id][
         "coordinator"
     ].controller
