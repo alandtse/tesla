@@ -5,7 +5,7 @@ from typing import Any, Optional, Tuple
 
 from homeassistant.const import ATTR_BATTERY_CHARGING, ATTR_BATTERY_LEVEL
 from homeassistant.core import callback
-from homeassistant.helpers.entity_registry import async_get_registry
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 from teslajsonpy.exceptions import IncompleteCredentials
@@ -117,7 +117,7 @@ class TeslaDevice(CoordinatorEntity):
     async def async_added_to_hass(self):
         """Register state update callback."""
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
-        registry = await async_get_registry(self.hass)
+        registry = er.async_get(self.hass)
         self.config_entry_id = registry.entities.get(self.entity_id).config_entry_id
 
     @callback
