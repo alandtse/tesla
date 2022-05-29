@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.0 (2022-05-29)
+
+
 ## v2.2.1 (2022-05-02)
 ### Fix
 * Check vin before adjusting climate devices ([#208](https://github.com/alandtse/tesla/issues/208)) ([`5c81955`](https://github.com/alandtse/tesla/commit/5c819554ef3d81446066262b4435066d17cf7a96))
