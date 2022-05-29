@@ -1,11 +1,11 @@
 """Support for Tesla cars."""
 from functools import wraps
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from homeassistant.const import ATTR_BATTERY_CHARGING, ATTR_BATTERY_LEVEL
 from homeassistant.core import callback
-from homeassistant.helpers.entity_registry import async_get_registry
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 from teslajsonpy.exceptions import IncompleteCredentials
@@ -13,6 +13,14 @@ from teslajsonpy.exceptions import IncompleteCredentials
 from .const import DOMAIN, ICONS
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def device_identifier(tesla_device) -> Tuple[str, int]:
+    """Return the identifier for a tesla device."""
+    # Note that Home Assistant types this to be
+    # tuple[str, str] but since that would involve
+    # migrating, it is not changed here.
+    return (DOMAIN, tesla_device.id())
 
 
 class TeslaDevice(CoordinatorEntity):
@@ -92,7 +100,7 @@ class TeslaDevice(CoordinatorEntity):
         """Return the device_info of the device."""
         if hasattr(self.tesla_device, "car_name"):
             return {
-                "identifiers": {(DOMAIN, self.tesla_device.id())},
+                "identifiers": {device_identifier(self.tesla_device)},
                 "name": self.tesla_device.car_name(),
                 "manufacturer": "Tesla",
                 "model": self.tesla_device.car_type,
@@ -100,7 +108,7 @@ class TeslaDevice(CoordinatorEntity):
             }
         elif hasattr(self.tesla_device, "site_name"):
             return {
-                "identifiers": {(DOMAIN, self.tesla_device.id())},
+                "identifiers": {device_identifier(self.tesla_device)},
                 "name": self.tesla_device.site_name(),
                 "manufacturer": "Tesla",
             }
@@ -109,7 +117,7 @@ class TeslaDevice(CoordinatorEntity):
     async def async_added_to_hass(self):
         """Register state update callback."""
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
-        registry = await async_get_registry(self.hass)
+        registry = er.async_get(self.hass)
         self.config_entry_id = registry.entities.get(self.entity_id).config_entry_id
 
     @callback

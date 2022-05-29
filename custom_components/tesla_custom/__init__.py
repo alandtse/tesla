@@ -6,7 +6,7 @@ from http import HTTPStatus
 import logging
 
 import async_timeout
-from homeassistant.config_entries import SOURCE_IMPORT
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
     CONF_DOMAIN,
@@ -15,8 +15,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     EVENT_HOMEASSISTANT_CLOSE,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
@@ -38,6 +39,7 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
+from .tesla_device import device_identifier
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -238,7 +240,9 @@ async def update_listener(hass, config_entry):
     """Update when config_entry options update."""
     controller = hass.data[DOMAIN][config_entry.entry_id]["coordinator"].controller
     old_update_interval = controller.update_interval
-    controller.update_interval = config_entry.options.get(CONF_SCAN_INTERVAL)
+    controller.update_interval = config_entry.options.get(
+        CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+    )
     if old_update_interval != controller.update_interval:
         _LOGGER.debug(
             "Changing scan_interval from %s to %s",
@@ -286,3 +290,16 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+) -> bool:
+    """Remove tesla_custom config entry from a device."""
+    controller: TeslaAPI = hass.data[DOMAIN][config_entry.entry_id][
+        "coordinator"
+    ].controller
+    return not device_entry.identifiers.intersection(
+        device_identifier(telsa_device)
+        for telsa_device in controller.get_homeassistant_components()
+    )
