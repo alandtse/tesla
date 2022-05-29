@@ -1,7 +1,6 @@
 {
   "name": "Tesla",
   "hacs": "1.6.0",
-  "iot_class": "Cloud Polling",
   "homeassistant": "2021.9.0",
   "zip_release": true,
   "filename": "tesla_custom.zip"
