@@ -3,7 +3,13 @@
 <!--next-version-placeholder-->
 
 ## v2.3.0 (2022-05-29)
+### Feature
+* Add support for async_remove_config_entry_device ([#218](https://github.com/alandtse/tesla/issues/218)) ([`562c1b0`](https://github.com/alandtse/tesla/commit/562c1b0ce01ced7adb0743a39178a7e9951c5e35))
 
+### Fix
+* Improve handling on 0 Watts power reads ([`bf94f3b`](https://github.com/alandtse/tesla/commit/bf94f3b68ad7d55fb48add049b0c5b444adb55f8))
+* Switch to non-deprecated async_get instead ([#217](https://github.com/alandtse/tesla/issues/217)) ([`f82e030`](https://github.com/alandtse/tesla/commit/f82e030fca09b8a45497db5a63d7e37f9ae6f4d9))
+* Use default if scan_interval settings missing ([`0d3d4ce`](https://github.com/alandtse/tesla/commit/0d3d4ce2947d311a6664cf77f97d9ab88433666a))
 
 ## v2.2.1 (2022-05-02)
 ### Fix
