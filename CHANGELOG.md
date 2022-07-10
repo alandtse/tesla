@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.1 (2022-07-10)
+### Fix
+* Use json in post requests ([`867475f`](https://github.com/alandtse/tesla/commit/867475f94dd341f58ea0692e289abe2c895654b5))
+
+### Documentation
+* Update HACS URL ([#220](https://github.com/alandtse/tesla/issues/220)) ([`d93f36f`](https://github.com/alandtse/tesla/commit/d93f36f052af6ac69795ceff4a7aea73246778d0))
+
 ## v2.3.0 (2022-05-29)
 ### Feature
 * Add support for async_remove_config_entry_device ([#218](https://github.com/alandtse/tesla/issues/218)) ([`562c1b0`](https://github.com/alandtse/tesla/commit/562c1b0ce01ced7adb0743a39178a7e9951c5e35))
