@@ -1475,7 +1475,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "2.4.0"
+version = "2.4.1"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
