@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.0 (2022-08-13)
+### Feature
+* Add solar power, grid power, load power sensors ([`57d6095`](https://github.com/alandtse/tesla/commit/57d6095a2b6cc17e57317eef800261b4bb47bf8c))
+
 ## v2.3.1 (2022-07-10)
 ### Fix
 * Use json in post requests ([`867475f`](https://github.com/alandtse/tesla/commit/867475f94dd341f58ea0692e289abe2c895654b5))
