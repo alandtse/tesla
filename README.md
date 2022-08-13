@@ -63,6 +63,10 @@ The following sensors provide all available vehicle data as attributes. These se
 - Drive State data sensor
 - GUI Settings data sensor
 
+This integration provies the following platforms for solar systems:
+
+- Sensors - solar production, grid import/export and home consumption (updates every 10 seconds)
+
 ## Options
 
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
