@@ -508,7 +508,7 @@ bleak = ">=0.14.3"
 
 [[package]]
 name = "homeassistant"
-version = "2022.8.4"
+version = "2022.8.5"
 description = "Open-source home automation platform running on Python 3."
 category = "dev"
 optional = false
@@ -1152,7 +1152,7 @@ pytest = ">=3.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.11.9"
+version = "0.11.10"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 category = "dev"
 optional = false
@@ -1162,7 +1162,7 @@ python-versions = ">=3.9"
 coverage = "6.4.2"
 fnvhash = "0.1.0"
 freezegun = "1.2.1"
-homeassistant = "2022.8.4"
+homeassistant = "2022.8.5"
 mock-open = "1.4.0"
 paho-mqtt = "1.6.1"
 pipdeptree = "2.2.1"
@@ -1178,8 +1178,8 @@ pytest-xdist = "2.5.0"
 requests-mock = "1.9.2"
 respx = "0.19.2"
 sqlalchemy = [
-    "1.4.38",
     "*",
+    "1.4.38",
 ]
 stdlib-list = "0.7.0"
 tomli = {version = "2.0.1", markers = "python_version < \"3.11\""}
@@ -1475,7 +1475,7 @@ python-versions = "*"
 
 [[package]]
 name = "teslajsonpy"
-version = "2.4.1"
+version = "2.4.2"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
