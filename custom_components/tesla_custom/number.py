@@ -97,13 +97,13 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
             self.async_write_ha_state()
 
     @property
-    def value(self):
+    def native_value(self):
         """Return the current value."""
 
         return self.car.charging.get("charge_current_request")
 
     @property
-    def min_value(self):
+    def native_min_value(self):
         """Return the Min value for Charge Limit."""
 
         # I can't find anything in the API that
@@ -112,7 +112,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         return CHARGE_CURRENT_MIN
 
     @property
-    def max_value(self):
+    def native_max_value(self):
         """Return the Max value for Charge Limit."""
 
         return self.car.charging.get("charge_current_request_max")
