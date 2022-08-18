@@ -31,7 +31,7 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "charge limit number"
+        self._name = "charge limit number"
         self._attr_icon = "mdi:battery"
         self._attr_mode = NumberMode.AUTO
         self._attr_step = 1
@@ -53,19 +53,16 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-
         return self.car.charging.get("charge_limit_soc")
 
     @property
     def native_min_value(self) -> float:
         """Return the Min value for Charge Limit."""
-
         return self.car.charging.get("charge_limit_soc_min")
 
     @property
     def native_max_value(self) -> float:
         """Return the Max value for Charge Limit."""
-
         return self.car.charging.get("charge_limit_soc_max")
 
 
@@ -77,7 +74,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "current limit number"
+        self._name = "current limit number"
         self._attr_icon = "mdi:battery"
         self._attr_mode = NumberMode.AUTO
         self._attr_step = 1
@@ -99,13 +96,11 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     @property
     def native_value(self):
         """Return the current value."""
-
         return self.car.charging.get("charge_current_request")
 
     @property
     def native_min_value(self):
         """Return the Min value for Charge Limit."""
-
         # I can't find anything in the API that
         # sets the min_value for current requests.
         # So i've just set it to 1 amp 🤷‍♂️
@@ -114,5 +109,4 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     @property
     def native_max_value(self):
         """Return the Max value for Charge Limit."""
-
         return self.car.charging.get("charge_current_request_max")

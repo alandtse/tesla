@@ -33,7 +33,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
     ) -> None:
         """Initialize the Update Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "Software Update"
+        self._name = "Software Update"
 
     @property
     def supported_features(self):

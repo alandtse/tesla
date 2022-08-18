@@ -32,7 +32,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "location tracker"
+        self._name = "location tracker"
 
     @property
     def source_type(self):

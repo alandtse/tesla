@@ -37,7 +37,7 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "parking brake sensor"
+        self._name = "parking brake sensor"
         self._attr_icon = "mdi:car-brake-parking"
         self._attr_device_class = None
 
@@ -55,7 +55,7 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "charger sensor"
+        self._name = "charger sensor"
         self._attr_icon = "mdi:ev-station"
         self._attr_device_class = None
 
@@ -86,7 +86,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "Charging sensor"
+        self._name = "Charging sensor"
         self._attr_icon = None
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
 
@@ -104,7 +104,7 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "online sensor"
+        self._name = "online sensor"
         self._attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
     @property

@@ -36,7 +36,7 @@ class Horn(TeslaCarDevice, ButtonEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "horn"
+        self._name = "horn"
         self._attr_icon = "mdi:bullhorn"
 
     async def async_press(self) -> None:
@@ -57,7 +57,7 @@ class FlashLights(TeslaCarDevice, ButtonEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "flash lights"
+        self._name = "flash lights"
         self._attr_icon = "mdi:car-light-high"
 
     async def async_press(self) -> None:
@@ -78,7 +78,7 @@ class WakeUp(TeslaCarDevice, ButtonEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "wake up"
+        self._name = "wake up"
         self._attr_icon = "mdi:moon-waning-crescent"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -99,7 +99,7 @@ class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "force Data update"
+        self._name = "force Data update"
         self._attr_icon = "mdi:database-sync"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -121,7 +121,7 @@ class TriggerHomelink(TeslaCarDevice, ButtonEntity):
     ) -> None:
         """Initialise the button."""
         super().__init__(hass, car, coordinator)
-        self.type = "trigger homelink"
+        self._name = "trigger homelink"
         self._attr_icon = "mdi:garage"
         self.__waiting = False
         self._enabled_by_default = False

@@ -34,7 +34,7 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "heated steering switch"
+        self._name = "heated steering switch"
         self._attr_icon = "mdi:steering"
 
     @property
@@ -74,7 +74,7 @@ class Polling(TeslaCarDevice, SwitchEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "polling switch"
+        self._name = "polling switch"
         self._attr_icon = "mdi:car-connected"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -107,7 +107,7 @@ class Charger(TeslaCarDevice, SwitchEntity):
     ) -> None:
         """Representation of a Tesla charger switch."""
         super().__init__(hass, car, coordinator)
-        self.type = "charger switch"
+        self._name = "charger switch"
         self._attr_icon = "mdi:battery-charging"
 
     @property
@@ -153,7 +153,7 @@ class SentryMode(TeslaCarDevice, SwitchEntity):
     ) -> None:
         """Representation of a Tesla Sentry Mode switch."""
         super().__init__(hass, car, coordinator)
-        self.type = "sentry mode switch"
+        self._name = "sentry mode switch"
         self._attr_icon = "mdi:shield-car"
 
     @property

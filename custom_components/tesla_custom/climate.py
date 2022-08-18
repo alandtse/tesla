@@ -48,7 +48,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaClimate(TeslaCarDevice, ClimateEntity):
     """Representation of a Tesla climate."""
 
-    type = "HVAC (climate) system"
+    def __init__(
+        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, car, coordinator)
+        self._name = "HVAC (climate) system"
 
     @property
     def supported_features(self):
@@ -64,6 +69,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
         if self.car.climate.get("is_climate_on", False):
             return HVAC_MODE_HEAT_COOL
+
         return HVAC_MODE_OFF
 
     @property

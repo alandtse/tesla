@@ -66,7 +66,7 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "battery sensor"
+        self._name = "battery sensor"
         self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PERCENTAGE
@@ -101,7 +101,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "charging rate sensor"
+        self._name = "charging rate sensor"
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:speedometer"
 
@@ -171,7 +171,7 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "energy added sensor"
+        self._name = "energy added sensor"
         self._attr_device_class = SensorDeviceClass.ENERGY
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
@@ -193,7 +193,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "mileage sensor"
+        self._name = "mileage sensor"
         self._attr_device_class = None
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         self._attr_icon = "mdi:counter"
@@ -235,7 +235,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "range sensor"
+        self._name = "range sensor"
         self._attr_device_class = None
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:gauge"
@@ -285,13 +285,13 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "temperature sensor"
+        self._name = "temperature sensor"
         self.inside = inside
 
         if inside is True:
-            self.type += " (inside)"
+            self._name += " (inside)"
         else:
-            self.type += " (outside)"
+            self._name += " (outside)"
 
         self._attr_device_class = SensorDeviceClass.TEMPERATURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
@@ -337,7 +337,6 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return power in Watts."""
-
         return round(
             self.coordinator.controller.get_power(self.energysite_id, self._sensor_type)
         )

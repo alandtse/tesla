@@ -63,7 +63,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         super().__init__(hass, car, coordinator)
 
         self._seat_name = seat_name
-        self.type = f"heated seat {seat_name}"
+        self._name = f"heated seat {seat_name}"
 
         # For 3rd row disable by default
         if (
@@ -122,7 +122,7 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
         """Initialize a heated seat for the vehicle."""
         super().__init__(hass, car, coordinator)
 
-        self.type = "cabin overheat protection"
+        self._name = "cabin overheat protection"
         self._attr_options = CABIN_OPTIONS
         self._attr_entity_category = EntityCategory.CONFIG
 

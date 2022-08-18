@@ -32,12 +32,11 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.hass = hass
         # reset the device type. If its not already set, it sets it to the
         # default device.
-        self.type: str = getattr(self, "type", DEFAULT_DEVICE)
+        self._name: str = getattr(self, "type", DEFAULT_DEVICE)
 
         self.attrs: dict[str, str] = {}
         self._enabled_by_default: bool = True
         self.config_entry_id = None
-        self._name = None
         self._unique_id = None
         self._attributes = {}
 
@@ -49,6 +48,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         This assumes the controller has already been updated. This should be
         called by inherited classes so the overall device information is updated.
         """
+
         self.async_write_ha_state()
 
     @property
@@ -64,6 +64,7 @@ class TeslaBaseEntity(CoordinatorEntity):
 
     async def async_added_to_hass(self):
         """Register state update callback."""
+
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
 
     async def _send_command(
@@ -90,6 +91,13 @@ class TeslaCarDevice(TeslaBaseEntity):
         """Initialise the Tesla car device."""
         super().__init__(hass, coordinator)
         self.car = TeslaCar(car, coordinator)
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, self.car.id)},
+            name=self.car.name,
+            manufacturer="Tesla",
+            model=self.car.type,
+            sw_version=self.car.version,
+        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -122,14 +130,6 @@ class TeslaCarDevice(TeslaBaseEntity):
     @property
     def name(self) -> str:
         """Return the name of car device."""
-        if self._name is None:
-            self._name = (
-                f"{self.car.display_name} {self.type}"
-                if self.car.display_name is not None
-                and self.car.display_name != self.car.vin[-6:]
-                else f"Tesla Model {str(self.car.vin[3]).upper()} {self.type}"
-            )
-
         return self._name
 
     @property
@@ -137,7 +137,7 @@ class TeslaCarDevice(TeslaBaseEntity):
         """Return a unique ID for car device."""
         if self._unique_id is None:
             self._unique_id = slugify(
-                f"Tesla Model {str(self.car.vin[3]).upper()} {self.car.vin[-6:]} {self.type}"
+                f"Tesla Model {str(self.car.vin[3]).upper()} {self.car.vin[-6:]} {self._name}"
             )
 
         return self._unique_id
@@ -246,6 +246,7 @@ class TeslaCar:
     @property
     def name(self) -> str:
         """Return the car name of this Vehicle."""
+
         return (
             self.display_name
             if self.display_name is not None and self.display_name != self.vin[-6:]
@@ -302,25 +303,21 @@ class TeslaEnergyDevice(TeslaBaseEntity):
     @property
     def available(self) -> str:
         """Return the Availability of Data."""
-
         return self.energysite != []
 
     @property
     def name(self) -> str:
         """Return the entity name."""
-
         return self._name
 
     @property
     def energysite_id(self) -> str:
         """Return the id of this energy site."""
-
         return self.energysite["energy_site_id"]
 
     @property
     def site_name(self) -> str:
         """Return the energy site name."""
-
         return self.energysite.get("site_name", TESLA_DEFAULT_ENERGY_SITE_NAME)
 
     @property
