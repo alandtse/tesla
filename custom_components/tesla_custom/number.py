@@ -5,7 +5,7 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 CHARGE_CURRENT_MIN = 1
@@ -23,7 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaChargeLimit(TeslaBaseEntity, NumberEntity):
+class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
     """Representation of the Tesla Charge Limit Number."""
 
     def __init__(
@@ -36,7 +36,7 @@ class TeslaChargeLimit(TeslaBaseEntity, NumberEntity):
         self._attr_mode = NumberMode.AUTO
         self._attr_step = 1
 
-    async def async_set_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
 
         data = await self._send_command(
@@ -51,25 +51,25 @@ class TeslaChargeLimit(TeslaBaseEntity, NumberEntity):
             self.async_write_ha_state()
 
     @property
-    def value(self):
+    def native_value(self) -> float | None:
         """Return the current value."""
 
         return self.car.charging.get("charge_limit_soc")
 
     @property
-    def min_value(self):
+    def native_min_value(self) -> float:
         """Return the Min value for Charge Limit."""
 
         return self.car.charging.get("charge_limit_soc_min")
 
     @property
-    def max_value(self):
+    def native_max_value(self) -> float:
         """Return the Max value for Charge Limit."""
 
         return self.car.charging.get("charge_limit_soc_max")
 
 
-class TeslaCurrentLimit(TeslaBaseEntity, NumberEntity):
+class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     """Representation of the Tesla Current Limit Number."""
 
     def __init__(
@@ -82,7 +82,7 @@ class TeslaCurrentLimit(TeslaBaseEntity, NumberEntity):
         self._attr_mode = NumberMode.AUTO
         self._attr_step = 1
 
-    async def async_set_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
 
         data = await self._send_command(

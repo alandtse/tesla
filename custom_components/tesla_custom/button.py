@@ -7,7 +7,7 @@ from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.exceptions import HomelinkError
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class Horn(TeslaBaseEntity, ButtonEntity):
+class Horn(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -49,7 +49,7 @@ class Horn(TeslaBaseEntity, ButtonEntity):
         )
 
 
-class FlashLights(TeslaBaseEntity, ButtonEntity):
+class FlashLights(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -70,7 +70,7 @@ class FlashLights(TeslaBaseEntity, ButtonEntity):
         )
 
 
-class WakeUp(TeslaBaseEntity, ButtonEntity):
+class WakeUp(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -91,7 +91,7 @@ class WakeUp(TeslaBaseEntity, ButtonEntity):
         )
 
 
-class ForceDataUpdate(TeslaBaseEntity, ButtonEntity):
+class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -113,7 +113,7 @@ class ForceDataUpdate(TeslaBaseEntity, ButtonEntity):
         return True
 
 
-class TriggerHomelink(TeslaBaseEntity, ButtonEntity):
+class TriggerHomelink(TeslaCarDevice, ButtonEntity):
     """Representation of a Tesla Homelink button."""
 
     def __init__(

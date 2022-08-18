@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 from .helpers import wait_for_climate
 
@@ -49,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
+class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
     """Representation of a Tesla Heated Seat Select."""
 
     def __init__(
@@ -110,7 +110,7 @@ class HeatedSeatSelect(TeslaBaseEntity, SelectEntity):
         return HEATER_OPTIONS
 
 
-class TeslaCabinOverheatProtection(TeslaBaseEntity, SelectEntity):
+class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
     """Representation of a Tesla Heated Seat Select."""
 
     def __init__(

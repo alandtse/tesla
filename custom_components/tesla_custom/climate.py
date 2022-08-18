@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from teslajsonpy.exceptions import UnknownPresetMode
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaClimate(TeslaBaseEntity, ClimateEntity):
+class TeslaClimate(TeslaCarDevice, ClimateEntity):
     """Representation of a Tesla climate."""
 
     type = "HVAC (climate) system"

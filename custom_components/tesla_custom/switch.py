@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class HeatedSteeringWheel(TeslaBaseEntity, SwitchEntity):
+class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -66,7 +66,7 @@ class HeatedSteeringWheel(TeslaBaseEntity, SwitchEntity):
         await self.set_heated_steering_wheel(False)
 
 
-class Polling(TeslaBaseEntity, SwitchEntity):
+class Polling(TeslaCarDevice, SwitchEntity):
     """Representation of the Polling Switch."""
 
     def __init__(
@@ -99,7 +99,7 @@ class Polling(TeslaBaseEntity, SwitchEntity):
         self.async_write_ha_state()
 
 
-class Charger(TeslaBaseEntity, SwitchEntity):
+class Charger(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -145,7 +145,7 @@ class Charger(TeslaBaseEntity, SwitchEntity):
             self.update_controller(wake_if_asleep=True, force=True, blocking=False)
 
 
-class SentryMode(TeslaBaseEntity, SwitchEntity):
+class SentryMode(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(

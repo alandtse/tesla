@@ -6,7 +6,7 @@ from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaUpdate(TeslaBaseEntity, UpdateEntity):
+class TeslaUpdate(TeslaCarDevice, UpdateEntity):
     """Tesla Update Entity."""
 
     def __init__(

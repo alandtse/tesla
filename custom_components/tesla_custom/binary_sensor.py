@@ -9,7 +9,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class ParkingBrake(TeslaBaseEntity, BinarySensorEntity):
+class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -47,7 +47,7 @@ class ParkingBrake(TeslaBaseEntity, BinarySensorEntity):
         return self.car.drive.get("shift_state") == "P"
 
 
-class ChargerConnection(TeslaBaseEntity, BinarySensorEntity):
+class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -78,7 +78,7 @@ class ChargerConnection(TeslaBaseEntity, BinarySensorEntity):
         return attrs
 
 
-class Charging(TeslaBaseEntity, BinarySensorEntity):
+class Charging(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -96,7 +96,7 @@ class Charging(TeslaBaseEntity, BinarySensorEntity):
         return self.car.charging.get("charging_state") == "Charging"
 
 
-class CarOnline(TeslaBaseEntity, BinarySensorEntity):
+class CarOnline(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
