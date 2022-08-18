@@ -2,6 +2,8 @@
 import logging
 from xxlimited import Str
 
+from teslajsonpy.const import TESLA_DEFAULT_ENERGY_SITE_NAME
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -269,7 +271,7 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         super().__init__(hass, coordinator)
         self.energysite = energysite
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.site_id)},
+            identifiers={(DOMAIN, self.energysite_id)},
             manufacturer="Tesla",
             model=self.site_type,
             name=self.site_name,
@@ -293,7 +295,7 @@ class TeslaEnergyDevice(TeslaBaseEntity):
             return
 
         await self._coordinator.controller.update(
-            self.energysite.id, wake_if_asleep=wake_if_asleep, force=force
+            wake_if_asleep=wake_if_asleep, force=force
         )
         await self._coordinator.async_refresh()
 
@@ -310,7 +312,7 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         return self._name
 
     @property
-    def site_id(self) -> str:
+    def energysite_id(self) -> str:
         """Return the id of this energy site."""
 
         return self.energysite["energy_site_id"]
@@ -319,10 +321,12 @@ class TeslaEnergyDevice(TeslaBaseEntity):
     def site_name(self) -> str:
         """Return the energy site name."""
 
-        return self.energysite.get("site_name", "My Home")
+        return self.energysite.get("site_name", TESLA_DEFAULT_ENERGY_SITE_NAME)
 
     @property
     def site_type(self) -> str:
         """Return the type of energy site."""
+        _resource_type = self.energysite["resource_type"].title()
+        _solar_type = self.energysite["components"]["solar_type"].replace("_", " ")
 
-        return f"{self.energysite['resource_type'].title()} {self.energysite['components']['solar_type'].replace('_', ' ')}"
+        return f"{_resource_type} {_solar_type}"

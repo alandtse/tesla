@@ -325,19 +325,19 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
         coordinator: TeslaDataUpdateCoordinator,
         sensor_type: str,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize the Tesla energy power sensor."""
         super().__init__(hass, energysite, coordinator)
         self._name = sensor_type.replace("_", " ")
         self._sensor_type = sensor_type
         self._attr_device_class = SensorDeviceClass.POWER
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = POWER_WATT
-        self._attr_unique_id = f"{self.site_id}-{self._sensor_type}"
+        self._attr_unique_id = f"{self.energysite_id}-{self._sensor_type}"
 
     @property
     def native_value(self) -> int:
-        """Return solar power in Watts."""
+        """Return power in Watts."""
 
         return round(
-            self.coordinator.controller.get_power(self.site_id, self._sensor_type)
+            self.coordinator.controller.get_power(self.energysite_id, self._sensor_type)
         )
