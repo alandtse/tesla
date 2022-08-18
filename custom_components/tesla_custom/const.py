@@ -4,6 +4,7 @@ CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
 CONF_POLLING_POLICY = "polling_policy"
 DOMAIN = "tesla_custom"
+ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
 DEFAULT_WAKE_ON_START = False
