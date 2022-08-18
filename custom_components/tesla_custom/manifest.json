@@ -5,10 +5,14 @@
   "documentation": "https://github.com/alandtse/tesla/wiki",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "requirements": [
-    "git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==2.2.0"
+    "git+https://github.com/shred86/teslajsonpy.git@rewrite-support#teslajsonpy==2.5.0"
   ],
-  "codeowners": ["@alandtse"],
-  "dependencies": ["http"],
+  "codeowners": [
+    "@alandtse"
+  ],
+  "dependencies": [
+    "http"
+  ],
   "dhcp": [
     {
       "hostname": "tesla_*",
