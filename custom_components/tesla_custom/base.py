@@ -32,7 +32,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.hass = hass
         # reset the device type. If its not already set, it sets it to the
         # default device.
-        self._name: str = getattr(self, "type", DEFAULT_DEVICE)
+        self.type: str = getattr(self, "type", DEFAULT_DEVICE)
 
         self.attrs: dict[str, str] = {}
         self._enabled_by_default: bool = True
@@ -50,6 +50,13 @@ class TeslaBaseEntity(CoordinatorEntity):
         """
 
         self.async_write_ha_state()
+
+    @property
+    def name(self) -> str:
+        """Return name of entity."""
+        # TeslaEnergyPowerSensors self.type contains an underscore
+        # since we use it
+        return self.type.replace("_", " ").capitalize()
 
     @property
     def entity_registry_enabled_default(self):
@@ -91,13 +98,6 @@ class TeslaCarDevice(TeslaBaseEntity):
         """Initialise the Tesla car device."""
         super().__init__(hass, coordinator)
         self.car = TeslaCar(car, coordinator)
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.car.id)},
-            name=self.car.name,
-            manufacturer="Tesla",
-            model=self.car.type,
-            sw_version=self.car.version,
-        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -128,16 +128,11 @@ class TeslaCarDevice(TeslaBaseEntity):
         return self.car.state != {}
 
     @property
-    def name(self) -> str:
-        """Return the name of car device."""
-        return self._name
-
-    @property
     def unique_id(self) -> str:
-        """Return a unique ID for car device."""
+        """Return entity unique id."""
         if self._unique_id is None:
             self._unique_id = slugify(
-                f"Tesla Model {str(self.car.vin[3]).upper()} {self.car.vin[-6:]} {self._name}"
+                f"Tesla Model {str(self.car.vin[3]).upper()} {self.car.vin[-6:]} {self.type}"
             )
 
         return self._unique_id
@@ -145,13 +140,13 @@ class TeslaCarDevice(TeslaBaseEntity):
     @property
     def device_info(self):
         """Return the device_info of the device."""
-        return {
-            "identifiers": {(DOMAIN, self.car.id)},
-            "name": self.car.name,
-            "manufacturer": "Tesla",
-            "model": self.car.type,
-            "sw_version": self.car.version,
-        }
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.car.id)},
+            name=self.car.name,
+            manufacturer="Tesla",
+            model=self.car.type,
+            sw_version=self.car.version,
+        )
 
     @property
     def assumed_state(self) -> bool:
@@ -271,12 +266,6 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         """Initialise the Tesla energy device."""
         super().__init__(hass, coordinator)
         self.energysite = energysite
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.energysite_id)},
-            manufacturer="Tesla",
-            model=self.site_type,
-            name=self.site_name,
-        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -301,14 +290,14 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         await self._coordinator.async_refresh()
 
     @property
+    def unique_id(self) -> str:
+        """Return a unique ID for energy site device."""
+        return f"{self.energysite_id}-{self.type}"
+
+    @property
     def available(self) -> str:
         """Return the Availability of Data."""
         return self.energysite != []
-
-    @property
-    def name(self) -> str:
-        """Return the entity name."""
-        return self._name
 
     @property
     def energysite_id(self) -> str:
@@ -327,3 +316,13 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         _solar_type = self.energysite["components"]["solar_type"].replace("_", " ")
 
         return f"{_resource_type} {_solar_type}"
+
+    @property
+    def device_info(self):
+        """Return the device_info of the device."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.energysite_id)},
+            manufacturer="Tesla",
+            model=self.site_type,
+            name=self.site_name,
+        )

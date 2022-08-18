@@ -7,12 +7,8 @@
   "requirements": [
     "git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==2.2.0"
   ],
-  "codeowners": [
-    "@alandtse"
-  ],
-  "dependencies": [
-    "http"
-  ],
+  "codeowners": ["@alandtse"],
+  "dependencies": ["http"],
   "dhcp": [
     {
       "hostname": "tesla_*",

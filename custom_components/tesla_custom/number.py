@@ -31,10 +31,10 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "charge limit number"
+        self.type = "charge limit number"
         self._attr_icon = "mdi:battery"
         self._attr_mode = NumberMode.AUTO
-        self._attr_step = 1
+        self._attr_native_step = 1
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
@@ -74,10 +74,10 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "current limit number"
+        self.type = "current limit number"
         self._attr_icon = "mdi:battery"
         self._attr_mode = NumberMode.AUTO
-        self._attr_step = 1
+        self._attr_native_step = 1
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""

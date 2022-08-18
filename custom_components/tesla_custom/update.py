@@ -33,7 +33,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
     ) -> None:
         """Initialize the Update Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "Software Update"
+        self.type = "software update"
 
     @property
     def supported_features(self):
@@ -78,7 +78,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
         return version_str
 
     @property
-    def in_progress(self) -> int | bool:
+    def in_progress(self):
         """Get Progress, if updating."""
         update_status = self.car.state.get("software_update", {}).get("status")
 
@@ -94,9 +94,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
         # Otherwise, we're not updating, so return False
         return False
 
-    async def async_install(
-        self, version: str | None, backup: bool, **kwargs: Any
-    ) -> None:
+    async def async_install(self, version, backup: bool, **kwargs: Any) -> None:
         """Install an Update."""
 
         # Ask Tesla to start the update now.

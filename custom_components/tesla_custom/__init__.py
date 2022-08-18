@@ -149,7 +149,8 @@ async def async_setup_entry(hass, config_entry):
         result = await controller.connect(
             wake_if_asleep=config_entry.options.get(
                 CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
-            )
+            ),
+            skip_add=True,
         )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
@@ -192,15 +193,11 @@ async def async_setup_entry(hass, config_entry):
     coordinator = TeslaDataUpdateCoordinator(
         hass, config_entry=config_entry, controller=controller
     )
-
-    cars = await controller.get_vehicles()
-    energysites = await controller.get_energysites()
-
     # Fetch initial data so we have data when entities subscribe
-    entry_data = hass.data[DOMAIN][config_entry.entry_id] = {
+    hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
-        "cars": cars,
-        "energysites": energysites,
+        "cars": controller.cars,
+        "energysites": controller.energysites,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")

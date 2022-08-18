@@ -33,7 +33,7 @@ class Trunk(TeslaCarDevice, LockEntity):
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "trunk lock"
+        self.type = "trunk lock"
 
     async def toggle_trunk(self):
         """Toggle Trunk lock."""
@@ -80,7 +80,7 @@ class Frunk(TeslaCarDevice, LockEntity):
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "frunk lock"
+        self.type = "frunk lock"
 
     async def toggle_trunk(self):
         """Toggle Frunk lock."""
@@ -127,7 +127,7 @@ class Doors(TeslaCarDevice, LockEntity):
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "door lock"
+        self.type = "door lock"
 
     async def async_lock(self, **kwargs):
         """Send the lock command."""
@@ -167,7 +167,7 @@ class ChargerDoor(TeslaCarDevice, LockEntity):
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "charger door lock"
+        self.type = "charger door lock"
 
     async def async_lock(self, **kwargs):
         """Send the lock command."""

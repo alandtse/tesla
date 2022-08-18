@@ -32,7 +32,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "location tracker"
+        self.type = "location tracker"
 
     @property
     def source_type(self):
@@ -40,7 +40,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
         return SOURCE_TYPE_GPS
 
     @property
-    def longitude(self) -> float | None:
+    def longitude(self):
         """Return longitude value of the device."""
         data: dict = self.car.drive
         if data.get("native_location_supported"):
@@ -49,7 +49,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
         return data.get("longitude")
 
     @property
-    def latitude(self) -> float | None:
+    def latitude(self):
         """Return latitude value of the device."""
         data: dict = self.car.drive
         if data.get("native_location_supported"):

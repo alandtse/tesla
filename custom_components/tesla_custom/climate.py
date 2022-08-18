@@ -53,7 +53,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
-        self._name = "HVAC (climate) system"
+        self.type = "HVAC (climate) system"
 
     @property
     def supported_features(self):
