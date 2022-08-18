@@ -194,11 +194,13 @@ async def async_setup_entry(hass, config_entry):
     )
 
     cars = await controller.get_vehicles()
+    energysites = await controller.get_energysites()
 
     # Fetch initial data so we have data when entities subscribe
     entry_data = hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
         "cars": cars,
+        "energysites": energysites,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")

@@ -1,6 +1,8 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
+from teslajsonpy.const import TESLA_RESOURCE_TYPE_SOLAR, TESLA_RESOURCE_TYPE_BATTERY
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -12,14 +14,18 @@ from homeassistant.const import (
     LENGTH_MILES,
     PERCENTAGE,
     TEMP_CELSIUS,
+    POWER_WATT,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.distance import convert
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaBaseEntity
+from .base import TeslaCarDevice, TeslaEnergyDevice
 from .const import DOMAIN
+
+SOLAR_SITE_SENSORS = ["solar_power", "grid_power", "load_power"]
+BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery_power"]
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
@@ -36,10 +42,23 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaTemp(hass, car, coordinator))
         entities.append(TeslaTemp(hass, car, coordinator, inside=True))
 
+    for energysite in hass.data[DOMAIN][config_entry.entry_id]["energysites"]:
+        if energysite["resource_type"] == TESLA_RESOURCE_TYPE_SOLAR:
+            for sensor_type in SOLAR_SITE_SENSORS:
+                entities.append(
+                    TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
+                )
+
+        if energysite["resource_type"] == TESLA_RESOURCE_TYPE_BATTERY:
+            for sensor_type in BATTERY_SITE_SENSORS:
+                entities.append(
+                    TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
+                )
+
     async_add_entities(entities, True)
 
 
-class TeslaBattery(TeslaBaseEntity, SensorEntity):
+class TeslaBattery(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
@@ -74,7 +93,7 @@ class TeslaBattery(TeslaBaseEntity, SensorEntity):
         )
 
 
-class TeslaChargerRate(TeslaBaseEntity, SensorEntity):
+class TeslaChargerRate(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Charging Rate."""
 
     def __init__(
@@ -144,7 +163,7 @@ class TeslaChargerRate(TeslaBaseEntity, SensorEntity):
         return self.attrs
 
 
-class TeslaChargerEnergy(TeslaBaseEntity, SensorEntity):
+class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Energy Added."""
 
     def __init__(
@@ -166,7 +185,7 @@ class TeslaChargerEnergy(TeslaBaseEntity, SensorEntity):
         return charge_energy_added
 
 
-class TeslaMileage(TeslaBaseEntity, SensorEntity):
+class TeslaMileage(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Energy Added."""
 
     def __init__(
@@ -208,7 +227,7 @@ class TeslaMileage(TeslaBaseEntity, SensorEntity):
         return LENGTH_KILOMETERS
 
 
-class TeslaRange(TeslaBaseEntity, SensorEntity):
+class TeslaRange(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Energy Added."""
 
     def __init__(
@@ -253,7 +272,7 @@ class TeslaRange(TeslaBaseEntity, SensorEntity):
         return LENGTH_KILOMETERS
 
 
-class TeslaTemp(TeslaBaseEntity, SensorEntity):
+class TeslaTemp(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Energy Added."""
 
     def __init__(
@@ -294,3 +313,31 @@ class TeslaTemp(TeslaBaseEntity, SensorEntity):
         Tesla API always returns in Celsius.
         """
         return TEMP_CELSIUS
+
+
+class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
+    """Representation of the Tesla energy power sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: list,
+        coordinator: TeslaDataUpdateCoordinator,
+        sensor_type: str,
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, energysite, coordinator)
+        self._name = sensor_type.replace("_", " ")
+        self._sensor_type = sensor_type
+        self._attr_device_class = SensorDeviceClass.POWER
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = POWER_WATT
+        self._attr_unique_id = f"{self.site_id}-{self._sensor_type}"
+
+    @property
+    def native_value(self) -> int:
+        """Return solar power in Watts."""
+
+        return round(
+            self.coordinator.controller.get_power(self.site_id, self._sensor_type)
+        )
