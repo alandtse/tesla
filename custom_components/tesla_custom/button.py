@@ -152,10 +152,10 @@ class TriggerHomelink(TeslaCarDevice, ButtonEntity):
         await self.update_controller(wake_if_asleep=True, force=True, blocking=True)
 
         if self.car.state.get("homelink_device_count") is None:
-            raise HomelinkError(f"No homelink devices added to {self.car_name}.")
+            raise HomelinkError(f"No homelink devices added to {self.car.name}.")
 
         if self.car.state.get("homelink_nearby") is not True:
-            raise HomelinkError(f"No homelink devices near {self.car_name}.")
+            raise HomelinkError(f"No homelink devices near {self.car.name}.")
 
         lat, long = self._get_lat_long()
 

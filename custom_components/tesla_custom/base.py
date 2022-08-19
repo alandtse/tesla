@@ -267,28 +267,6 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         super().__init__(hass, coordinator)
         self.energysite = energysite
 
-    async def update_controller(
-        self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
-    ):
-        """Get the latest data from Tesla.
-
-        This does a controller update,
-        then a coordinator update.
-        the coordinator triggers a call to the refresh function.
-
-        Setting the Blocking param to False will create a background task for the update.
-        """
-        if blocking is False:
-            await self.hass.async_create_task(
-                self.update_controller(wake_if_asleep=wake_if_asleep, force=force)
-            )
-            return
-
-        await self._coordinator.controller.update(
-            wake_if_asleep=wake_if_asleep, force=force
-        )
-        await self._coordinator.async_refresh()
-
     @property
     def unique_id(self) -> str:
         """Return a unique ID for energy site device."""
