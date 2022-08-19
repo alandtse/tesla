@@ -304,3 +304,8 @@ class TeslaEnergyDevice(TeslaBaseEntity):
             model=self.site_type,
             name=self.site_name,
         )
+
+    @property
+    def power_data(self):
+        """Return the coordinator controller power data."""
+        return self.coordinator.controller.get_power_params(self.energysite_id)

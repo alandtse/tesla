@@ -336,9 +336,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return power in Watts."""
-        return round(
-            self.coordinator.controller.get_power_params(self.energysite_id)[self.type]
-        )
+        return round(self.power_data[self.type])
 
 
 class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
@@ -366,22 +364,12 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the battery level."""
-        return round(
-            self.coordinator.controller.get_power_params(self.energysite_id)[
-                "percentage_charged"
-            ],
-            2,
-        )
+        return round(self.power_data["percentage_charged"], 2)
 
     @property
     def icon(self):
         """Return the icon for the battery."""
-        charging = (
-            self.coordinator.controller.get_power_params(self.energysite_id)[
-                "battery_power"
-            ]
-            > 0
-        )
+        charging = self.power_data["battery_power"] > 0
 
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging

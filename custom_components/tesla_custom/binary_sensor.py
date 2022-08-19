@@ -146,10 +146,4 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-
-        return (
-            self.coordinator.controller.get_power_params(self.energysite_id)[
-                "battery_power"
-            ]
-            > 0
-        )
+        return self.power_data["battery_power"] > 0
