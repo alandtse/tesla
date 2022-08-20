@@ -1,7 +1,8 @@
 """Support for Tesla binary sensor."""
 import logging
 
-from teslajsonpy.const import TESLA_RESOURCE_TYPE_BATTERY
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import PowerwallSite
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -27,8 +28,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(ChargerConnection(hass, car, coordinator))
         entities.append(Charging(hass, car, coordinator))
 
-    for energysite in hass.data[DOMAIN][config_entry.entry_id]["energysites"]:
-        if energysite["resource_type"] == TESLA_RESOURCE_TYPE_BATTERY:
+    for energysite in coordinator.controller.energysites.values():
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyCharging(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
@@ -135,7 +136,7 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: dict,
+        energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -146,4 +147,4 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-        return self.power_data["battery_power"] > 0
+        return self._energysite.battery_power > 0

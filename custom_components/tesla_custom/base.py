@@ -2,7 +2,7 @@
 import logging
 from xxlimited import Str
 
-from teslajsonpy.const import TESLA_DEFAULT_ENERGY_SITE_NAME
+from teslajsonpy.energy import EnergySite
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -260,52 +260,32 @@ class TeslaEnergyDevice(TeslaBaseEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: list,
+        energysite: EnergySite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla energy device."""
         super().__init__(hass, coordinator)
-        self.energysite = energysite
+        self._energysite = energysite
 
     @property
     def unique_id(self) -> str:
         """Return a unique ID for energy site device."""
-        return f"{self.energysite_id}-{self.type}"
+        return f"{self._energysite.energysite_id}-{self.type}"
 
     @property
     def available(self) -> str:
         """Return the Availability of Data."""
-        return self.energysite != []
-
-    @property
-    def energysite_id(self) -> str:
-        """Return the id of this energy site."""
-        return self.energysite["energy_site_id"]
-
-    @property
-    def site_name(self) -> str:
-        """Return the energy site name."""
-        return self.energysite.get("site_name", TESLA_DEFAULT_ENERGY_SITE_NAME)
-
-    @property
-    def site_type(self) -> str:
-        """Return the type of energy site."""
-        _resource_type = self.energysite["resource_type"].title()
-        _solar_type = self.energysite["components"]["solar_type"].replace("_", " ")
-
-        return f"{_resource_type} {_solar_type}"
+        return self._energysite != []
 
     @property
     def device_info(self):
         """Return the device_info of the device."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self.energysite_id)},
-            manufacturer="Tesla",
-            model=self.site_type,
-            name=self.site_name,
+        model = (
+            f"{self._energysite.resource_type.title()} {self._energysite.solar_type}"
         )
-
-    @property
-    def power_data(self):
-        """Return the coordinator controller power data."""
-        return self.coordinator.controller.get_power_params(self.energysite_id)
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._energysite.energysite_id)},
+            manufacturer="Tesla",
+            model=model,
+            name=self._energysite.site_name,
+        )

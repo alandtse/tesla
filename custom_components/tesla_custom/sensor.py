@@ -1,7 +1,8 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
-from teslajsonpy.const import TESLA_RESOURCE_TYPE_SOLAR, TESLA_RESOURCE_TYPE_BATTERY
+from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import EnergySite, PowerwallSite
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -42,14 +43,14 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaTemp(hass, car, coordinator))
         entities.append(TeslaTemp(hass, car, coordinator, inside=True))
 
-    for energysite in hass.data[DOMAIN][config_entry.entry_id]["energysites"]:
-        if energysite["resource_type"] == TESLA_RESOURCE_TYPE_SOLAR:
+    for energysite in coordinator.controller.energysites.values():
+        if energysite.resource_type == RESOURCE_TYPE_SOLAR:
             for sensor_type in SOLAR_SITE_SENSORS:
                 entities.append(
                     TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
                 )
 
-        if energysite["resource_type"] == TESLA_RESOURCE_TYPE_BATTERY:
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBattery(hass, energysite, coordinator))
             for sensor_type in BATTERY_SITE_SENSORS:
                 entities.append(
@@ -322,7 +323,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: list,
+        energysite: EnergySite,
         coordinator: TeslaDataUpdateCoordinator,
         sensor_type: str,
     ) -> None:
@@ -336,7 +337,14 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return power in Watts."""
-        return round(self.power_data[self.type])
+        if self.type == "solar_power":
+            return round(self._energysite.solar_power)
+        if self.type == "grid_power":
+            return round(self._energysite.grid_power)
+        if self.type == "load_power":
+            return round(self._energysite.load_power)
+        if self.type == "battery_power":
+            return round(self._energysite.battery_power)
 
 
 class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
@@ -345,7 +353,7 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: list,
+        energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -364,12 +372,12 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the battery level."""
-        return round(self.power_data["percentage_charged"], 2)
+        return round(self._energysite.battery_percent, 2)
 
     @property
     def icon(self):
         """Return the icon for the battery."""
-        charging = self.power_data["battery_power"] > 0
+        charging = self._energysite.battery_power > 0
 
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging
