@@ -47,7 +47,7 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         )
 
         if data and data["response"]["result"] is True:
-            self.car.climate["charge_limit_soc"] = int(value)
+            self.car.charging["charge_limit_soc"] = int(value)
             self.async_write_ha_state()
 
     @property
@@ -90,7 +90,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         )
 
         if data and data["response"]["result"] is True:
-            self.car.climate["charge_limit_soc"] = int(value)
+            self.car.charging["charge_limit_soc"] = int(value)
             self.async_write_ha_state()
 
     @property
