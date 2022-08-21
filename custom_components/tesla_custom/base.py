@@ -56,7 +56,6 @@ class TeslaBaseEntity(CoordinatorEntity):
     def name(self) -> str:
         """Return name of entity."""
         # TeslaEnergyPowerSensors self.type contains an underscore
-        # since we use it
         return self.type.replace("_", " ").capitalize()
 
     @property
@@ -74,20 +73,6 @@ class TeslaBaseEntity(CoordinatorEntity):
         """Register state update callback."""
 
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
-
-    async def _send_command(
-        self, name: str, *, path_vars: dict, wake_if_asleep: bool = False, **kwargs
-    ):
-        """Wrapper for Sending Commands to the Tesla API.
-
-        Just cleans up command functions throughout the codebase.
-        """
-        _LOGGER.debug("Sending Command: %s", name)
-        data = await self._coordinator.controller.api(
-            name, path_vars=path_vars, wake_if_asleep=wake_if_asleep, **kwargs
-        )
-
-        return data
 
 
 class TeslaCarDevice(TeslaBaseEntity):
@@ -127,7 +112,7 @@ class TeslaCarDevice(TeslaBaseEntity):
         await self._coordinator.async_refresh()
 
     @property
-    def available(self) -> str:
+    def available(self) -> bool:
         """Return the Availability of Data."""
         return self._car.data_available != {}
 
@@ -153,7 +138,7 @@ class TeslaCarDevice(TeslaBaseEntity):
         return self._unique_id
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo:
         """Return the device_info of the device."""
         return DeviceInfo(
             identifiers={(DOMAIN, self._car.id)},
@@ -193,12 +178,12 @@ class TeslaEnergyDevice(TeslaBaseEntity):
         return f"{self._energysite.energysite_id}-{self.type}"
 
     @property
-    def available(self) -> str:
+    def available(self) -> bool:
         """Return the Availability of Data."""
-        return self._energysite != []
+        return self._energysite != {}
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo:
         """Return the device_info of the device."""
         model = (
             f"{self._energysite.resource_type.title()} {self._energysite.solar_type}"
