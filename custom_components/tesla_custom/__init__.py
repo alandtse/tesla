@@ -149,8 +149,7 @@ async def async_setup_entry(hass, config_entry):
         result = await controller.connect(
             wake_if_asleep=config_entry.options.get(
                 CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
-            ),
-            skip_add=True,
+            )
         )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
