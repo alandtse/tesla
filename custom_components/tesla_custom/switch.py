@@ -20,7 +20,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     entities = []
     for car in coordinator.controller.cars.values():
-        entities.append(HeatedSteeringWheel(hass, car, coordinator))
+        if car.steering_wheel_heater:
+            entities.append(HeatedSteeringWheel(hass, car, coordinator))
         entities.append(Polling(hass, car, coordinator))
         entities.append(Charger(hass, car, coordinator))
         entities.append(SentryMode(hass, car, coordinator))

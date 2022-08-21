@@ -43,8 +43,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
     for car in coordinator.controller.cars.values():
         entities.append(TeslaCabinOverheatProtection(hass, car, coordinator))
-
         for seat_name in SEAT_ID_MAP:
+            if "rear" in seat_name and not car.rear_heated_seats:
+                continue
+            if "third_row" in seat_name and not car.third_row_seats:
+                continue
             entities.append(HeatedSeatSelect(hass, car, coordinator, seat_name))
 
     async_add_entities(entities, True)
@@ -65,13 +68,6 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
 
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
-
-        # For 3rd row disable by default
-        if (
-            self._seat_name in ["third_row_left", "third_row_right"]
-            and self._car.third_row_seats is not None
-        ):
-            self._enabled_by_default = False
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
