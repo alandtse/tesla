@@ -1,6 +1,8 @@
 """Support for Tesla door locks."""
 import logging
 
+from teslajsonpy.car import TeslaCar
+
 from homeassistant.components.lock import LockEntity
 from homeassistant.core import HomeAssistant
 
@@ -16,7 +18,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(Trunk(hass, car, coordinator))
         entities.append(Frunk(hass, car, coordinator))
         entities.append(Doors(hass, car, coordinator))
@@ -29,7 +31,10 @@ class Trunk(TeslaCarDevice, LockEntity):
     """Representation of a Tesla door lock."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
@@ -38,31 +43,23 @@ class Trunk(TeslaCarDevice, LockEntity):
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        if self.is_trunk_locked is False:
+        if self.is_locked is False:
             await self._car.toggle_trunk()
-            # if result == 1:
-            #     self.car.state["rt"] = 0
-
-        # self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        if self.is_trunk_locked is True:
+        if self.is_locked is True:
             await self._car.toggle_trunk()
-            # if result == 1:
-            #     self.car.state["rt"] = 255
-
-        # self.async_write_ha_state()
 
     @property
-    def is_trunk_locked(self):
-        """Get whether the lock is in locked state."""
+    def is_locked(self):
+        """Get whether the trunk is in locked state."""
         return self._car.is_trunk_locked
 
 
 class Frunk(TeslaCarDevice, LockEntity):
-    """Representation of a Tesla door lock."""
+    """Representation of a Tesla docar: TeslaCaraCar"""
 
     def __init__(
         self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
@@ -93,7 +90,10 @@ class Doors(TeslaCarDevice, LockEntity):
     """Representation of a Tesla door lock."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
@@ -102,12 +102,12 @@ class Doors(TeslaCarDevice, LockEntity):
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        self._car.lock()
+        await self._car.lock()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        self._car.unlock()
+        await self._car.unlock()
 
     @property
     def is_locked(self):
@@ -119,7 +119,10 @@ class ChargerDoor(TeslaCarDevice, LockEntity):
     """Representation of a Tesla Charger door lock."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Lock Entity."""
         super().__init__(hass, car, coordinator)
@@ -128,12 +131,12 @@ class ChargerDoor(TeslaCarDevice, LockEntity):
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        self._car.charge_port_door_close()
+        await self._car.charge_port_door_close()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        self._car.charge_port_door_open()
+        await self._car.charge_port_door_open()
 
     @property
     def is_locked(self):

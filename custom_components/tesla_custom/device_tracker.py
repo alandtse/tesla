@@ -1,6 +1,8 @@
 """Support for tracking Tesla cars."""
 import logging
 
+from teslajsonpy.car import TeslaCar
+
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
@@ -17,7 +19,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(CarLocation(hass, car, coordinator))
 
     async_add_entities(entities, True)
@@ -27,7 +29,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     """Representation of the Tesla Car Location Tracker."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self, hass: HomeAssistant, car: TeslaCar, coordinator: TeslaDataUpdateCoordinator
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)

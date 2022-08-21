@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import logging
 
+from teslajsonpy.car import TeslaCar
+
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     DEFAULT_MAX_TEMP,
@@ -34,13 +36,15 @@ KEEPER_MAP = {
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla CLimate by config_entry."""
+    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+
     entities = [
         TeslaClimate(
             hass,
             car,
-            hass.data[DOMAIN][config_entry.entry_id]["coordinator"],
+            coordinator,
         )
-        for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]
+        for car in coordinator.controller.cars.values()
     ]
     async_add_entities(entities, True)
 
@@ -49,7 +53,10 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
     """Representation of a Tesla climate."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)

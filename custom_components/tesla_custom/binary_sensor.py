@@ -3,6 +3,7 @@ import logging
 
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import PowerwallSite
+from teslajsonpy.car import TeslaCar
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -22,7 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(ParkingBrake(hass, car, coordinator))
         entities.append(CarOnline(hass, car, coordinator))
         entities.append(ChargerConnection(hass, car, coordinator))
@@ -39,7 +40,10 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -57,7 +61,10 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -88,7 +95,10 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -106,7 +116,10 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)

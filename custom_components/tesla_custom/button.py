@@ -1,10 +1,12 @@
 """Support for Tesla charger buttons."""
 import logging
 
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.exceptions import HomelinkError
+
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
-from teslajsonpy.exceptions import HomelinkError
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarDevice
@@ -18,7 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(Horn(hass, car, coordinator))
         entities.append(FlashLights(hass, car, coordinator))
         entities.append(WakeUp(hass, car, coordinator))
@@ -32,7 +34,10 @@ class Horn(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -48,7 +53,10 @@ class FlashLights(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -64,7 +72,10 @@ class WakeUp(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -81,7 +92,10 @@ class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -103,7 +117,10 @@ class TriggerHomelink(TeslaCarDevice, ButtonEntity):
     """Representation of a Tesla Homelink button."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the button."""
         super().__init__(hass, car, coordinator)

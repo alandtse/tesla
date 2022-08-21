@@ -3,6 +3,7 @@ import logging
 from xxlimited import Str
 
 from teslajsonpy.energy import EnergySite
+from teslajsonpy.car import TeslaCar
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -95,19 +96,12 @@ class TeslaCarDevice(TeslaBaseEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla car device."""
         super().__init__(hass, coordinator)
-        self.car = TeslaCarData(car, coordinator)
-        self._car = self.get_car()
-
-    def get_car(self):
-        """Temporary function for rewrite"""
-        # This is temporary until we can pass in car object during instantiation
-        for car in self._coordinator.controller.cars.values():
-            return car
+        self._car = car
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -128,21 +122,32 @@ class TeslaCarDevice(TeslaBaseEntity):
             return
 
         await self._coordinator.controller.update(
-            self.car.id, wake_if_asleep=wake_if_asleep, force=force
+            self._car.id, wake_if_asleep=wake_if_asleep, force=force
         )
         await self._coordinator.async_refresh()
 
     @property
     def available(self) -> str:
         """Return the Availability of Data."""
-        return self.car.state != {}
+        return self._car.data_available != {}
+
+    @property
+    def vehicle_name(self) -> str:
+        """Return the car name of this Vehicle."""
+
+        return (
+            self._car.display_name
+            if self._car.display_name is not None
+            and self._car.display_name != self._car.vin[-6:]
+            else f"Tesla Model {str(self._car.vin[3]).upper()}"
+        )
 
     @property
     def unique_id(self) -> str:
         """Return entity unique id."""
         if self._unique_id is None:
             self._unique_id = slugify(
-                f"Tesla Model {str(self.car.vin[3]).upper()} {self.car.vin[-6:]} {self.type}"
+                f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
             )
 
         return self._unique_id
@@ -151,117 +156,22 @@ class TeslaCarDevice(TeslaBaseEntity):
     def device_info(self):
         """Return the device_info of the device."""
         return DeviceInfo(
-            identifiers={(DOMAIN, self.car.id)},
-            name=self.car.name,
+            identifiers={(DOMAIN, self._car.id)},
+            name=self.vehicle_name,
             manufacturer="Tesla",
-            model=self.car.type,
-            sw_version=self.car.version,
+            model=self._car.car_type,
+            sw_version=self._car.car_version,
         )
 
     @property
     def assumed_state(self) -> bool:
         # pylint: disable=protected-access
         """Return whether the data is from an online vehicle."""
-        return not self._coordinator.controller.is_car_online(vin=self.car.vin) and (
-            self._coordinator.controller.get_last_update_time(vin=self.car.vin)
-            - self._coordinator.controller.get_last_wake_up_time(vin=self.car.vin)
+        return not self._coordinator.controller.is_car_online(vin=self._car.vin) and (
+            self._coordinator.controller.get_last_update_time(vin=self._car.vin)
+            - self._coordinator.controller.get_last_wake_up_time(vin=self._car.vin)
             > self._coordinator.controller.update_interval
         )
-
-
-class TeslaCarData:
-    """Data Holder for all Car Data.
-
-    Exists simply so we don't have a bunch of attributes on the top level Entity.
-    """
-
-    def __init__(self, car: dict, coordinator: TeslaDataUpdateCoordinator) -> None:
-        """Initialize TeslaCard Data Holder."""
-        self.coordinator: TeslaDataUpdateCoordinator = coordinator
-        self.raw: dict = car
-
-    def set_car_data(self, new_data: dict) -> None:
-        """Update Car Data."""
-        self.raw = new_data
-
-    @property
-    def state(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_state_params(vin=self.vin)
-
-    @property
-    def config(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_config_params(vin=self.vin)
-
-    @property
-    def charging(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_charging_params(vin=self.vin)
-
-    @property
-    def climate(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_climate_params(vin=self.vin)
-
-    @property
-    def gui(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_gui_params(vin=self.vin)
-
-    @property
-    def drive(self) -> dict:
-        """Return State Data."""
-        return self.coordinator.controller.get_drive_params(vin=self.vin)
-
-    @property
-    def sentry_mode_available(self) -> bool:
-        """Return True if sentry mode is available on this Vehicle."""
-        return (
-            "vehicle_state" in self.raw
-            and "sentry_mode_available" in self.raw["vehicle_state"]
-            and self.raw["vehicle_state"]["sentry_mode_available"]
-        )
-
-    @property
-    def type(self) -> str:
-        """Return the car_type of this Vehicle."""
-        return f"Model {str(self.vin[3]).upper()}"
-
-    @property
-    def display_name(self) -> str:
-        """Return the display_name of this Vehicle."""
-        return self.raw.get("display_name")
-
-    @property
-    def vehicle_id(self) -> str:
-        """Return the vehicle_id of this Vehicle."""
-        return self.raw.get("vehicle_id")
-
-    @property
-    def id(self) -> str:
-        """Return the id of this Vehicle."""
-        return self.raw.get("id")
-
-    @property
-    def vin(self) -> str:
-        """Return the vin of this Vehicle."""
-        return self.raw.get("vin")
-
-    @property
-    def name(self) -> str:
-        """Return the car name of this Vehicle."""
-
-        return (
-            self.display_name
-            if self.display_name is not None and self.display_name != self.vin[-6:]
-            else f"Tesla Model {str(self.vin[3]).upper()}"
-        )
-
-    @property
-    def version(self) -> str:
-        """Return the Software Version of this Vehicle."""
-        return self.state.get("car_version")
 
 
 class TeslaEnergyDevice(TeslaBaseEntity):

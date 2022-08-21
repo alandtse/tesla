@@ -1,7 +1,9 @@
 """Support for Tesla charger switches."""
 import logging
 
-from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
+from teslajsonpy.car import TeslaCar
+
+from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
@@ -17,7 +19,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(HeatedSteeringWheel(hass, car, coordinator))
         entities.append(Polling(hass, car, coordinator))
         entities.append(Charger(hass, car, coordinator))
@@ -30,7 +32,10 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -40,37 +45,25 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
     @property
     def is_on(self):
         """Return Heated Steering Wheel state."""
-
-        return self.car.climate.get("steering_wheel_heater")
-
-    async def set_heated_steering_wheel(self, value: bool) -> None:
-        """Set the Heated Steering Wheel to the desired state."""
-        _LOGGER.info("Setting Heated Steering Wheel to: %s", value)
-        data = await self._send_command(
-            "REMOTE_STEERING_WHEEL_HEATER_REQUEST",
-            path_vars={"vehicle_id": self.car.id},
-            on=value,
-            wake_if_asleep=True,
-        )
-
-        if data and data["response"]["result"]:
-            self.car.climate["steering_wheel_heater"] = value
-            self.async_write_ha_state()
+        return self._car.is_steering_wheel_heater_on
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        await self.set_heated_steering_wheel(True)
+        await self._car.set_heated_steering_wheel(True)
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        await self.set_heated_steering_wheel(False)
+        await self._car.set_heated_steering_wheel(False)
 
 
 class Polling(TeslaCarDevice, SwitchEntity):
     """Representation of the Polling Switch."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -81,21 +74,21 @@ class Polling(TeslaCarDevice, SwitchEntity):
     @property
     def is_on(self):
         """Return Heated Steering Wheel state."""
-        if self._coordinator.controller.get_updates(vin=self.car.vin) is None:
+        if self._coordinator.controller.get_updates(vin=self._car.vin) is None:
             return None
 
-        return bool(self._coordinator.controller.get_updates(vin=self.car.vin))
+        return bool(self._coordinator.controller.get_updates(vin=self._car.vin))
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        _LOGGER.debug("Enable polling: %s %s", self.name, self.car.vin)
-        self._coordinator.controller.set_updates(vin=self.car.vin, value=True)
+        _LOGGER.debug("Enable polling: %s %s", self.name, self._car.vin)
+        self._coordinator.controller.set_updates(vin=self._car.vin, value=True)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        _LOGGER.debug("Disable polling: %s %s", self.name, self.car.vin)
-        self._coordinator.controller.set_updates(vin=self.car.vin, value=False)
+        _LOGGER.debug("Disable polling: %s %s", self.name, self._car.vin)
+        self._coordinator.controller.set_updates(vin=self._car.vin, value=False)
         self.async_write_ha_state()
 
 
@@ -103,7 +96,10 @@ class Charger(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Representation of a Tesla charger switch."""
         super().__init__(hass, car, coordinator)
@@ -112,44 +108,29 @@ class Charger(TeslaCarDevice, SwitchEntity):
 
     @property
     def is_on(self):
-        """Return Heated Steering Wheel state."""
-        charging_state = self.car.charging.get("charging_state")
-
-        return charging_state == "Charging"
+        """Return charging state."""
+        return self._car.charging_state == "Charging"
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        data = await self._send_command(
-            "START_CHARGE",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
-
-        if data and data["response"]["result"]:
-            self.car.charging["charging_state"] = "Charging"
-            self.async_write_ha_state()
+        await self._car.start_charge()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        data = await self._send_command(
-            "STOP_CHARGE",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
+        await self._car.stop_charge()
 
-        if data and data["response"]["result"]:
-            self.car.charging["charging_state"] = None
-            self.async_write_ha_state()
-
-            # Do a non-blocking update to get the latest Charging state.
-            self.update_controller(wake_if_asleep=True, force=True, blocking=False)
+        # Do a non-blocking update to get the latest Charging state.
+        self.update_controller(wake_if_asleep=True, force=True, blocking=False)
 
 
 class SentryMode(TeslaCarDevice, SwitchEntity):
     """Representation of the Tesla Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Representation of a Tesla Sentry Mode switch."""
         super().__init__(hass, car, coordinator)
@@ -159,31 +140,18 @@ class SentryMode(TeslaCarDevice, SwitchEntity):
     @property
     def is_on(self):
         """Return Sentry Mode state."""
-        sentry_mode_available = self.car.state.get("sentry_mode_available")
-        sentry_mode_status = self.car.state.get("sentry_mode")
+        sentry_mode_available = self._car.sentry_mode_available
+        sentry_mode_status = self._car.sentry_mode
 
         if sentry_mode_available is True and sentry_mode_status is True:
             return True
 
         return False
 
-    async def set_sentry_mode(self, value: bool) -> None:
-        """Set Sentry Mode to the desired value."""
-        data = await self._send_command(
-            "SET_SENTRY_MODE",
-            path_vars={"vehicle_id": self.car.id},
-            on=value,
-            wake_if_asleep=True,
-        )
-
-        if data and data["response"]["result"]:
-            self.car.state["sentry_mode"] = value
-            self.async_write_ha_state()
-
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
-        await self.set_sentry_mode(True)
+        await self._car.set_sentry_mode(True)
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
-        await self.set_sentry_mode(False)
+        await self._car.set_sentry_mode(False)

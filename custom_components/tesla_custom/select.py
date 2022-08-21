@@ -1,6 +1,8 @@
 """Support for Tesla selects."""
 import logging
 
+from teslajsonpy.car import TeslaCar
+
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
@@ -40,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(TeslaCabinOverheatProtection(hass, car, coordinator))
 
         for seat_name in SEAT_ID_MAP:
@@ -55,7 +57,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         seat_name: str,
     ):
@@ -68,7 +70,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         # For 3rd row disable by default
         if (
             self._seat_name in ["third_row_left", "third_row_right"]
-            and self.car.config.get("third_row_seats") is not None
+            and self._car.third_row_seats is not None
         ):
             self._enabled_by_default = False
 
@@ -76,25 +78,16 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         """Change the selected option."""
         level: int = HEATER_OPTIONS.index(option)
 
-        # await wait_for_climate(self.hass, self.config_entry_id)
+        await wait_for_climate(self.hass, self.config_entry_id)
         _LOGGER.debug("Setting %s to %s", self.name, level)
-        data = await self._send_command(
-            "REMOTE_SEAT_HEATER_REQUEST",
-            path_vars={"vehicle_id": self.car.id},
-            heater=SEAT_ID_MAP[self._seat_name],
-            level=level,
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.climate[self._seat_key] = level
+        await self._car.remote_seat_heater_request(level, SEAT_ID_MAP[self._seat_name])
 
         await self.update_controller(force=True)
-        self.async_write_ha_state()
 
     @property
     def current_option(self):
         """Return the selected entity option to represent the entity state."""
-        current_value = self.car.climate.get(self._seat_key)
+        current_value = self._car.get_seat_heater_status(SEAT_ID_MAP[self._seat_name])
 
         if current_value is None:
             return HEATER_OPTIONS[0]
@@ -116,7 +109,7 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize a heated seat for the vehicle."""
@@ -128,29 +121,9 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
-
-        if option == "Off":
-            body_on = False
-            fan_only = False
-        elif option == "No A/C":
-            body_on = True
-            fan_only = True
-        elif option == "On":
-            body_on = True
-            fan_only = False
-
-        data = await self._send_command(
-            "SET_CABIN_OVERHEAT_PROTECTION",
-            path_vars={"vehicle_id": self.car.id},
-            on=body_on,
-            fan_only=fan_only,
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.climate["cabin_overheat_protection"] = option
-            self.async_write_ha_state()
+        await self._car.set_cabin_overheat_protection(option)
 
     @property
     def current_option(self):
         """Return the selected entity option to represent the entity state."""
-        return self.car.climate.get("cabin_overheat_protection")
+        return self._car.cabin_overheat_protection

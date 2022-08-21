@@ -1,6 +1,9 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import CHARGE_CURRENT_MIN
+
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
 
@@ -8,15 +11,13 @@ from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarDevice
 from .const import DOMAIN
 
-CHARGE_CURRENT_MIN = 1
-
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(TeslaChargeLimit(hass, car, coordinator))
         entities.append(TeslaCurrentLimit(hass, car, coordinator))
 
@@ -27,7 +28,10 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
     """Representation of the Tesla Charge Limit Number."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
@@ -38,39 +42,32 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
-
-        data = await self._send_command(
-            "CHANGE_CHARGE_LIMIT",
-            path_vars={"vehicle_id": self.car.id},
-            percent=int(value),
-            wake_if_asleep=True,
-        )
-
-        if data and data["response"]["result"] is True:
-            self.car.charging["charge_limit_soc"] = int(value)
-            self.async_write_ha_state()
+        await self._car.change_charge_limit(value)
 
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-        return self.car.charging.get("charge_limit_soc")
+        return self._car.charge_limit_soc
 
     @property
     def native_min_value(self) -> float:
         """Return the Min value for Charge Limit."""
-        return self.car.charging.get("charge_limit_soc_min")
+        return self._car.charge_limit_soc_min
 
     @property
     def native_max_value(self) -> float:
         """Return the Max value for Charge Limit."""
-        return self.car.charging.get("charge_limit_soc_max")
+        return self._car.charge_limit_soc_max
 
 
 class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
     """Representation of the Tesla Current Limit Number."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
@@ -80,33 +77,21 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         self._attr_native_step = 1
 
     async def async_set_native_value(self, value: float) -> None:
-        """Update the current value."""
-
-        data = await self._send_command(
-            "CHARGING_AMPS",
-            path_vars={"vehicle_id": self.car.id},
-            charging_amps=int(value),
-            wake_if_asleep=True,
-        )
-
-        if data and data["response"]["result"] is True:
-            self.car.charging["charge_limit_soc"] = int(value)
-            self.async_write_ha_state()
+        """Update the charging amps value."""
+        await self._car.set_charging_amps(value)
 
     @property
     def native_value(self):
         """Return the current value."""
-        return self.car.charging.get("charge_current_request")
+        return self._car.charge_current_request
 
     @property
     def native_min_value(self):
         """Return the Min value for Charge Limit."""
-        # I can't find anything in the API that
-        # sets the min_value for current requests.
-        # So i've just set it to 1 amp 🤷‍♂️
+        # Not in API but Tesla app allows minimum of 5
         return CHARGE_CURRENT_MIN
 
     @property
     def native_max_value(self):
         """Return the Max value for Charge Limit."""
-        return self.car.charging.get("charge_current_request_max")
+        return self._car.charge_current_request_max

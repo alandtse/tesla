@@ -1,8 +1,8 @@
 """Support for the Tesla sensors."""
 from __future__ import annotations
 
-from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
 from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite, PowerwallSite
 
 from homeassistant.components.sensor import (
@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
     entities = []
-    for car in hass.data[DOMAIN][config_entry.entry_id]["cars"]:
+    for car in coordinator.controller.cars.values():
         entities.append(TeslaBattery(hass, car, coordinator))
         entities.append(TeslaChargerRate(hass, car, coordinator))
         entities.append(TeslaChargerEnergy(hass, car, coordinator))
@@ -67,7 +67,7 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -105,7 +105,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -173,7 +173,7 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -196,7 +196,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -239,7 +239,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
@@ -286,7 +286,7 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        car: dict,
+        car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         *,
         inside=False,
