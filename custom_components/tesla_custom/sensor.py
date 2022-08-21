@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
+from teslajsonpy.car import TeslaCar
 from teslajsonpy.energy import EnergySite, PowerwallSite
 
 from homeassistant.components.sensor import (
@@ -64,7 +65,10 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Car Battery Sensor."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -82,13 +86,13 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the battery level."""
-        return self.car.charging.get("battery_level")
+        return self._car.battery_level
 
     @property
     def icon(self):
         """Return the icon for the battery."""
 
-        charging = self.car.charging.get("charging_state") == "Charging"
+        charging = self._car.battery_level == "Charging"
 
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging
@@ -99,7 +103,10 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Car Charging Rate."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -113,12 +120,12 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
 
         Get from Car setting
         """
-        return self.car.gui.get("gui_distance_units", "mi/hr")
+        return self._car.gui_distance_units
 
     @property
     def native_value(self) -> int:
         """Return the battery Charge Rate."""
-        charge_rate = self.car.charging.get("charge_rate")
+        charge_rate = self._car.charge_rate
 
         # If we don't have anything, just return None.
         if charge_rate is None:
@@ -134,15 +141,10 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
+        added_range = self._car.charge_miles_added_ideal
 
-        # we're going to be ref'ing this alot, so lets make a local var.
-
-        c_data = self.car.charging
-
-        added_range = c_data.get("charge_miles_added_ideal")
-
-        if self.car.gui.get("gui_range_display") == "Rated":
-            added_range = c_data.get("charge_miles_added_rated")
+        if self._car.gui_range_display == "Rated":
+            added_range = self._car.charge_miles_added_rated
 
         if self.unit_of_measurement == "km/hr":
             added_range = round(
@@ -150,16 +152,16 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
             )
 
         data = {
-            "time_left": c_data.get("time_to_full_charge"),
+            "time_left": self._car.time_to_full_charge,
             "added_range": added_range,
-            "charge_energy_added": c_data.get("charge_energy_added"),
-            "charge_current_request": c_data.get("charge_current_request"),
-            "charge_current_request_max": c_data.get("charge_current_request_max"),
-            "charger_actual_current": c_data.get("charger_actual_current"),
-            "charger_voltage": c_data.get("charger_voltage"),
-            "charger_power": c_data.get("charger_power"),
-            "charger_phases": c_data.get("charger_phases"),
-            "charge_limit_soc": c_data.get("charge_limit_soc"),
+            "charge_energy_added": self._car.charge_energy_added,
+            "charge_current_request": self._car.charge_current_request,
+            "charge_current_request_max": self._car.charge_current_request_max,
+            "charger_actual_current": self._car.charger_actual_current,
+            "charger_voltage": self._car.charger_voltage,
+            "charger_power": self._car.charger_power,
+            "charger_phases": self._car.charger_phases,
+            "charge_limit_soc": self._car.charge_limit_soc,
         }
         self.attrs.update(data)
         return self.attrs
@@ -169,7 +171,10 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Car Energy Added."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -182,16 +187,17 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the Charge Energy Added."""
-        charge_energy_added = self.car.charging.get("charge_energy_added")
-
-        return charge_energy_added
+        return self._car.charge_energy_added
 
 
 class TeslaMileage(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Car Mileage Added."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -203,7 +209,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the Charge Energy Added."""
-        odometer_value = self.car.state.get("odometer")
+        odometer_value = self._car.odometer
 
         if odometer_value is None:
             return None
@@ -221,9 +227,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
 
         Get from Car setting
         """
-        gui_uom = self.car.gui.get("gui_distance_units", "mi/hr")
-
-        if gui_uom == "mi/hr":
+        if self._car.gui_distance_units == "mi/hr":
             return LENGTH_MILES
 
         return LENGTH_KILOMETERS
@@ -233,7 +237,10 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
     """Representation of the Tesla Car Range Added."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
@@ -245,10 +252,10 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the Charge Energy Added."""
-        range_value = self.car.charging.get("battery_range")
+        range_value = self._car.battery_range
 
-        if self.car.gui.get("gui_range_display") == "Rated":
-            range_value = self.car.charging.get("ideal_battery_range")
+        if self._car.gui_range_display == "Rated":
+            range_value = self._car.ideal_battery_range
 
         if range_value is None:
             return None
@@ -266,9 +273,8 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
 
         Get from Car setting
         """
-        gui_uom = self.car.gui.get("gui_distance_units", "mi/hr")
 
-        if gui_uom == "mi/hr":
+        if self._car.gui_distance_units == "mi/hr":
             return LENGTH_MILES
 
         return LENGTH_KILOMETERS
@@ -304,9 +310,9 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
         """Return the car temperature."""
 
         if self.inside is True:
-            return self.car.climate.get("inside_temp")
+            return self._car.inside_temp
 
-        return self.car.climate.get("outside_temp")
+        return self._car.outside_temp
 
     @property
     def native_unit_of_measurement(self):

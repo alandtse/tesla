@@ -50,7 +50,7 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-        return self.car.drive.get("shift_state") == "P"
+        return self._car.shift_state == "P"
 
 
 class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
@@ -68,17 +68,17 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-        return self.car.charging.get("charging_state") != "Disconnected"
+        return self._car.charging_state != "Disconnected"
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
         attrs = {
-            "charging_state": self.car.charging.get("charging_state"),
-            "conn_charge_cable": self.car.charging.get("conn_charge_cable"),
-            "fast_charger_present": self.car.charging.get("fast_charger_present"),
-            "fast_charger_brand": self.car.charging.get("fast_charger_brand"),
-            "fast_charger_type": self.car.charging.get("fast_charger_type"),
+            "charging_state": self._car.charging_state,
+            "conn_charge_cable": self._car.conn_charge_cable,
+            "fast_charger_present": self._car.fast_charger_present,
+            "fast_charger_brand": self._car.fast_charger_brand,
+            "fast_charger_type": self._car.fast_charger_type,
         }
 
         return attrs
@@ -99,7 +99,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-        return self.car.charging.get("charging_state") == "Charging"
+        return self._car.charging_state == "Charging"
 
 
 class CarOnline(TeslaCarDevice, BinarySensorEntity):
@@ -116,15 +116,15 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the binary sensor."""
-        return self._coordinator.controller.car_online[self.car.vin]
+        return self._car.is_on
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
         attrs = {
-            "vehicle_id": self.car.vehicle_id,
-            "vin": self.car.vin,
-            "id": self.car.id,
+            "vehicle_id": self._car.vehicle_id,
+            "vin": self._car.vin,
+            "id": self._car.id,
         }
 
         return attrs

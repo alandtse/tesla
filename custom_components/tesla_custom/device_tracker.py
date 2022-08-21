@@ -4,7 +4,6 @@ import logging
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarDevice
@@ -42,33 +41,30 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     @property
     def longitude(self):
         """Return longitude value of the device."""
-        data: dict = self.car.drive
-        if data.get("native_location_supported"):
-            return data.get("native_longitude")
+        if self._car.native_location_supported:
+            return self._car.native_longitude
 
-        return data.get("longitude")
+        return self._car.longitude
 
     @property
     def latitude(self):
         """Return latitude value of the device."""
-        data: dict = self.car.drive
-        if data.get("native_location_supported"):
-            return data.get("native_latitude")
+        if self._car.native_location_supported:
+            return self._car.native_latitude
 
-        return data.get("latitude")
+        return self._car.latitude
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
-        data: dict = self.car.drive
-        if data.get("native_location_supported"):
-            heading = data.get("native_heading")
+        if self._car.native_location_supported:
+            heading = self._car.native_heading
         else:
-            heading = data.get("heading")
+            heading = self._car.heading
 
         attr = {
             "heading": heading,
-            "speed": data.get("speed", 0),
+            "speed": self._car.speed,
         }
 
         return attr

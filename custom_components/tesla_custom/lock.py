@@ -35,41 +35,30 @@ class Trunk(TeslaCarDevice, LockEntity):
         super().__init__(hass, car, coordinator)
         self.type = "trunk lock"
 
-    async def toggle_trunk(self):
-        """Toggle Trunk lock."""
-        data = await self._send_command(
-            "ACTUATE_TRUNK",
-            path_vars={"vehicle_id": self.car.id},
-            which_trunk="rear",
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            return 1
-
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        if self.is_locked is False:
-            result = await self.toggle_trunk()
-            if result == 1:
-                self.car.state["rt"] = 0
+        if self.is_trunk_locked is False:
+            await self._car.toggle_trunk()
+            # if result == 1:
+            #     self.car.state["rt"] = 0
 
-        self.async_write_ha_state()
+        # self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        if self.is_locked is True:
-            result = await self.toggle_trunk()
-            if result == 1:
-                self.car.state["rt"] = 255
+        if self.is_trunk_locked is True:
+            await self._car.toggle_trunk()
+            # if result == 1:
+            #     self.car.state["rt"] = 255
 
-        self.async_write_ha_state()
+        # self.async_write_ha_state()
 
     @property
-    def is_locked(self):
+    def is_trunk_locked(self):
         """Get whether the lock is in locked state."""
-        return self.car.state.get("rt") == 0
+        return self._car.is_trunk_locked
 
 
 class Frunk(TeslaCarDevice, LockEntity):
@@ -82,41 +71,22 @@ class Frunk(TeslaCarDevice, LockEntity):
         super().__init__(hass, car, coordinator)
         self.type = "frunk lock"
 
-    async def toggle_trunk(self):
-        """Toggle Frunk lock."""
-        data = await self._send_command(
-            "ACTUATE_TRUNK",
-            path_vars={"vehicle_id": self.car.id},
-            which_trunk="front",
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            return 1
-
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
         if self.is_locked is False:
-            result = await self.toggle_trunk()
-            if result == 1:
-                self.car.state["ft"] = 0
-
-        self.async_write_ha_state()
+            await self._car.toggle_frunk()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
         if self.is_locked is True:
-            result = await self.toggle_trunk()
-            if result == 1:
-                self.car.state["ft"] = 255
-
-        self.async_write_ha_state()
+            await self._car.toggle_frunk()
 
     @property
     def is_locked(self):
         """Get whether the lock is in locked state."""
-        return self.car.state.get("ft") == 0
+        return self._car.is_frunk_locked
 
 
 class Doors(TeslaCarDevice, LockEntity):
@@ -132,31 +102,17 @@ class Doors(TeslaCarDevice, LockEntity):
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        data = await self._send_command(
-            "LOCK",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.state["locked"] = True
-            self.async_write_ha_state()
+        self._car.lock()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        data = await self._send_command(
-            "UNLOCK",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.state["locked"] = False
-            self.async_write_ha_state()
+        self._car.unlock()
 
     @property
     def is_locked(self):
         """Get whether the lock is in locked state."""
-        return self.car.state.get("locked")
+        return self._car.is_locked
 
 
 class ChargerDoor(TeslaCarDevice, LockEntity):
@@ -172,32 +128,18 @@ class ChargerDoor(TeslaCarDevice, LockEntity):
     async def async_lock(self, **kwargs):
         """Send the lock command."""
         _LOGGER.debug("Locking doors for: %s", self.name)
-        data = await self._send_command(
-            "CHARGE_PORT_DOOR_CLOSE",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.charging["charge_port_door_open"] = True
-            self.async_write_ha_state()
+        self._car.charge_port_door_close()
 
     async def async_unlock(self, **kwargs):
         """Send the unlock command."""
         _LOGGER.debug("Unlocking doors for: %s", self.name)
-        data = await self._send_command(
-            "CHARGE_PORT_DOOR_OPEN",
-            path_vars={"vehicle_id": self.car.id},
-            wake_if_asleep=True,
-        )
-        if data and data["response"]["result"]:
-            self.car.charging["charge_port_door_open"] = False
-            self.async_write_ha_state()
+        self._car.charge_port_door_open()
 
     @property
     def is_locked(self):
         """Get whether the lock is in locked state."""
-        charge_door_open = self.car.charging.get("charge_port_door_open")
-        charger_latched = self.car.charging.get("charge_port_latch") == "Engaged"
+        charge_door_open = self._car.charge_port_door_open
+        charger_latched = self._car.charge_port_latch == "Engaged"
 
         if charger_latched:
             return True

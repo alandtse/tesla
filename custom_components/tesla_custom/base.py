@@ -93,11 +93,21 @@ class TeslaCarDevice(TeslaBaseEntity):
     """Representation of a Tesla car device."""
 
     def __init__(
-        self, hass: HomeAssistant, car: dict, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: dict,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla car device."""
         super().__init__(hass, coordinator)
-        self.car = TeslaCar(car, coordinator)
+        self.car = TeslaCarData(car, coordinator)
+        self._car = self.get_car()
+
+    def get_car(self):
+        """Temporary function for rewrite"""
+        # This is temporary until we can pass in car object during instantiation
+        for car in self._coordinator.controller.cars.values():
+            return car
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -159,7 +169,7 @@ class TeslaCarDevice(TeslaBaseEntity):
         )
 
 
-class TeslaCar:
+class TeslaCarData:
     """Data Holder for all Car Data.
 
     Exists simply so we don't have a bunch of attributes on the top level Entity.
