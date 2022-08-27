@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.1 (2022-08-27)
+### Fix
+* Bump teslajsonpy to fix solar naming ([#249](https://github.com/alandtse/tesla/issues/249)) ([`26658bd`](https://github.com/alandtse/tesla/commit/26658bd46d56d4c94cc5b99cfbcfa56a1671ee36))
+
 ## v2.4.0 (2022-08-13)
 ### Feature
 * Add solar power, grid power, load power sensors ([`57d6095`](https://github.com/alandtse/tesla/commit/57d6095a2b6cc17e57317eef800261b4bb47bf8c))
