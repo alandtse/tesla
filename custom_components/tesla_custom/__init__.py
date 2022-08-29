@@ -1,6 +1,5 @@
 """Support for Tesla cars."""
 import asyncio
-from collections import defaultdict
 from datetime import timedelta
 from http import HTTPStatus
 import logging

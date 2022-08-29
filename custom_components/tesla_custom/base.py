@@ -1,7 +1,4 @@
 """Support for Tesla cars."""
-import logging
-from xxlimited import Str
-
 from teslajsonpy.energy import EnergySite
 from teslajsonpy.car import TeslaCar
 
@@ -12,8 +9,6 @@ from homeassistant.util import slugify
 
 from . import TeslaDataUpdateCoordinator
 from .const import ATTRIBUTION, DOMAIN
-
-_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_DEVICE = "device"
 
