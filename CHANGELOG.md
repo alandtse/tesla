@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.2 (2022-08-29)
+### Fix
+* Fix grid status issue ([#258](https://github.com/alandtse/tesla/issues/258)) ([`f889173`](https://github.com/alandtse/tesla/commit/f88917321369d0faaf280e1139967eebf6df8be5))
+
 ## v2.4.1 (2022-08-27)
 ### Fix
 * Bump teslajsonpy to fix solar naming ([#249](https://github.com/alandtse/tesla/issues/249)) ([`26658bd`](https://github.com/alandtse/tesla/commit/26658bd46d56d4c94cc5b99cfbcfa56a1671ee36))
