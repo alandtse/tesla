@@ -263,7 +263,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
         """Return the Charge Energy Added."""
         range_value = self._car.battery_range
 
-        if self._car.gui_range_display == "Rated":
+        if self._car.gui_range_display == "Ideal":
             range_value = self._car.ideal_battery_range
 
         if range_value is None:
