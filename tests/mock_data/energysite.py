@@ -1,0 +1,38 @@
+ENERGYSITE = {
+    "energy_site_id": 12345,
+    "resource_type": "solar",
+    "id": "313dbc37-555c-45b1-83aa-62a4ef9ff7ac",
+    "asset_site_id": "12345",
+    "solar_power": 2260,
+    "solar_type": "pv_panel",
+    "storm_mode_enabled": None,
+    "powerwall_onboarding_settings_set": None,
+    "sync_grid_alert_enabled": False,
+    "breaker_alert_enabled": False,
+    "components": {
+        "battery": False,
+        "solar": True,
+        "solar_type": "pv_panel",
+        "grid": True,
+        "load_meter": True,
+        "market_type": "residential",
+    },
+}
+
+SITE_DATA = {
+    "solar_power": 7720,
+    "energy_left": 0,
+    "total_pack_energy": 1,
+    "percentage_charged": 0,
+    "battery_power": 0,
+    "load_power": 4517.14990234375,
+    "grid_status": "Unknown",
+    "grid_services_active": False,
+    "grid_power": -3202.85009765625,
+    "grid_services_power": 0,
+    "generator_power": 0,
+    "island_status": "island_status_unknown",
+    "storm_mode_active": False,
+    "timestamp": "2022-07-28T17:11:27Z",
+    "wall_connectors": None,
+}

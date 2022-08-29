@@ -21,15 +21,17 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
     entities = []
-    for car in coordinator.controller.cars.values():
+
+    for car in cars.values():
         entities.append(ParkingBrake(hass, car, coordinator))
         entities.append(CarOnline(hass, car, coordinator))
         entities.append(ChargerConnection(hass, car, coordinator))
         entities.append(Charging(hass, car, coordinator))
 
-    for energysite in coordinator.controller.energysites.values():
+    for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyCharging(hass, energysite, coordinator))
 

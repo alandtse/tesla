@@ -37,6 +37,7 @@ KEEPER_MAP = {
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla CLimate by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
     entities = [
         TeslaClimate(
@@ -44,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             car,
             coordinator,
         )
-        for car in coordinator.controller.cars.values()
+        for car in cars.values()
     ]
     async_add_entities(entities, True)
 

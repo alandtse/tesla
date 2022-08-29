@@ -17,7 +17,7 @@ SAMPLE_VEHICLE = {
     "id": 12345678901234567,
     "vehicle_id": 1234567890,
     "vin": "5YJSA11111111111",
-    "display_name": "Nikola 2.0",
+    "display_name": "My Model S",
     "option_codes": "MDLS,RENA,AF02,APF1,APH2,APPB,AU01,BC0R,BP00,BR00,BS00,CDM0,CH05,PBCW,CW00,DCF0,DRLH,DSH7,DV4W,FG02,FR04,HP00,IDBA,IX01,LP01,ME02,MI01,PF01,PI01,PK00,PS01,PX00,PX4D,QTVB,RFP2,SC01,SP00,SR01,SU01,TM00,TP03,TR00,UTAB,WTAS,X001,X003,X007,X011,X013,X021,X024,X027,X028,X031,X037,X040,X044,YFFC,COUS",
     "color": None,
     "tokens": ["abcdef1234567890", "1234567890abcdef"],
@@ -153,7 +153,7 @@ VEHICLE_STATE = {
     "locked": True,
     "media_state": {"remote_control_enabled": True},
     "notifications_supported": True,
-    "odometer": 33561.422505,
+    "odometer": round(33561.422505),
     "parsed_calendar_supported": True,
     "pf": 0,
     "pr": 0,
@@ -187,7 +187,7 @@ VEHICLE_STATE = {
     "timestamp": 1538364666096,
     "valet_mode": False,
     "valet_pin_needed": True,
-    "vehicle_name": "Nikola 2.0",
+    "vehicle_name": "My Model S",
 }
 
 VEHICLE_CONFIG = {
@@ -223,7 +223,7 @@ VEHICLE = {
     "user_id": 123,
     "vehicle_id": 1234567890,
     "vin": "5YJSA11111111111",
-    "display_name": "Nikola 2.0",
+    "display_name": "My Model S",
     "option_codes": "MDLS,RENA,AF02,APF1,APH2,APPB,AU01,BC0R,BP00,BR00,BS00,CDM0,CH05,PBCW,CW00,DCF0,DRLH,DSH7,DV4W,FG02,FR04,HP00,IDBA,IX01,LP01,ME02,MI01,PF01,PI01,PK00,PS01,PX00,PX4D,QTVB,RFP2,SC01,SP00,SR01,SU01,TM00,TP03,TR00,UTAB,WTAS,X001,X003,X007,X011,X013,X021,X024,X027,X028,X031,X037,X040,X044,YFFC,COUS",
     "color": None,
     "tokens": ["abcdef1234567890", "1234567890abcdef"],
@@ -240,41 +240,4 @@ VEHICLE = {
     "gui_settings": None,
     "vehicle_state": None,
     "vehicle_config": None,
-}
-
-ENERGYSITE_CONFIG = {
-    "id": 12345678901234567,
-    "energy_site_id": 1234567890,
-    "asset_site_id": 1234567890,
-    "resource_type": "solar",
-    "site_name": "Test Site",
-    "solar_type": "pv_panels",
-    "solar_power": None,
-    "sync_grid_alert_enabled": False,
-    "breaker_alert_enabled": False,
-}
-
-ENERGYSITE_CONFIG_NO_NAME = {
-    "id": 12345678901234567,
-    "energy_site_id": 1234567890,
-    "asset_site_id": 1234567890,
-    "resource_type": "solar",
-    "solar_type": "pv_panels",
-    "solar_power": None,
-    "sync_grid_alert_enabled": False,
-    "breaker_alert_enabled": False,
-}
-
-ENERGYSITE_STATE = {
-    "id": 12345678901234567,
-    "timestamp": "2011-01-01",
-    "solar_power": 1900,
-}
-
-ENERGYSITE_STATE_UNKNOWN_GRID = {
-    "id": 12345678901234567,
-    "timestamp": "2011-01-01",
-    "solar_power": 1750,
-    "grid_status": "Unknown",
-    "grid_services_active": False,
 }

@@ -17,9 +17,10 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
-    for car in coordinator.controller.cars.values():
+
+    for car in cars.values():
         entities.append(CarLocation(hass, car, coordinator))
 
     async_add_entities(entities, True)
@@ -29,7 +30,10 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     """Representation of the Tesla Car Location Tracker."""
 
     def __init__(
-        self, hass: HomeAssistant, car: TeslaCar, coordinator: TeslaDataUpdateCoordinator
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)

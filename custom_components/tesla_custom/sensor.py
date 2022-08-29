@@ -33,9 +33,11 @@ BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery_power"]
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
     entities = []
-    for car in coordinator.controller.cars.values():
+
+    for car in cars.values():
         entities.append(TeslaBattery(hass, car, coordinator))
         entities.append(TeslaChargerRate(hass, car, coordinator))
         entities.append(TeslaChargerEnergy(hass, car, coordinator))
@@ -44,12 +46,19 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaTemp(hass, car, coordinator))
         entities.append(TeslaTemp(hass, car, coordinator, inside=True))
 
-    for energysite in coordinator.controller.energysites.values():
-        if energysite.resource_type == RESOURCE_TYPE_SOLAR:
+    for energysite in energysites.values():
+        if (
+            energysite.resource_type == RESOURCE_TYPE_SOLAR
+            and energysite.has_load_meter
+        ):
             for sensor_type in SOLAR_SITE_SENSORS:
                 entities.append(
                     TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
                 )
+        elif energysite.resource_type == RESOURCE_TYPE_SOLAR:
+            entities.append(
+                TeslaEnergyPowerSensor(hass, energysite, coordinator, "solar_power")
+            )
 
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBattery(hass, energysite, coordinator))

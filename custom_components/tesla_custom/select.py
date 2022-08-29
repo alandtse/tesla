@@ -40,8 +40,10 @@ SEAT_ID_MAP = {
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
-    for car in coordinator.controller.cars.values():
+
+    for car in cars.values():
         entities.append(TeslaCabinOverheatProtection(hass, car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_heated_seats:

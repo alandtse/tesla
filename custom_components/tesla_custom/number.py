@@ -15,9 +15,10 @@ from .const import DOMAIN
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
-    for car in coordinator.controller.cars.values():
+
+    for car in cars.values():
         entities.append(TeslaChargeLimit(hass, car, coordinator))
         entities.append(TeslaCurrentLimit(hass, car, coordinator))
 
@@ -40,22 +41,22 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         self._attr_mode = NumberMode.AUTO
         self._attr_native_step = 1
 
-    async def async_set_native_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: int) -> None:
         """Update the current value."""
         await self._car.change_charge_limit(value)
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> int:
         """Return the current value."""
         return self._car.charge_limit_soc
 
     @property
-    def native_min_value(self) -> float:
+    def native_min_value(self) -> int:
         """Return the Min value for Charge Limit."""
         return self._car.charge_limit_soc_min
 
     @property
-    def native_max_value(self) -> float:
+    def native_max_value(self) -> int:
         """Return the Max value for Charge Limit."""
         return self._car.charge_limit_soc_max
 
@@ -76,22 +77,22 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         self._attr_mode = NumberMode.AUTO
         self._attr_native_step = 1
 
-    async def async_set_native_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: int) -> None:
         """Update the charging amps value."""
         await self._car.set_charging_amps(value)
 
     @property
-    def native_value(self):
+    def native_value(self) -> int:
         """Return the current value."""
         return self._car.charge_current_request
 
     @property
-    def native_min_value(self):
+    def native_min_value(self) -> int:
         """Return the Min value for Charge Limit."""
         # Not in API but Tesla app allows minimum of 5
         return CHARGE_CURRENT_MIN
 
     @property
-    def native_max_value(self):
+    def native_max_value(self) -> int:
         """Return the Max value for Charge Limit."""
         return self._car.charge_current_request_max

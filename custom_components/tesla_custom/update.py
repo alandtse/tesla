@@ -17,14 +17,15 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla binary_sensors by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
     entities = [
         TeslaUpdate(
             hass,
             car,
-            hass.data[DOMAIN][config_entry.entry_id]["coordinator"],
+            coordinator,
         )
-        for car in coordinator.controller.cars.values()
+        for car in cars.values()
     ]
     async_add_entities(entities, True)
 
