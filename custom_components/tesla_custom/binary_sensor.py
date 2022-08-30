@@ -1,7 +1,7 @@
 """Support for Tesla binary sensor."""
 import logging
 
-from teslajsonpy.const import RESOURCE_TYPE_BATTERY
+from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import PowerwallSite
 from teslajsonpy.car import TeslaCar
 
@@ -34,6 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyCharging(hass, energysite, coordinator))
+            entities.append(TeslaEnergyGridStatus(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
 
@@ -160,6 +161,26 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
 
     @property
-    def is_on(self):
-        """Return the state of the binary sensor."""
+    def is_on(self) -> bool:
+        """Return the state of battery charging."""
         return self._energysite.battery_power > 0
+
+
+class TeslaEnergyGridStatus(TeslaEnergyDevice, BinarySensorEntity):
+    """Representation of the Tesla energy grid status sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: PowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, energysite, coordinator)
+        self.type = "grid status"
+        self._attr_device_class = BinarySensorDeviceClass.POWER
+
+    @property
+    def is_on(self) -> bool:
+        """Return the state of the grid status."""
+        return self._energysite.grid_status == GRID_ACTIVE

@@ -62,6 +62,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBattery(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBatteryRemaining(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBatteryReserve(hass, energysite, coordinator))
             for sensor_type in BATTERY_SITE_SENSORS:
                 entities.append(
                     TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
@@ -387,7 +389,7 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the battery level."""
-        return round(self._energysite.battery_percent, 2)
+        return round(self._energysite.percentage_charged)
 
     @property
     def icon(self):
@@ -397,3 +399,48 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging
         )
+
+
+class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
+    """Representation of the Tesla Energy battery remaining sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: PowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, energysite, coordinator)
+        self.type = "battery remaining"
+        self._attr_device_class = SensorDeviceClass.BATTERY
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = POWER_WATT
+
+    @property
+    def native_value(self) -> int:
+        """Return the battery energy remaining."""
+        return round(self._energysite.energy_left)
+
+
+class TeslaEnergyBatteryReserve(TeslaEnergyDevice, SensorEntity):
+    """Representation of the Tesla Energy battery reserve sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: PowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize the Sensor Entity."""
+        super().__init__(hass, energysite, coordinator)
+        self.type = "battery reserve"
+        self._attr_device_class = SensorDeviceClass.BATTERY
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_icon = "mdi:battery"
+
+    @property
+    def native_value(self) -> int:
+        """Return the battery level."""
+        return round(self._energysite.battery_reserve_percent)
