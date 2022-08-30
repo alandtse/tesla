@@ -12,6 +12,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
+    ENERGY_WATT_HOUR,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
@@ -415,7 +416,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
         self.type = "battery remaining"
         self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = POWER_WATT
+        self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
 
     @property
     def native_value(self) -> int:
