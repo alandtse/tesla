@@ -2,13 +2,15 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
+from teslajsonpy.energy import PowerwallSite
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarDevice, TeslaEnergyDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,6 +28,12 @@ CABIN_OPTIONS = [
     "On",
 ]
 
+OPERATION_MODE = [
+    "Self-Powered",
+    "Time-Based Control",
+    "Backup",
+]
+
 SEAT_ID_MAP = {
     "left": 0,
     "right": 1,
@@ -41,6 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
     entities = []
 
     for car in cars.values():
@@ -51,6 +60,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             if "third_row" in seat_name and not car.third_row_seats:
                 continue
             entities.append(HeatedSeatSelect(hass, car, coordinator, seat_name))
+
+    for energysite in energysites.values():
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY:
+            entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
 
@@ -124,3 +137,33 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
     def current_option(self):
         """Return the selected entity option to represent the entity state."""
         return self._car.cabin_overheat_protection
+
+
+class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
+    """Representation of a Tesla energy site operation mode."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: PowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ):
+        """Initialize operation mode."""
+        super().__init__(hass, energysite, coordinator)
+
+        self.type = "operation mode"
+        self._attr_options = OPERATION_MODE
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+        if option == OPERATION_MODE[0]:
+            await self._energysite.set_operation_mode("self_consumption")
+        if option == OPERATION_MODE[1]:
+            await self._energysite.set_operation_mode("autonomous")
+        if option == OPERATION_MODE[2]:
+            await self._energysite.set_operation_mode("backup")
+
+    @property
+    def current_option(self):
+        """Return the selected entity option to represent the entity state."""
+        return self._energysite.operation_mode

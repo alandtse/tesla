@@ -163,7 +163,7 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return the state of battery charging."""
-        return self._energysite.battery_power > 0
+        return self._energysite.battery_power < 0
 
 
 class TeslaEnergyGridStatus(TeslaEnergyDevice, BinarySensorEntity):
