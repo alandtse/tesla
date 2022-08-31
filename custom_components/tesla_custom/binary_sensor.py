@@ -159,6 +159,7 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
         super().__init__(hass, energysite, coordinator)
         self.type = "charging"
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
+        self._attr_icon = "mdi:battery-charging"
 
     @property
     def is_on(self) -> bool:

@@ -417,11 +417,21 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
         self._attr_device_class = SensorDeviceClass.BATTERY
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
+        self._attr_icon = "mdi:battery"
 
     @property
     def native_value(self) -> int:
         """Return the battery energy remaining."""
         return round(self._energysite.energy_left)
+
+    @property
+    def icon(self):
+        """Return the icon for the battery remaining."""
+        charging = self._energysite.battery_power < 0
+
+        return icon_for_battery_level(
+            battery_level=self.native_value, charging=charging
+        )
 
 
 class TeslaEnergyBatteryReserve(TeslaEnergyDevice, SensorEntity):
