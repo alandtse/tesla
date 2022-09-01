@@ -28,6 +28,11 @@ CABIN_OPTIONS = [
     "On",
 ]
 
+EXPORT_RULE = [
+    "Solar",
+    "Everything",
+]
+
 OPERATION_MODE = [
     "Self-Powered",
     "Time-Based Control",
@@ -64,6 +69,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
+            entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
 
@@ -139,6 +146,37 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
         return self._car.cabin_overheat_protection
 
 
+class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
+    """Representation of a Tesla energy site energy export rule."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: PowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ):
+        """Initialize operation mode."""
+        super().__init__(hass, energysite, coordinator)
+
+        self.type = "export rule"
+        self._attr_options = EXPORT_RULE
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+        if option == EXPORT_RULE[0]:
+            await self._energysite.set_export_rule("pv_only")
+        if option == EXPORT_RULE[1]:
+            await self._energysite.set_export_rule("battery_ok")
+
+    @property
+    def current_option(self):
+        """Return the selected entity option to represent the entity state."""
+        if self._energysite.export_rule == "pv_only":
+            return EXPORT_RULE[0]
+        if self._energysite.export_rule == "battery_ok":
+            return EXPORT_RULE[1]
+
+
 class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
     """Representation of a Tesla energy site operation mode."""
 
@@ -166,4 +204,9 @@ class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
     @property
     def current_option(self):
         """Return the selected entity option to represent the entity state."""
-        return self._energysite.operation_mode
+        if self._energysite.operation_mode == "self_consumption":
+            return OPERATION_MODE[0]
+        if self._energysite.operation_mode == "autonomous":
+            return OPERATION_MODE[1]
+        if self._energysite.operation_mode == "backup":
+            return OPERATION_MODE[2]
