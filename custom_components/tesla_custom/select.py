@@ -158,7 +158,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
         """Initialize operation mode."""
         super().__init__(hass, energysite, coordinator)
 
-        self.type = "export rule"
+        self.type = "energy exports"
         self._attr_options = EXPORT_RULE
 
     async def async_select_option(self, option: str, **kwargs):
