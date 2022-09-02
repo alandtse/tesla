@@ -106,7 +106,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
         """Initialize the Sensor Entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charging"
-        self._attr_icon = None
+        self._attr_icon = "mdi:ev-station"
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
 
     @property

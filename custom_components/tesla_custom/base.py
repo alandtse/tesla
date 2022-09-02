@@ -33,7 +33,6 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.attrs: dict[str, str] = {}
         self._enabled_by_default: bool = True
         self.config_entry_id = None
-        self._unique_id = None
         self._attributes = {}
 
     def refresh(self) -> None:
@@ -124,12 +123,9 @@ class TeslaCarDevice(TeslaBaseEntity):
     @property
     def unique_id(self) -> str:
         """Return entity unique id."""
-        if self._unique_id is None:
-            self._unique_id = slugify(
-                f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
-            )
-
-        return self._unique_id
+        return slugify(
+            f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
+        )
 
     @property
     def device_info(self) -> DeviceInfo:

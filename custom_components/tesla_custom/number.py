@@ -48,7 +48,7 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charge limit"
-        self._attr_icon = "mdi:battery"
+        self._attr_icon = "mdi:ev-plug-tesla"
         self._attr_mode = NumberMode.AUTO
         self._attr_native_step = 1
 
@@ -84,7 +84,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         """Initialize the Number Entity."""
         super().__init__(hass, car, coordinator)
         self.type = "current limit"
-        self._attr_icon = "mdi:battery"
+        self._attr_icon = "mdi:ev-plug-tesla"
         self._attr_mode = NumberMode.AUTO
         self._attr_native_step = 1
 
