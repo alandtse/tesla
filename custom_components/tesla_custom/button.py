@@ -1,4 +1,4 @@
-"""Support for Tesla charger buttons."""
+"""Support for Tesla buttons."""
 import logging
 
 from teslajsonpy.car import TeslaCar
@@ -32,7 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class Horn(TeslaCarDevice, ButtonEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car horn button."""
 
     def __init__(
         self,
@@ -40,7 +40,7 @@ class Horn(TeslaCarDevice, ButtonEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize horn entity."""
         super().__init__(hass, car, coordinator)
         self.type = "horn"
         self._attr_icon = "mdi:bullhorn"
@@ -51,7 +51,7 @@ class Horn(TeslaCarDevice, ButtonEntity):
 
 
 class FlashLights(TeslaCarDevice, ButtonEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car flash lights button."""
 
     def __init__(
         self,
@@ -59,7 +59,7 @@ class FlashLights(TeslaCarDevice, ButtonEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize flash light entity."""
         super().__init__(hass, car, coordinator)
         self.type = "flash lights"
         self._attr_icon = "mdi:car-light-high"
@@ -70,7 +70,7 @@ class FlashLights(TeslaCarDevice, ButtonEntity):
 
 
 class WakeUp(TeslaCarDevice, ButtonEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car wake up button"""
 
     def __init__(
         self,
@@ -78,7 +78,7 @@ class WakeUp(TeslaCarDevice, ButtonEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize wake up button."""
         super().__init__(hass, car, coordinator)
         self.type = "wake up"
         self._attr_icon = "mdi:moon-waning-crescent"
@@ -90,7 +90,7 @@ class WakeUp(TeslaCarDevice, ButtonEntity):
 
 
 class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car force data update button."""
 
     def __init__(
         self,
@@ -98,9 +98,9 @@ class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize force data update button."""
         super().__init__(hass, car, coordinator)
-        self.type = "force Data update"
+        self.type = "force data update"
         self._attr_icon = "mdi:database-sync"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -115,7 +115,7 @@ class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
 
 
 class TriggerHomelink(TeslaCarDevice, ButtonEntity):
-    """Representation of a Tesla Homelink button."""
+    """Representation of a Tesla car Homelink button."""
 
     def __init__(
         self,
@@ -123,7 +123,7 @@ class TriggerHomelink(TeslaCarDevice, ButtonEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialise the button."""
+        """Initialise Homelink button."""
         super().__init__(hass, car, coordinator)
         self.type = "trigger homelink"
         self._attr_icon = "mdi:garage"

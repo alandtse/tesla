@@ -1,5 +1,4 @@
-"""Support for Tesla door locks."""
-import logging
+"""Support for Tesla update."""
 from typing import Any
 
 from teslajsonpy.car import TeslaCar
@@ -11,11 +10,9 @@ from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarDevice
 from .const import DOMAIN
 
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
-    """Set up the Tesla binary_sensors by config_entry."""
+    """Set up the Tesla update entities by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
@@ -31,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class TeslaUpdate(TeslaCarDevice, UpdateEntity):
-    """Tesla Update Entity."""
+    """Representation of a Tesla car update."""
 
     def __init__(
         self,
@@ -39,7 +36,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Update Entity."""
+        """Initialize update entity."""
         super().__init__(hass, car, coordinator)
         self.type = "software update"
 
@@ -50,7 +47,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
 
     @property
     def release_url(self) -> str:
-        """Return Release URL.
+        """Return release URL.
 
         Uses notateslaapp.com as Tesla doesn't have offical web based release Notes.
         """
@@ -65,7 +62,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
 
     @property
     def latest_version(self) -> str:
-        """Get the latest Version."""
+        """Get the latest version."""
         version_str: str = self._car.software_update.get("version")
 
         # If we don't have a software_update version, then we're running the latest version.
@@ -76,7 +73,7 @@ class TeslaUpdate(TeslaCarDevice, UpdateEntity):
 
     @property
     def installed_version(self) -> str:
-        """Get the Installed Version."""
+        """Get the installed version."""
         version_str = self._car.car_version
 
         # We will split out the version Hash, purely cause it looks nicer in the UI.

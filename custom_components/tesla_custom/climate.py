@@ -1,6 +1,4 @@
-"""Support for Tesla HVAC system."""
-from __future__ import annotations
-
+"""Support for Tesla climate."""
 import logging
 
 from teslajsonpy.car import TeslaCar
@@ -36,7 +34,7 @@ KEEPER_MAP = {
 async def async_setup_entry(
     hass: HomeAssistant, config_entry, async_add_entities
 ) -> None:
-    """Set up the Tesla CLimate by config_entry."""
+    """Set up the Tesla climate by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
@@ -52,7 +50,7 @@ async def async_setup_entry(
 
 
 class TeslaClimate(TeslaCarDevice, ClimateEntity):
-    """Representation of a Tesla climate."""
+    """Representation of a Tesla car climate."""
 
     def __init__(
         self,
@@ -60,7 +58,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize climate entity."""
         super().__init__(hass, car, coordinator)
         self.type = "HVAC (climate) system"
 
@@ -75,7 +73,6 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
         Need to be one of HVAC_MODE_*.
         """
-
         if self._car.is_climate_on:
             return HVAC_MODE_HEAT_COOL
 
@@ -83,7 +80,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
     @property
     def hvac_modes(self):
-        """Return the list of available hvac operation modes.
+        """Return list of available hvac operation modes.
 
         Need to be a subset of HVAC_MODES.
         """
@@ -91,7 +88,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
     @property
     def temperature_unit(self):
-        """Return the unit of measurement.
+        """Return unit of measurement.
 
         Tesla API always returns in Celsius.
         """
@@ -99,12 +96,12 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
     @property
     def current_temperature(self):
-        """Return the current temperature."""
+        """Return current temperature."""
         return self._car.inside_temp
 
     @property
     def max_temp(self):
-        """Return the max temperature."""
+        """Return max temperature."""
         if self._car.max_avail_temp:
             return self._car.max_avail_temp
 
@@ -112,7 +109,7 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
     @property
     def min_temp(self):
-        """Return the min temperature"""
+        """Return min temperature"""
         if self._car.min_avail_temp:
             return self._car.min_avail_temp
 
@@ -120,11 +117,11 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
     @property
     def target_temperature(self):
-        """Return the temperature we try to reach."""
+        """Return target temperature."""
         return self._car.driver_temp_setting
 
     async def async_set_temperature(self, **kwargs):
-        """Set new target temperatures."""
+        """Set new target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature:
             _LOGGER.debug("%s: Setting temperature to %s", self.name, temperature)
@@ -158,13 +155,10 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
         """
         if self._car.defrost_mode == 2:
             return "Defrost"
-
         if self._car.climate_keeper_mode == "dog":
             return "Dog Mode"
-
         if self._car.climate_keeper_mode == "camp":
             return "Camp Mode"
-
         if self._car.climate_keeper_mode == "on":
             return "Keep On"
 
@@ -184,7 +178,6 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
         if preset_mode == "Normal":
             # If setting Normal, we need to check Defrost And Keep modes.
-
             if self._car.defrost_mode != 0:
                 await self._car.set_max_defrost(False)
 
@@ -196,7 +189,6 @@ class TeslaClimate(TeslaCarDevice, ClimateEntity):
 
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
-
         # Changing the Climate modes mode can change alot of climate parms
         # So we'll do a blocking update.
         await self.update_controller(force=True, wake_if_asleep=True)

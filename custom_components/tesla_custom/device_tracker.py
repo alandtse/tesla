@@ -1,4 +1,4 @@
-"""Support for tracking Tesla cars."""
+"""Support for Tesla device tracker."""
 import logging
 
 from teslajsonpy.car import TeslaCar
@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
-    """Set up the Tesla selects by config_entry."""
+    """Set up the Tesla device trackers by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class CarLocation(TeslaCarDevice, TrackerEntity):
-    """Representation of the Tesla Car Location Tracker."""
+    """Representation of a Tesla car location device tracker."""
 
     def __init__(
         self,
@@ -35,18 +35,18 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize car location entity."""
         super().__init__(hass, car, coordinator)
         self.type = "location tracker"
 
     @property
     def source_type(self):
-        """Return the source type, eg gps or router, of the device."""
+        """Return device tracker source type."""
         return SOURCE_TYPE_GPS
 
     @property
     def longitude(self):
-        """Return longitude value of the device."""
+        """Return longitude."""
         if self._car.native_location_supported:
             return self._car.native_longitude
 
@@ -54,7 +54,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
 
     @property
     def latitude(self):
-        """Return latitude value of the device."""
+        """Return latitude."""
         if self._car.native_location_supported:
             return self._car.native_latitude
 
@@ -62,7 +62,7 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return the state attributes of the device."""
+        """Return device state attributes."""
         # "native_heading" does not exist in Tesla API with 2015 Model S 85D - newer models only?
         # if self._car.native_location_supported:
         #     heading = self._car.native_heading

@@ -1,4 +1,4 @@
-"""Support for Tesla charger switches."""
+"""Support for Tesla switches."""
 import logging
 
 from teslajsonpy.car import TeslaCar
@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
-    """Set up the Tesla selects by config_entry."""
+    """Set up the Tesla switches by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
@@ -32,7 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car heated steering wheel switch."""
 
     def __init__(
         self,
@@ -40,14 +40,14 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize heated steering wheel entity."""
         super().__init__(hass, car, coordinator)
         self.type = "heated steering"
         self._attr_icon = "mdi:steering"
 
     @property
     def is_on(self):
-        """Return Heated Steering Wheel state."""
+        """Return True if steering wheel heater is on."""
         return self._car.is_steering_wheel_heater_on
 
     async def async_turn_on(self, **kwargs):
@@ -60,7 +60,7 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
 
 
 class Polling(TeslaCarDevice, SwitchEntity):
-    """Representation of the Polling Switch."""
+    """Representation of a polling switch."""
 
     def __init__(
         self,
@@ -68,7 +68,7 @@ class Polling(TeslaCarDevice, SwitchEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize polling entity."""
         super().__init__(hass, car, coordinator)
         self.type = "polling"
         self._attr_icon = "mdi:car-connected"
@@ -76,7 +76,7 @@ class Polling(TeslaCarDevice, SwitchEntity):
 
     @property
     def is_on(self):
-        """Return Heated Steering Wheel state."""
+        """Return True if updates available."""
         if self._coordinator.controller.get_updates(vin=self._car.vin) is None:
             return None
 
@@ -96,7 +96,7 @@ class Polling(TeslaCarDevice, SwitchEntity):
 
 
 class Charger(TeslaCarDevice, SwitchEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car charger switch."""
 
     def __init__(
         self,
@@ -104,7 +104,7 @@ class Charger(TeslaCarDevice, SwitchEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Representation of a Tesla charger switch."""
+        """Initialize charger switch entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charger"
         self._attr_icon = "mdi:ev-station"
@@ -127,7 +127,7 @@ class Charger(TeslaCarDevice, SwitchEntity):
 
 
 class SentryMode(TeslaCarDevice, SwitchEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car sentry mode switch."""
 
     def __init__(
         self,
@@ -135,14 +135,14 @@ class SentryMode(TeslaCarDevice, SwitchEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Representation of a Tesla Sentry Mode switch."""
+        """Initialize sentry mode entity."""
         super().__init__(hass, car, coordinator)
         self.type = "sentry mode"
         self._attr_icon = "mdi:shield-car"
 
     @property
     def is_on(self):
-        """Return Sentry Mode state."""
+        """Return True if sentry mode is on."""
         sentry_mode_available = self._car.sentry_mode_available
         sentry_mode_status = self._car.sentry_mode
 

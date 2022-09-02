@@ -2,8 +2,8 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
@@ -14,13 +14,6 @@ from .base import TeslaCarDevice, TeslaEnergyDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-
-HEATER_OPTIONS = [
-    "Off",
-    "Low",
-    "Medium",
-    "High",
-]
 
 CABIN_OPTIONS = [
     "Off",
@@ -36,6 +29,13 @@ EXPORT_RULE = [
 GRID_CHARGING = [
     "Yes",
     "No",
+]
+
+HEATER_OPTIONS = [
+    "Off",
+    "Low",
+    "Medium",
+    "High",
 ]
 
 OPERATION_MODE = [
@@ -82,7 +82,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
-    """Representation of a Tesla Heated Seat Select."""
+    """Representation of a Tesla car heated seat select."""
 
     def __init__(
         self,
@@ -91,7 +91,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         coordinator: TeslaDataUpdateCoordinator,
         seat_name: str,
     ):
-        """Initialize a heated seat for the vehicle."""
+        """Initialize heated seat entity."""
         super().__init__(hass, car, coordinator)
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
@@ -109,7 +109,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
 
     @property
     def current_option(self):
-        """Return the selected entity option to represent the entity state."""
+        """Return current heated seat setting."""
         current_value = self._car.get_seat_heater_status(SEAT_ID_MAP[self._seat_name])
 
         if current_value is None:
@@ -122,12 +122,12 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
 
     @property
     def options(self):
-        """Return a set of selectable options."""
+        """Return heated seat options."""
         return HEATER_OPTIONS
 
 
 class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
-    """Representation of a Tesla Heated Seat Select."""
+    """Representation of a Tesla car cabin overheat protection select."""
 
     def __init__(
         self,
@@ -135,7 +135,7 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize a heated seat for the vehicle."""
+        """Initialize cabin overheat protection entity."""
         super().__init__(hass, car, coordinator)
         self.type = "cabin overheat protection"
         self._attr_options = CABIN_OPTIONS
@@ -148,12 +148,12 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
 
     @property
     def current_option(self):
-        """Return the selected entity option to represent the entity state."""
+        """Return current cabin overheat protection setting."""
         return self._car.cabin_overheat_protection
 
 
 class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
-    """Representation of a Tesla energy site grid charging."""
+    """Representation of a Tesla energy site grid charging select."""
 
     def __init__(
         self,
@@ -161,7 +161,7 @@ class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
         energysite: SolarPowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize grid charging."""
+        """Initialize grid charging entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "grid charging"
         self._attr_options = GRID_CHARGING
@@ -176,14 +176,14 @@ class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
 
     @property
     def current_option(self):
-        """Return the selected entity option to represent the entity state."""
+        """Return current grid charging setting."""
         if self._energysite.grid_charging:
             return GRID_CHARGING[0]
         return GRID_CHARGING[1]
 
 
 class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
-    """Representation of a Tesla energy site energy export rule."""
+    """Representation of a Tesla energy site energy export rule select."""
 
     def __init__(
         self,
@@ -191,7 +191,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
         energysite: SolarPowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize operation mode."""
+        """Initialize energy export rule entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "energy exports"
         self._attr_options = EXPORT_RULE
@@ -206,7 +206,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
 
     @property
     def current_option(self):
-        """Return the selected entity option to represent the entity state."""
+        """Return current energy export rule setting."""
         if self._energysite.export_rule == "pv_only":
             return EXPORT_RULE[0]
         if self._energysite.export_rule == "battery_ok":
@@ -214,7 +214,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
 
 
 class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
-    """Representation of a Tesla energy site operation mode."""
+    """Representation of a Tesla energy site operation mode select."""
 
     def __init__(
         self,
@@ -222,7 +222,7 @@ class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize operation mode."""
+        """Initialize operation mode entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "operation mode"
         self._attr_options = OPERATION_MODE
@@ -239,7 +239,7 @@ class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
 
     @property
     def current_option(self):
-        """Return the selected entity option to represent the entity state."""
+        """Return current operation mode setting."""
         if self._energysite.operation_mode == "self_consumption":
             return OPERATION_MODE[0]
         if self._energysite.operation_mode == "autonomous":

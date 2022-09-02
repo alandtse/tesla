@@ -1,6 +1,4 @@
 """Support for the Tesla sensors."""
-from __future__ import annotations
-
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite, PowerwallSite
@@ -74,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class TeslaBattery(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Battery Sensor."""
+    """Representation of the Tesla car battery sensor."""
 
     def __init__(
         self,
@@ -97,12 +95,12 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the battery level."""
+        """Return battery level."""
         return self._car.battery_level
 
     @property
     def icon(self):
-        """Return the icon for the battery."""
+        """Return icon for the battery."""
 
         charging = self._car.battery_level == "Charging"
 
@@ -112,7 +110,7 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
 
 
 class TeslaChargerRate(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Charging Rate."""
+    """Representation of the Tesla car charging rate."""
 
     def __init__(
         self,
@@ -120,7 +118,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize charging rate entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charging rate"
         self._attr_state_class = SensorStateClass.MEASUREMENT
@@ -128,15 +126,12 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
 
     @property
     def native_unit_of_measurement(self) -> str:
-        """Return Native Unit of Measurement.
-
-        Get from Car setting
-        """
+        """Return distance units from car settings."""
         return self._car.gui_distance_units
 
     @property
     def native_value(self) -> int:
-        """Return the battery Charge Rate."""
+        """Return charge rate."""
         charge_rate = self._car.charge_rate
 
         # If we don't have anything, just return None.
@@ -152,7 +147,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return the state attributes of the device."""
+        """Return device state attributes."""
         added_range = self._car.charge_miles_added_ideal
 
         if self._car.gui_range_display == "Rated":
@@ -180,7 +175,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
 
 
 class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Energy Added."""
+    """Representation of a Tesla car energy added sensor."""
 
     def __init__(
         self,
@@ -188,7 +183,7 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize energy added entity."""
         super().__init__(hass, car, coordinator)
         self.type = "energy added"
         self._attr_device_class = SensorDeviceClass.ENERGY
@@ -203,7 +198,7 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
 
 
 class TeslaMileage(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Mileage Added."""
+    """Representation of the Tesla car mileage added sensor."""
 
     def __init__(
         self,
@@ -211,7 +206,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize mileage added entity."""
         super().__init__(hass, car, coordinator)
         self.type = "mileage"
         self._attr_device_class = None
@@ -220,7 +215,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the Charge Energy Added."""
+        """Return the charge energy added."""
         odometer_value = self._car.odometer
 
         if odometer_value is None:
@@ -235,10 +230,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
 
     @property
     def native_unit_of_measurement(self) -> str:
-        """Return Native Unit of Measurement.
-
-        Get from Car setting
-        """
+        """Return distance units from car settings."""
         if self._car.gui_distance_units == "mi/hr":
             return LENGTH_MILES
 
@@ -246,7 +238,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
 
 
 class TeslaRange(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Range Added."""
+    """Representation of the Tesla car range sensor."""
 
     def __init__(
         self,
@@ -254,7 +246,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize range entity."""
         super().__init__(hass, car, coordinator)
         self.type = "range"
         self._attr_device_class = None
@@ -263,7 +255,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the Charge Energy Added."""
+        """Return range."""
         range_value = self._car.battery_range
 
         if self._car.gui_range_display == "Ideal":
@@ -281,11 +273,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
 
     @property
     def native_unit_of_measurement(self) -> str:
-        """Return Native Unit of Measurement.
-
-        Get from Car setting
-        """
-
+        """Return distance units from car settings."""
         if self._car.gui_distance_units == "mi/hr":
             return LENGTH_MILES
 
@@ -293,7 +281,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
 
 
 class TeslaTemp(TeslaCarDevice, SensorEntity):
-    """Representation of the Tesla Car Temp."""
+    """Representation of a Tesla car temp sensor."""
 
     def __init__(
         self,
@@ -303,7 +291,7 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
         *,
         inside=False,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize temp entity."""
         super().__init__(hass, car, coordinator)
         self.type = "temperature"
         self.inside = inside
@@ -319,8 +307,7 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the car temperature."""
-
+        """Return car temperature."""
         if self.inside is True:
             return self._car.inside_temp
 
@@ -336,7 +323,7 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
 
 
 class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
-    """Representation of the Tesla Energy power sensor."""
+    """Representation of a Tesla energy power sensor."""
 
     def __init__(
         self,
@@ -345,7 +332,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
         coordinator: TeslaDataUpdateCoordinator,
         sensor_type: str,
     ) -> None:
-        """Initialize the Tesla energy power sensor."""
+        """Initialize power sensor."""
         super().__init__(hass, energysite, coordinator)
         self.type = sensor_type
         self._attr_device_class = SensorDeviceClass.POWER
@@ -375,7 +362,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
 
 
 class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
-    """Representation of the Tesla Energy battery sensor."""
+    """Representation of the Tesla energy battery sensor."""
 
     def __init__(
         self,
@@ -383,7 +370,7 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize battery sensor entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "battery"
         self._attr_device_class = SensorDeviceClass.BATTERY
@@ -397,12 +384,12 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the battery level."""
+        """Return battery level."""
         return round(self._energysite.percentage_charged)
 
     @property
     def icon(self):
-        """Return the icon for the battery."""
+        """Return icon for the battery."""
         charging = self._energysite.battery_power < 0
 
         return icon_for_battery_level(
@@ -411,7 +398,7 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
 
 
 class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
-    """Representation of the Tesla Energy battery remaining sensor."""
+    """Representation of a Tesla energy battery remaining sensor."""
 
     def __init__(
         self,
@@ -419,7 +406,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize battery remaining entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "battery remaining"
         self._attr_device_class = SensorDeviceClass.BATTERY
@@ -428,12 +415,12 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the battery energy remaining."""
+        """Return battery energy remaining."""
         return round(self._energysite.energy_left)
 
     @property
     def icon(self):
-        """Return the icon for the battery remaining."""
+        """Return icon for the battery remaining."""
         charging = self._energysite.battery_power < 0
 
         return icon_for_battery_level(
@@ -442,7 +429,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
 
 
 class TeslaEnergyBackupReserve(TeslaEnergyDevice, SensorEntity):
-    """Representation of the Tesla Energy backup reserve sensor."""
+    """Representation of a Tesla energy backup reserve sensor."""
 
     def __init__(
         self,
@@ -450,7 +437,7 @@ class TeslaEnergyBackupReserve(TeslaEnergyDevice, SensorEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize backup energy reserve entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "backup reserve"
         self._attr_device_class = SensorDeviceClass.BATTERY
@@ -459,10 +446,10 @@ class TeslaEnergyBackupReserve(TeslaEnergyDevice, SensorEntity):
 
     @property
     def native_value(self) -> int:
-        """Return the backup reserve level."""
+        """Return backup reserve level."""
         return round(self._energysite.backup_reserve_percent)
 
     @property
     def icon(self):
-        """Return the icon for the backup reserve."""
+        """Return icon for the backup reserve."""
         return icon_for_battery_level(battery_level=self.native_value)

@@ -1,6 +1,6 @@
 """Support for Tesla cars."""
-from teslajsonpy.energy import EnergySite
 from teslajsonpy.car import TeslaCar
+from teslajsonpy.energy import EnergySite
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
@@ -48,7 +48,7 @@ class TeslaBaseEntity(CoordinatorEntity):
 
     @property
     def name(self) -> str:
-        """Return name of entity."""
+        """Return device name."""
         return self.type.capitalize()
 
     @property
@@ -58,7 +58,7 @@ class TeslaBaseEntity(CoordinatorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, str]:
-        """Return the state attributes of the device."""
+        """Return device state attributes."""
         attr = self._attributes
         return attr
 
@@ -106,13 +106,12 @@ class TeslaCarDevice(TeslaBaseEntity):
 
     @property
     def available(self) -> bool:
-        """Return the Availability of Data."""
+        """Return availability of data."""
         return self._car.data_available != {}
 
     @property
     def vehicle_name(self) -> str:
-        """Return the car name of this Vehicle."""
-
+        """Return vehicle name."""
         return (
             self._car.display_name
             if self._car.display_name is not None
@@ -122,14 +121,14 @@ class TeslaCarDevice(TeslaBaseEntity):
 
     @property
     def unique_id(self) -> str:
-        """Return entity unique id."""
+        """Return unique id for car device."""
         return slugify(
             f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
         )
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Return the device_info of the device."""
+        """Return device info."""
         return DeviceInfo(
             identifiers={(DOMAIN, self._car.id)},
             name=self.vehicle_name,
@@ -164,17 +163,17 @@ class TeslaEnergyDevice(TeslaBaseEntity):
 
     @property
     def unique_id(self) -> str:
-        """Return a unique ID for energy site device."""
+        """Return unique id for energy site device."""
         return slugify(f"{self._energysite.energysite_id} {self.type}")
 
     @property
     def available(self) -> bool:
-        """Return the Availability of Data."""
+        """Return availability of data."""
         return self._energysite != {}
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Return the device_info of the device."""
+        """Return device info."""
         model = f"{self._energysite.resource_type.title()} {self._energysite.solar_type.replace('_', ' ')}"
         return DeviceInfo(
             identifiers={(DOMAIN, self._energysite.energysite_id)},

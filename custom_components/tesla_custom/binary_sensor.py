@@ -1,9 +1,9 @@
-"""Support for Tesla binary sensor."""
+"""Support for Tesla binary sensors."""
 import logging
 
+from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import PowerwallSite
-from teslajsonpy.car import TeslaCar
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -40,7 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
-    """Representation of a Tesla Parking Brake."""
+    """Representation of a Tesla car parking brake binary sensor."""
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize parking brake entity."""
         super().__init__(hass, car, coordinator)
         self.type = "parking brake"
         self._attr_icon = "mdi:car-brake-parking"
@@ -56,12 +56,12 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
 
     @property
     def is_on(self):
-        """Return the state of the binary sensor."""
+        """Return True if car shift state in park."""
         return self._car.shift_state == "P"
 
 
 class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
-    """Representation of a Tesla Charger Connection."""
+    """Representation of a Tesla car charger connection binary sensor."""
 
     def __init__(
         self,
@@ -69,7 +69,7 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize charger connection entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charger"
         self._attr_icon = "mdi:ev-station"
@@ -77,12 +77,12 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
 
     @property
     def is_on(self):
-        """Return the state of the binary sensor."""
+        """Return True if charger connected."""
         return self._car.charging_state != "Disconnected"
 
     @property
     def extra_state_attributes(self):
-        """Return the state attributes of the device."""
+        """Return device state attributes."""
         attrs = {
             "charging_state": self._car.charging_state,
             "conn_charge_cable": self._car.conn_charge_cable,
@@ -95,7 +95,7 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
 
 
 class Charging(TeslaCarDevice, BinarySensorEntity):
-    """Representation of Tesla Charging."""
+    """Representation of Tesla car charging binary sensor."""
 
     def __init__(
         self,
@@ -103,7 +103,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize charging entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charging"
         self._attr_icon = "mdi:ev-station"
@@ -116,7 +116,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
 
 
 class CarOnline(TeslaCarDevice, BinarySensorEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla car online binary sensor."""
 
     def __init__(
         self,
@@ -124,19 +124,19 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize car online entity."""
         super().__init__(hass, car, coordinator)
         self.type = "online"
         self._attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
 
     @property
     def is_on(self):
-        """Return the state of the binary sensor."""
+        """Return True if car is online."""
         return self._car.is_on
 
     @property
     def extra_state_attributes(self):
-        """Return the state attributes of the device."""
+        """Return device state attributes."""
         attrs = {
             "vehicle_id": self._car.vehicle_id,
             "vin": self._car.vin,
@@ -147,7 +147,7 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
 
 
 class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
-    """Representation of the Tesla energy charging sensor."""
+    """Representation of a Tesla energy charging binary sensor."""
 
     def __init__(
         self,
@@ -155,7 +155,7 @@ class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize battery charging entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "battery charging"
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
@@ -163,12 +163,12 @@ class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool:
-        """Return the state of battery charging."""
+        """Return True if battery charging."""
         return self._energysite.battery_power < 0
 
 
 class TeslaEnergyGridStatus(TeslaEnergyDevice, BinarySensorEntity):
-    """Representation of the Tesla energy grid status sensor."""
+    """Representation of the Tesla energy grid status binary sensor."""
 
     def __init__(
         self,
@@ -176,12 +176,12 @@ class TeslaEnergyGridStatus(TeslaEnergyDevice, BinarySensorEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Sensor Entity."""
+        """Initialize grid status entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "grid status"
         self._attr_device_class = BinarySensorDeviceClass.POWER
 
     @property
     def is_on(self) -> bool:
-        """Return the state of the grid status."""
+        """Return True if grid status is active."""
         return self._energysite.grid_status == GRID_ACTIVE

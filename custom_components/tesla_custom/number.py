@@ -1,14 +1,12 @@
-"""Support for the Tesla sensors."""
-from __future__ import annotations
-
+"""Support for Tesla numbers."""
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import PowerwallSite
 from teslajsonpy.const import (
     BACKUP_RESERVE_MAX,
     BACKUP_RESERVE_MIN,
     CHARGE_CURRENT_MIN,
     RESOURCE_TYPE_BATTERY,
 )
+from teslajsonpy.energy import PowerwallSite
 
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
@@ -19,7 +17,7 @@ from .const import DOMAIN
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
-    """Set up the Tesla Sensors by config_entry."""
+    """Set up the Tesla numbers by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
@@ -37,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
-    """Representation of the Tesla Charge Limit Number."""
+    """Representation of a Tesla car charge limit number."""
 
     def __init__(
         self,
@@ -45,7 +43,7 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Number Entity."""
+        """Initialize charge limit entity."""
         super().__init__(hass, car, coordinator)
         self.type = "charge limit"
         self._attr_icon = "mdi:ev-station"
@@ -53,27 +51,27 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         self._attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
-        """Update the current value."""
+        """Update charge limit."""
         await self._car.change_charge_limit(value)
 
     @property
     def native_value(self) -> int:
-        """Return the current value."""
+        """Return charge limit."""
         return self._car.charge_limit_soc
 
     @property
     def native_min_value(self) -> int:
-        """Return the Min value for Charge Limit."""
+        """Return min charge limit."""
         return self._car.charge_limit_soc_min
 
     @property
     def native_max_value(self) -> int:
-        """Return the Max value for Charge Limit."""
+        """Return max charge limit."""
         return self._car.charge_limit_soc_max
 
 
 class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
-    """Representation of the Tesla Current Limit Number."""
+    """Representation of a Tesla car current limit number."""
 
     def __init__(
         self,
@@ -81,7 +79,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Number Entity."""
+        """Initialize current limit entity."""
         super().__init__(hass, car, coordinator)
         self.type = "current limit"
         self._attr_icon = "mdi:ev-station"
@@ -89,28 +87,28 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         self._attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
-        """Update the charging amps value."""
+        """Update current limit."""
         await self._car.set_charging_amps(value)
 
     @property
     def native_value(self) -> int:
-        """Return the current value."""
+        """Return current limit."""
         return self._car.charge_current_request
 
     @property
     def native_min_value(self) -> int:
-        """Return the Min value for Charge Limit."""
+        """Return min current limitt."""
         # Not in API but Tesla app allows minimum of 5
         return CHARGE_CURRENT_MIN
 
     @property
     def native_max_value(self) -> int:
-        """Return the Max value for Charge Limit."""
+        """Return max current limit."""
         return self._car.charge_current_request_max
 
 
 class TeslaEnergyBackupReserve(TeslaEnergyDevice, NumberEntity):
-    """Representation of the Tesla energy backup reserve percent."""
+    """Representation of a Tesla energy backup reserve number."""
 
     def __init__(
         self,
@@ -118,7 +116,7 @@ class TeslaEnergyBackupReserve(TeslaEnergyDevice, NumberEntity):
         energysite: PowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize the Number Entity."""
+        """Initialize backup reserve entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "backup reserve"
         self._attr_icon = "mdi:battery"
@@ -126,20 +124,20 @@ class TeslaEnergyBackupReserve(TeslaEnergyDevice, NumberEntity):
         self._attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
-        """Update the backup reserve percentage."""
+        """Update backup reserve percentage."""
         await self._energysite.set_reserve_percent(value)
 
     @property
     def native_value(self) -> int:
-        """Return the current value."""
+        """Return backup reserve percentage."""
         return self._energysite.backup_reserve_percent
 
     @property
     def native_min_value(self) -> int:
-        """Return the min value for battery reserve."""
+        """Return min backup reserve percentage."""
         return BACKUP_RESERVE_MIN
 
     @property
     def native_max_value(self) -> int:
-        """Return the max value for battery reserve."""
+        """Return max backup reserve percentage."""
         return BACKUP_RESERVE_MAX
