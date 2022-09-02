@@ -50,8 +50,7 @@ class TeslaBaseEntity(CoordinatorEntity):
     @property
     def name(self) -> str:
         """Return name of entity."""
-        # TeslaEnergyPowerSensors self.type contains an underscore
-        return self.type.replace("_", " ").capitalize()
+        return self.type.capitalize()
 
     @property
     def entity_registry_enabled_default(self):
@@ -170,7 +169,7 @@ class TeslaEnergyDevice(TeslaBaseEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID for energy site device."""
-        return f"{self._energysite.energysite_id}-{self.type}"
+        return slugify(f"{self._energysite.energysite_id} {self.type}")
 
     @property
     def available(self) -> bool:

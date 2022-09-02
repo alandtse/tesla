@@ -9,6 +9,7 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
+    ENERGY_WATT_HOUR,
     LENGTH_MILES,
     PERCENTAGE,
     POWER_WATT,
@@ -48,13 +49,25 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     assert entry.unique_id == "tesla_model_s_111111_temperature_inside"
 
     entry = entity_registry.async_get("sensor.my_home_solar_power")
-    assert entry.unique_id == "12345-solar_power"
+    assert entry.unique_id == "12345_solar_power"
 
     entry = entity_registry.async_get("sensor.my_home_grid_power")
-    assert entry.unique_id == "12345-grid_power"
+    assert entry.unique_id == "12345_grid_power"
 
     entry = entity_registry.async_get("sensor.my_home_load_power")
-    assert entry.unique_id == "12345-load_power"
+    assert entry.unique_id == "12345_load_power"
+
+    entry = entity_registry.async_get("sensor.battery_home_battery_power")
+    assert entry.unique_id == "67890_battery_power"
+
+    entry = entity_registry.async_get("sensor.battery_home_battery")
+    assert entry.unique_id == "67890_battery"
+
+    entry = entity_registry.async_get("sensor.battery_home_battery_remaining")
+    assert entry.unique_id == "67890_battery_remaining"
+
+    entry = entity_registry.async_get("sensor.battery_home_backup_reserve")
+    assert entry.unique_id == "67890_backup_reserve"
 
 
 async def test_battery_value(hass: HomeAssistant) -> None:
@@ -148,7 +161,7 @@ async def test_range_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_range")
-    assert state.state == str(car_mock_data.CHARGE_STATE["ideal_battery_range"])
+    assert state.state == str(car_mock_data.CHARGE_STATE["battery_range"])
 
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
@@ -212,3 +225,55 @@ async def test_load_power_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_battery_power_value(hass: HomeAssistant) -> None:
+    """Tests battery_power is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.battery_home_battery_power")
+    assert state.state == str(round(energysite_mock_data.BATTERY_DATA["battery_power"]))
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_battery(hass: HomeAssistant) -> None:
+    """Tests battery is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.battery_home_battery")
+    assert state.state == str(
+        round(energysite_mock_data.BATTERY_DATA["percentage_charged"])
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
+
+
+async def test_battery_remaining(hass: HomeAssistant) -> None:
+    """Tests battery remaining is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.battery_home_battery_remaining")
+    assert state.state == str(round(energysite_mock_data.BATTERY_DATA["energy_left"]))
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_WATT_HOUR
+
+
+async def test_backup_reserve(hass: HomeAssistant) -> None:
+    """Tests backup reserve is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.battery_home_backup_reserve")
+    assert state.state == str(
+        round(energysite_mock_data.BATTERY_DATA["backup_reserve_percent"])
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE

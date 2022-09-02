@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import SolarSite
+from teslajsonpy.energy import SolarSite, SolarPowerwallSite
 from teslajsonpy.const import AUTH_DOMAIN
 
 from custom_components.tesla_custom.const import CONF_EXPIRATION, DOMAIN as TESLA_DOMIN
@@ -50,16 +50,21 @@ def setup_mock_controller(mock_controller):
     }
 
     instance.generate_energysite_objects.return_value = {
-        1234567890: SolarSite(
+        12345: SolarSite(
             mock_controller.api,
-            energysite_mock_data.ENERGYSITE,
+            energysite_mock_data.ENERGYSITE_SOLAR,
             energysite_mock_data.SITE_DATA,
-        )
+        ),
+        67890: SolarPowerwallSite(
+            mock_controller.api,
+            energysite_mock_data.ENERGYSITE_BATTERY,
+            energysite_mock_data.BATTERY_DATA,
+        ),
     }
 
 
 async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
-    """Set up the Abode platform."""
+    """Set up the Tesla platform."""
 
     mock_entry = MockConfigEntry(
         domain=TESLA_DOMIN,

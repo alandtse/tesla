@@ -27,8 +27,8 @@ from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarDevice, TeslaEnergyDevice
 from .const import DOMAIN
 
-SOLAR_SITE_SENSORS = ["solar_power", "grid_power", "load_power"]
-BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery_power"]
+SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
+BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
@@ -58,7 +58,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                 )
         elif energysite.resource_type == RESOURCE_TYPE_SOLAR:
             entities.append(
-                TeslaEnergyPowerSensor(hass, energysite, coordinator, "solar_power")
+                TeslaEnergyPowerSensor(hass, energysite, coordinator, "solar power")
             )
 
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -352,16 +352,16 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = POWER_WATT
 
-        if self.type == "solar_power":
+        if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
             self._power = self._energysite.solar_power
-        if self.type == "grid_power":
+        if self.type == "grid power":
             self._attr_icon = "mdi:transmission-tower"
             self._power = self._energysite.grid_power
-        if self.type == "load_power":
+        if self.type == "load power":
             self._attr_icon = "mdi:home-lightning-bolt"
             self._power = self._energysite.load_power
-        if self.type == "battery_power":
+        if self.type == "battery power":
             self._attr_icon = "mdi:home-battery"
             self._power = self._energysite.battery_power
 
