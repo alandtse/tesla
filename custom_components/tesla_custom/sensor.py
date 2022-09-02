@@ -454,4 +454,4 @@ class TeslaEnergyBatteryReserve(TeslaEnergyDevice, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the battery level."""
-        return round(self._energysite.battery_reserve_percent)
+        return round(self._energysite.backup_reserve_percent)
