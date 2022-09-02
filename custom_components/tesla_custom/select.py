@@ -2,7 +2,7 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import PowerwallSite
+from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 
 from homeassistant.components.select import SelectEntity
@@ -152,7 +152,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: PowerwallSite,
+        energysite: SolarPowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize operation mode."""

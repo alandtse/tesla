@@ -2,7 +2,7 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import PowerwallSite
+from teslajsonpy.energy import SolarPowerwallSite
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 
 from homeassistant.components.switch import SwitchEntity
@@ -32,7 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(Charger(hass, car, coordinator))
 
     for energysite in energysites.values():
-        if energysite.resource_type == RESOURCE_TYPE_BATTERY:
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
             entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
@@ -173,7 +173,7 @@ class TeslaEnergyGridCharging(TeslaEnergyDevice, SwitchEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        energysite: PowerwallSite,
+        energysite: SolarPowerwallSite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize a Tesla energy grid charging switch."""
