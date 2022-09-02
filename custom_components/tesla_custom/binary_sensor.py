@@ -40,7 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla Parking Brake."""
 
     def __init__(
         self,
@@ -61,7 +61,7 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
 
 
 class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of a Tesla Charger Connection."""
 
     def __init__(
         self,
@@ -95,7 +95,7 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
 
 
 class Charging(TeslaCarDevice, BinarySensorEntity):
-    """Representation of the Tesla Battery Sensor."""
+    """Representation of Tesla Charging."""
 
     def __init__(
         self,

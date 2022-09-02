@@ -63,13 +63,14 @@ class CarLocation(TeslaCarDevice, TrackerEntity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
-        if self._car.native_location_supported:
-            heading = self._car.native_heading
-        else:
-            heading = self._car.heading
+        # "native_heading" does not exist in Tesla API with 2015 Model S 85D - newer models only?
+        # if self._car.native_location_supported:
+        #     heading = self._car.native_heading
+        # else:
+        #     heading = self._car.heading
 
         attr = {
-            "heading": heading,
+            "heading": self._car.heading,
             "speed": self._car.speed,
         }
 
