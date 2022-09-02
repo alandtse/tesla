@@ -33,7 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyCharging(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBatteryCharging(hass, energysite, coordinator))
             entities.append(TeslaEnergyGridStatus(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
@@ -146,7 +146,7 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
         return attrs
 
 
-class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
+class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
     """Representation of the Tesla energy charging sensor."""
 
     def __init__(
@@ -157,7 +157,7 @@ class TeslaEnergyCharging(TeslaEnergyDevice, BinarySensorEntity):
     ) -> None:
         """Initialize the Sensor Entity."""
         super().__init__(hass, energysite, coordinator)
-        self.type = "charging"
+        self.type = "battery charging"
         self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
         self._attr_icon = "mdi:battery-charging"
 

@@ -2,15 +2,13 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import SolarPowerwallSite
-from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice, TeslaEnergyDevice
+from .base import TeslaCarDevice
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,7 +18,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     """Set up the Tesla selects by config_entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
-    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
     entities = []
 
     for car in cars.values():
@@ -30,10 +27,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             entities.append(SentryMode(hass, car, coordinator))
         entities.append(Polling(hass, car, coordinator))
         entities.append(Charger(hass, car, coordinator))
-
-    for energysite in energysites.values():
-        if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
-            entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
 
@@ -165,30 +158,3 @@ class SentryMode(TeslaCarDevice, SwitchEntity):
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         await self._car.set_sentry_mode(False)
-
-
-class TeslaEnergyGridCharging(TeslaEnergyDevice, SwitchEntity):
-    """Representation of a Tesla energy grid charging switch."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: SolarPowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize a Tesla energy grid charging switch."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "grid charging"
-
-    @property
-    def is_on(self):
-        """Return grid charging enabled."""
-        return self._energysite.grid_charging
-
-    async def async_turn_on(self, **kwargs):
-        """Send the on command."""
-        await self._energysite.set_grid_charging(True)
-
-    async def async_turn_off(self, **kwargs):
-        """Send the off command."""
-        await self._energysite.set_grid_charging(False)

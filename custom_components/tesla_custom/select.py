@@ -33,6 +33,11 @@ EXPORT_RULE = [
     "Everything",
 ]
 
+GRID_CHARGING = [
+    "Yes",
+    "No",
+]
+
 OPERATION_MODE = [
     "Self-Powered",
     "Time-Based Control",
@@ -71,6 +76,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
         if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
             entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
+            entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
 
     async_add_entities(entities, True)
 
@@ -144,6 +150,36 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
     def current_option(self):
         """Return the selected entity option to represent the entity state."""
         return self._car.cabin_overheat_protection
+
+
+class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
+    """Representation of a Tesla energy site grid charging."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        energysite: SolarPowerwallSite,
+        coordinator: TeslaDataUpdateCoordinator,
+    ):
+        """Initialize grid charging."""
+        super().__init__(hass, energysite, coordinator)
+
+        self.type = "grid charging"
+        self._attr_options = GRID_CHARGING
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+        if option == GRID_CHARGING[0]:
+            await self._energysite.set_grid_charging(True)
+        else:
+            await self._energysite.set_grid_charging(False)
+
+    @property
+    def current_option(self):
+        """Return the selected entity option to represent the entity state."""
+        if self._energysite.grid_charging:
+            return GRID_CHARGING[0]
+        return GRID_CHARGING[1]
 
 
 class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
