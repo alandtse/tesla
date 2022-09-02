@@ -354,21 +354,24 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
 
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
-            self._power = self._energysite.solar_power
         if self.type == "grid power":
             self._attr_icon = "mdi:transmission-tower"
-            self._power = self._energysite.grid_power
         if self.type == "load power":
             self._attr_icon = "mdi:home-lightning-bolt"
-            self._power = self._energysite.load_power
         if self.type == "battery power":
             self._attr_icon = "mdi:home-battery"
-            self._power = self._energysite.battery_power
 
     @property
     def native_value(self) -> int:
         """Return power in Watts."""
-        return round(self._power)
+        if self.type == "solar power":
+            return round(self._energysite.solar_power)
+        if self.type == "grid power":
+            return round(self._energysite.grid_power)
+        if self.type == "load power":
+            return round(self._energysite.load_power)
+        if self.type == "battery power":
+            return round(self._energysite.battery_power)
 
 
 class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):

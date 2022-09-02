@@ -107,7 +107,7 @@ class Charger(TeslaCarDevice, SwitchEntity):
         """Representation of a Tesla charger switch."""
         super().__init__(hass, car, coordinator)
         self.type = "charger"
-        self._attr_icon = "mdi:battery-charging"
+        self._attr_icon = "mdi:ev-station"
 
     @property
     def is_on(self):

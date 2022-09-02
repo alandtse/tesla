@@ -52,17 +52,17 @@ class TeslaBaseEntity(CoordinatorEntity):
         return self.type.capitalize()
 
     @property
-    def entity_registry_enabled_default(self):
+    def entity_registry_enabled_default(self) -> bool:
         """Set entity registry to default."""
         return self._enabled_by_default
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, str]:
         """Return the state attributes of the device."""
         attr = self._attributes
         return attr
 
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Register state update callback."""
 
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
@@ -83,7 +83,7 @@ class TeslaCarDevice(TeslaBaseEntity):
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
-    ):
+    ) -> None:
         """Get the latest data from Tesla.
 
         This does a controller update,
