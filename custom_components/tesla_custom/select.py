@@ -93,9 +93,9 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
     ):
         """Initialize a heated seat for the vehicle."""
         super().__init__(hass, car, coordinator)
-
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
+        self._attr_icon = "mdi:car-seat-heater"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -137,10 +137,10 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
     ):
         """Initialize a heated seat for the vehicle."""
         super().__init__(hass, car, coordinator)
-
         self.type = "cabin overheat protection"
         self._attr_options = CABIN_OPTIONS
         self._attr_entity_category = EntityCategory.CONFIG
+        self._attr_icon = "mdi:sun-thermometer"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -163,9 +163,9 @@ class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
     ):
         """Initialize grid charging."""
         super().__init__(hass, energysite, coordinator)
-
         self.type = "grid charging"
         self._attr_options = GRID_CHARGING
+        self._attr_icon = "mdi:battery-charging"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -193,9 +193,9 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
     ):
         """Initialize operation mode."""
         super().__init__(hass, energysite, coordinator)
-
         self.type = "energy exports"
         self._attr_options = EXPORT_RULE
+        self._attr_icon = "mdi:home-export-outline"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -224,9 +224,9 @@ class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
     ):
         """Initialize operation mode."""
         super().__init__(hass, energysite, coordinator)
-
         self.type = "operation mode"
         self._attr_options = OPERATION_MODE
+        self._attr_icon = "mdi:home-battery"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
