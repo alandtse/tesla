@@ -7,7 +7,7 @@ from homeassistant.components.lock import LockEntity
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,15 +20,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(Trunk(hass, car, coordinator))
-        entities.append(Frunk(hass, car, coordinator))
-        entities.append(Doors(hass, car, coordinator))
-        entities.append(ChargerDoor(hass, car, coordinator))
+        entities.append(TeslaCarTrunk(hass, car, coordinator))
+        entities.append(TeslaCarFrunk(hass, car, coordinator))
+        entities.append(TeslaCarDoors(hass, car, coordinator))
+        entities.append(TeslaCarChargerDoor(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
 
-class Trunk(TeslaCarDevice, LockEntity):
+class TeslaCarTrunk(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car trunk lock."""
 
     def __init__(
@@ -61,7 +61,7 @@ class Trunk(TeslaCarDevice, LockEntity):
         return self._car.is_trunk_locked
 
 
-class Frunk(TeslaCarDevice, LockEntity):
+class TeslaCarFrunk(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car frunk lock."""
 
     def __init__(
@@ -91,7 +91,7 @@ class Frunk(TeslaCarDevice, LockEntity):
         return self._car.is_frunk_locked
 
 
-class Doors(TeslaCarDevice, LockEntity):
+class TeslaCarDoors(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car door lock."""
 
     def __init__(
@@ -122,7 +122,7 @@ class Doors(TeslaCarDevice, LockEntity):
         return self._car.is_locked
 
 
-class ChargerDoor(TeslaCarDevice, LockEntity):
+class TeslaCarChargerDoor(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car charger door lock."""
 
     def __init__(

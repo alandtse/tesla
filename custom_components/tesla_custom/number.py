@@ -12,7 +12,7 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice, TeslaEnergyDevice
+from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
 
@@ -24,8 +24,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(TeslaChargeLimit(hass, car, coordinator))
-        entities.append(TeslaCurrentLimit(hass, car, coordinator))
+        entities.append(TeslaCarChargeLimit(hass, car, coordinator))
+        entities.append(TeslaCarCurrentLimit(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
+class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
     """Representation of a Tesla car charge limit number."""
 
     def __init__(
@@ -70,7 +70,7 @@ class TeslaChargeLimit(TeslaCarDevice, NumberEntity):
         return self._car.charge_limit_soc_max
 
 
-class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
+class TeslaCarCurrentLimit(TeslaCarEntity, NumberEntity):
     """Representation of a Tesla car current limit number."""
 
     def __init__(
@@ -107,7 +107,7 @@ class TeslaCurrentLimit(TeslaCarDevice, NumberEntity):
         return self._car.charge_current_request_max
 
 
-class TeslaEnergyBackupReserve(TeslaEnergyDevice, NumberEntity):
+class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
     """Representation of a Tesla energy backup reserve number."""
 
     def __init__(

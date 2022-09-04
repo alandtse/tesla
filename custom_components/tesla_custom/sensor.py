@@ -22,7 +22,7 @@ from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.distance import convert
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice, TeslaEnergyDevice
+from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
@@ -37,13 +37,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(TeslaBattery(hass, car, coordinator))
-        entities.append(TeslaChargerRate(hass, car, coordinator))
-        entities.append(TeslaChargerEnergy(hass, car, coordinator))
-        entities.append(TeslaMileage(hass, car, coordinator))
-        entities.append(TeslaRange(hass, car, coordinator))
-        entities.append(TeslaTemp(hass, car, coordinator))
-        entities.append(TeslaTemp(hass, car, coordinator, inside=True))
+        entities.append(TeslaCarBattery(hass, car, coordinator))
+        entities.append(TeslaCarChargerRate(hass, car, coordinator))
+        entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
+        entities.append(TeslaCarMileage(hass, car, coordinator))
+        entities.append(TeslaCarRange(hass, car, coordinator))
+        entities.append(TeslaCarTemp(hass, car, coordinator))
+        entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
 
     for energysite in energysites.values():
         if (
@@ -71,7 +71,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaBattery(TeslaCarDevice, SensorEntity):
+class TeslaCarBattery(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car battery sensor."""
 
     def __init__(
@@ -109,7 +109,7 @@ class TeslaBattery(TeslaCarDevice, SensorEntity):
         )
 
 
-class TeslaChargerRate(TeslaCarDevice, SensorEntity):
+class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car charging rate."""
 
     def __init__(
@@ -174,7 +174,7 @@ class TeslaChargerRate(TeslaCarDevice, SensorEntity):
         return self.attrs
 
 
-class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
+class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car energy added sensor."""
 
     def __init__(
@@ -197,7 +197,7 @@ class TeslaChargerEnergy(TeslaCarDevice, SensorEntity):
         return self._car.charge_energy_added
 
 
-class TeslaMileage(TeslaCarDevice, SensorEntity):
+class TeslaCarMileage(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car mileage added sensor."""
 
     def __init__(
@@ -237,7 +237,7 @@ class TeslaMileage(TeslaCarDevice, SensorEntity):
         return LENGTH_KILOMETERS
 
 
-class TeslaRange(TeslaCarDevice, SensorEntity):
+class TeslaCarRange(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car range sensor."""
 
     def __init__(
@@ -280,7 +280,7 @@ class TeslaRange(TeslaCarDevice, SensorEntity):
         return LENGTH_KILOMETERS
 
 
-class TeslaTemp(TeslaCarDevice, SensorEntity):
+class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car temp sensor."""
 
     def __init__(
@@ -322,7 +322,7 @@ class TeslaTemp(TeslaCarDevice, SensorEntity):
         return TEMP_CELSIUS
 
 
-class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
+class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy power sensor."""
 
     def __init__(
@@ -361,7 +361,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyDevice, SensorEntity):
             return round(self._energysite.battery_power)
 
 
-class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
+class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
     """Representation of the Tesla energy battery sensor."""
 
     def __init__(
@@ -397,7 +397,7 @@ class TeslaEnergyBattery(TeslaEnergyDevice, SensorEntity):
         )
 
 
-class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
+class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy battery remaining sensor."""
 
     def __init__(
@@ -428,7 +428,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyDevice, SensorEntity):
         )
 
 
-class TeslaEnergyBackupReserve(TeslaEnergyDevice, SensorEntity):
+class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy backup reserve sensor."""
 
     def __init__(

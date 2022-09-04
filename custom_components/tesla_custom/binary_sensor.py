@@ -12,7 +12,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice, TeslaEnergyDevice
+from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,10 +26,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(ParkingBrake(hass, car, coordinator))
-        entities.append(CarOnline(hass, car, coordinator))
-        entities.append(ChargerConnection(hass, car, coordinator))
-        entities.append(Charging(hass, car, coordinator))
+        entities.append(TeslaCarParkingBrake(hass, car, coordinator))
+        entities.append(TeslaCarOnline(hass, car, coordinator))
+        entities.append(TeslaCarChargerConnection(hass, car, coordinator))
+        entities.append(TeslaCarCharging(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -39,7 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
+class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car parking brake binary sensor."""
 
     def __init__(
@@ -60,7 +60,7 @@ class ParkingBrake(TeslaCarDevice, BinarySensorEntity):
         return self._car.shift_state == "P"
 
 
-class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
+class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car charger connection binary sensor."""
 
     def __init__(
@@ -94,7 +94,7 @@ class ChargerConnection(TeslaCarDevice, BinarySensorEntity):
         return attrs
 
 
-class Charging(TeslaCarDevice, BinarySensorEntity):
+class TeslaCarCharging(TeslaCarEntity, BinarySensorEntity):
     """Representation of Tesla car charging binary sensor."""
 
     def __init__(
@@ -115,7 +115,7 @@ class Charging(TeslaCarDevice, BinarySensorEntity):
         return self._car.charging_state == "Charging"
 
 
-class CarOnline(TeslaCarDevice, BinarySensorEntity):
+class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car online binary sensor."""
 
     def __init__(
@@ -146,7 +146,7 @@ class CarOnline(TeslaCarDevice, BinarySensorEntity):
         return attrs
 
 
-class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
+class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):
     """Representation of a Tesla energy charging binary sensor."""
 
     def __init__(
@@ -167,7 +167,7 @@ class TeslaEnergyBatteryCharging(TeslaEnergyDevice, BinarySensorEntity):
         return self._energysite.battery_power < 0
 
 
-class TeslaEnergyGridStatus(TeslaEnergyDevice, BinarySensorEntity):
+class TeslaEnergyGridStatus(TeslaEnergyEntity, BinarySensorEntity):
     """Representation of the Tesla energy grid status binary sensor."""
 
     def __init__(

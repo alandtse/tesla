@@ -8,7 +8,7 @@ from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,12 +21,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(CarLocation(hass, car, coordinator))
+        entities.append(TeslaCarLocation(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
 
-class CarLocation(TeslaCarDevice, TrackerEntity):
+class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
     """Representation of a Tesla car location device tracker."""
 
     def __init__(

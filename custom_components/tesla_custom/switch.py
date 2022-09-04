@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,16 +22,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for car in cars.values():
         if car.steering_wheel_heater:
-            entities.append(HeatedSteeringWheel(hass, car, coordinator))
+            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
         if car.sentry_mode_available:
-            entities.append(SentryMode(hass, car, coordinator))
-        entities.append(Polling(hass, car, coordinator))
-        entities.append(Charger(hass, car, coordinator))
+            entities.append(TeslaCarSentryMode(hass, car, coordinator))
+        entities.append(TeslaCarPolling(hass, car, coordinator))
+        entities.append(TeslaCarCharger(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
 
-class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
+class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
     """Representation of a Tesla car heated steering wheel switch."""
 
     def __init__(
@@ -59,7 +59,7 @@ class HeatedSteeringWheel(TeslaCarDevice, SwitchEntity):
         await self._car.set_heated_steering_wheel(False)
 
 
-class Polling(TeslaCarDevice, SwitchEntity):
+class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
     """Representation of a polling switch."""
 
     def __init__(
@@ -95,7 +95,7 @@ class Polling(TeslaCarDevice, SwitchEntity):
         self.async_write_ha_state()
 
 
-class Charger(TeslaCarDevice, SwitchEntity):
+class TeslaCarCharger(TeslaCarEntity, SwitchEntity):
     """Representation of a Tesla car charger switch."""
 
     def __init__(
@@ -126,7 +126,7 @@ class Charger(TeslaCarDevice, SwitchEntity):
         self.update_controller(wake_if_asleep=True, force=True, blocking=False)
 
 
-class SentryMode(TeslaCarDevice, SwitchEntity):
+class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
     """Representation of a Tesla car sentry mode switch."""
 
     def __init__(

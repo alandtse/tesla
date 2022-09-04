@@ -16,7 +16,7 @@ from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ async def async_setup_entry(
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
     entities = [
-        TeslaClimate(
+        TeslaCarClimate(
             hass,
             car,
             coordinator,
@@ -49,7 +49,7 @@ async def async_setup_entry(
     async_add_entities(entities, True)
 
 
-class TeslaClimate(TeslaCarDevice, ClimateEntity):
+class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     """Representation of a Tesla car climate."""
 
     def __init__(

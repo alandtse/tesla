@@ -68,7 +68,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
 
 
-class TeslaCarDevice(TeslaBaseEntity):
+class TeslaCarEntity(TeslaBaseEntity):
     """Representation of a Tesla car device."""
 
     def __init__(
@@ -148,7 +148,7 @@ class TeslaCarDevice(TeslaBaseEntity):
         )
 
 
-class TeslaEnergyDevice(TeslaBaseEntity):
+class TeslaEnergyEntity(TeslaBaseEntity):
     """Representation of a Tesla energy device."""
 
     def __init__(

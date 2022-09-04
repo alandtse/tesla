@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,16 +22,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(Horn(hass, car, coordinator))
-        entities.append(FlashLights(hass, car, coordinator))
-        entities.append(WakeUp(hass, car, coordinator))
-        entities.append(ForceDataUpdate(hass, car, coordinator))
-        entities.append(TriggerHomelink(hass, car, coordinator))
+        entities.append(TeslaCarHorn(hass, car, coordinator))
+        entities.append(TeslaCarFlashLights(hass, car, coordinator))
+        entities.append(TeslaCarWakeUp(hass, car, coordinator))
+        entities.append(TeslaCarForceDataUpdate(hass, car, coordinator))
+        entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
 
-class Horn(TeslaCarDevice, ButtonEntity):
+class TeslaCarHorn(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car horn button."""
 
     def __init__(
@@ -50,7 +50,7 @@ class Horn(TeslaCarDevice, ButtonEntity):
         await self._car.honk_horn()
 
 
-class FlashLights(TeslaCarDevice, ButtonEntity):
+class TeslaCarFlashLights(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car flash lights button."""
 
     def __init__(
@@ -69,7 +69,7 @@ class FlashLights(TeslaCarDevice, ButtonEntity):
         await self._car.flash_lights()
 
 
-class WakeUp(TeslaCarDevice, ButtonEntity):
+class TeslaCarWakeUp(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car wake up button"""
 
     def __init__(
@@ -89,7 +89,7 @@ class WakeUp(TeslaCarDevice, ButtonEntity):
         await self._car.wake_up()
 
 
-class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
+class TeslaCarForceDataUpdate(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car force data update button."""
 
     def __init__(
@@ -114,7 +114,7 @@ class ForceDataUpdate(TeslaCarDevice, ButtonEntity):
         return True
 
 
-class TriggerHomelink(TeslaCarDevice, ButtonEntity):
+class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car Homelink button."""
 
     def __init__(

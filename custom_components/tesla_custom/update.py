@@ -7,7 +7,7 @@ from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.core import HomeAssistant
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice
+from .base import TeslaCarEntity
 from .const import DOMAIN
 
 
@@ -17,7 +17,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
 
     entities = [
-        TeslaUpdate(
+        TeslaCarUpdate(
             hass,
             car,
             coordinator,
@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class TeslaUpdate(TeslaCarDevice, UpdateEntity):
+class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     """Representation of a Tesla car update."""
 
     def __init__(

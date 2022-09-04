@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarDevice, TeslaEnergyDevice
+from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,13 +63,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        entities.append(TeslaCabinOverheatProtection(hass, car, coordinator))
+        entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
         for seat_name in SEAT_ID_MAP:
-            if "rear" in seat_name and not car.rear_heated_seats:
+            if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
             if "third_row" in seat_name and not car.third_row_seats:
                 continue
-            entities.append(HeatedSeatSelect(hass, car, coordinator, seat_name))
+            entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -81,7 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
+class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car heated seat select."""
 
     def __init__(
@@ -125,7 +125,7 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         return HEATER_OPTIONS
 
 
-class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
+class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car cabin overheat protection select."""
 
     def __init__(
@@ -151,7 +151,7 @@ class TeslaCabinOverheatProtection(TeslaCarDevice, SelectEntity):
         return self._car.cabin_overheat_protection
 
 
-class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
+class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site grid charging select."""
 
     def __init__(
@@ -181,7 +181,7 @@ class TeslaEnergyGridCharging(TeslaEnergyDevice, SelectEntity):
         return GRID_CHARGING[1]
 
 
-class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
+class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site energy export rule select."""
 
     def __init__(
@@ -212,7 +212,7 @@ class TeslaEnergyExportRule(TeslaEnergyDevice, SelectEntity):
             return EXPORT_RULE[1]
 
 
-class TeslaEnergyOperationMode(TeslaEnergyDevice, SelectEntity):
+class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site operation mode select."""
 
     def __init__(
