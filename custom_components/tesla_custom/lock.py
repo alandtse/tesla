@@ -43,15 +43,17 @@ class Trunk(TeslaCarDevice, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
-        _LOGGER.debug("Locking trunk for: %s", self.name)
+        _LOGGER.debug("Locking: %s", self.name)
         if self.is_locked is False:
             await self._car.toggle_trunk()
+            await self.async_update_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
-        _LOGGER.debug("Unlocking trunk for: %s", self.name)
+        _LOGGER.debug("Unlocking: %s", self.name)
         if self.is_locked is True:
             await self._car.toggle_trunk()
+            await self.async_update_ha_state()
 
     @property
     def is_locked(self):
@@ -71,15 +73,17 @@ class Frunk(TeslaCarDevice, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
-        _LOGGER.debug("Locking frunk for: %s", self.name)
+        _LOGGER.debug("Locking: %s", self.name)
         if self.is_locked is False:
             await self._car.toggle_frunk()
+            await self.async_update_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
-        _LOGGER.debug("Unlocking frunk for: %s", self.name)
+        _LOGGER.debug("Unlocking: %s", self.name)
         if self.is_locked is True:
             await self._car.toggle_frunk()
+            await self.async_update_ha_state()
 
     @property
     def is_locked(self):
@@ -102,13 +106,15 @@ class Doors(TeslaCarDevice, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
-        _LOGGER.debug("Locking doors for: %s", self.name)
+        _LOGGER.debug("Locking: %s", self.name)
         await self._car.lock()
+        await self.async_update_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
-        _LOGGER.debug("Unlocking doors for: %s", self.name)
+        _LOGGER.debug("Unlocking: %s", self.name)
         await self._car.unlock()
+        await self.async_update_ha_state()
 
     @property
     def is_locked(self):
@@ -131,13 +137,15 @@ class ChargerDoor(TeslaCarDevice, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
-        _LOGGER.debug("Locking doors for: %s", self.name)
+        _LOGGER.debug("Locking: %s", self.name)
         await self._car.charge_port_door_close()
+        await self.async_update_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
-        _LOGGER.debug("Unlocking doors for: %s", self.name)
+        _LOGGER.debug("Unlocking: %s", self.name)
         await self._car.charge_port_door_open()
+        await self.async_update_ha_state()
 
     @property
     def is_locked(self):

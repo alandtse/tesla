@@ -101,7 +101,6 @@ class HeatedSeatSelect(TeslaCarDevice, SelectEntity):
         """Change the selected option."""
         level: int = HEATER_OPTIONS.index(option)
 
-        # await wait_for_climate(self.hass, self.config_entry_id)
         _LOGGER.debug("Setting %s to %s", self.name, level)
         await self._car.remote_seat_heater_request(level, SEAT_ID_MAP[self._seat_name])
 
