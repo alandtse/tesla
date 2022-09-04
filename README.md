@@ -43,7 +43,7 @@ The `Tesla` integration offers integration with the [Tesla](https://auth.tesla.c
 This integration provides the following entities for vehicles:
 
 - Binary sensors - charger connection, charging status, car online and parking brake.
-- Buttons - horn, flash lights, wake up*, force data update<sup>2</sup> and trigger HomeLink. **Note:** The HomeLink button is disabled by default as some vehicles don't have this option. Enable via configuration/entities if desired.
+- Buttons - horn, flash lights, wake up<sup>2</sup> , force data update<sup>2</sup> and trigger HomeLink. **Note:** The HomeLink button is disabled by default as some vehicles don't have this option. Enable via configuration/entities if desired.
 - Climate - turn HVAC on/off, set target temperature, set preset modes (defrost, keep on, dog mode and camp mode).
 - Device tracker - car location<sup>2</sup>.
 - Locks - door lock, rear trunk lock, front trunk (frunk) lock and charger door lock.
@@ -52,8 +52,8 @@ This integration provides the following entities for vehicles:
 - Sensors - battery level, charge rate, energy added, inside/outside temperature, odometer and estimated range.
 - Switches - heated steering wheel, charger, sentry mode and polling<sup>2</sup>.
 
-<sup>1</sup> Configuration entities.
-<sup>2</sup> Diagnostics entities.
+<sup>1</sup> *Configuration entities.*<br/>
+<sup>2</sup> *Diagnostics entities.*
 
 This integration provides the following entities for energy sites:
 
@@ -66,9 +66,7 @@ This integration provides the following entities for energy sites:
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
 
 - Seconds between polling - referred to below as the `polling_interval`.
-
 - Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
-
 - Polling policy - When do we actively poll the car to get updates, and when do we try to allow the car to sleep. See [the Wiki](https://github.com/alandtse/tesla/wiki/Polling-policy) for more information.
 
 ## Potential Battery impacts
