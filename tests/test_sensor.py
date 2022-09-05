@@ -232,7 +232,9 @@ async def test_battery_power_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.battery_home_battery_power")
-    assert state.state == str(round(energysite_mock_data.BATTERY_DATA["battery_power"]))
+    assert state.state == str(
+        round(energysite_mock_data.BATTERY_DATA["power_reading"][0]["battery_power"])
+    )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
@@ -245,7 +247,7 @@ async def test_battery(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.battery_home_battery")
     assert state.state == str(
-        round(energysite_mock_data.BATTERY_DATA["percentage_charged"])
+        round(energysite_mock_data.BATTERY_SUMMARY["percentage_charged"])
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
@@ -258,7 +260,9 @@ async def test_battery_remaining(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.battery_home_battery_remaining")
-    assert state.state == str(round(energysite_mock_data.BATTERY_DATA["energy_left"]))
+    assert state.state == str(
+        round(energysite_mock_data.BATTERY_SUMMARY["energy_left"])
+    )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
@@ -271,7 +275,7 @@ async def test_backup_reserve(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.battery_home_backup_reserve")
     assert state.state == str(
-        round(energysite_mock_data.BATTERY_DATA["backup_reserve_percent"])
+        round(energysite_mock_data.BATTERY_DATA["backup"]["backup_reserve_percent"])
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY

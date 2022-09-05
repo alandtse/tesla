@@ -37,7 +37,7 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
 
 
 async def test_parking_brake(hass: HomeAssistant) -> None:
-    """Tests parking brake is getting the correct value."""
+    """Tests car parking brake is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_parking_brake")
@@ -47,7 +47,7 @@ async def test_parking_brake(hass: HomeAssistant) -> None:
 
 
 async def test_charger_connection(hass: HomeAssistant) -> None:
-    """Tests charger connection is getting the correct value."""
+    """Tests car charger connection is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charger")
@@ -77,7 +77,7 @@ async def test_charger_connection(hass: HomeAssistant) -> None:
 
 
 async def test_charging(hass: HomeAssistant) -> None:
-    """Tests charging is getting the correct value."""
+    """Tests car charging is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charging")
@@ -89,27 +89,27 @@ async def test_charging(hass: HomeAssistant) -> None:
     )
 
 
-# async def test_car_online(hass: HomeAssistant) -> None:
-#     """Tests car online is getting the correct value."""
-#     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+async def test_car_online(hass: HomeAssistant) -> None:
+    """Tests car online is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
-#     state = hass.states.get("binary_sensor.my_model_s_online")
-#     assert state.state == "on"
+    state = hass.states.get("binary_sensor.my_model_s_online")
+    assert state.state == "on"
 
-#     assert (
-#         state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.CONNECTIVITY
-#     )
-#     assert state.attributes.get("vehicle_id") == car_mock_data.VEHICLE["vehicle_id"]
-#     assert state.attributes.get("vin") == car_mock_data.VEHICLE["vin"]
-#     assert state.attributes.get("id") == car_mock_data.VEHICLE["id"]
+    assert (
+        state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.CONNECTIVITY
+    )
+    assert state.attributes.get("vehicle_id") == car_mock_data.VEHICLE["vehicle_id"]
+    assert state.attributes.get("vin") == car_mock_data.VEHICLE["vin"]
+    assert state.attributes.get("id") == car_mock_data.VEHICLE["id"]
 
 
 async def test_battery_charging(hass: HomeAssistant) -> None:
-    """Tests battery charging is getting the correct value."""
+    """Tests energy site battery charging is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.battery_home_battery_charging")
-    assert state.state == "on"
+    assert state.state == "off"
 
     assert (
         state.attributes.get(ATTR_DEVICE_CLASS)
@@ -118,7 +118,7 @@ async def test_battery_charging(hass: HomeAssistant) -> None:
 
 
 async def test_grid_status(hass: HomeAssistant) -> None:
-    """Tests grid status is getting the correct value."""
+    """Tests energy site grid status is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.battery_home_grid_status")

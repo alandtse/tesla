@@ -19,7 +19,7 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
 
 
 async def test_car_location(hass: HomeAssistant) -> None:
-    """Tests charging is getting the correct value."""
+    """Tests car location is getting the correct value."""
     await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
 
     state = hass.states.get("device_tracker.my_model_s_location_tracker")

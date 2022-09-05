@@ -24,6 +24,7 @@ from .mock_data import energysite as energysite_mock_data
 
 def setup_mock_controller(mock_controller):
     """Setup a mock controller with mock data."""
+
     instance = mock_controller.return_value
 
     instance.get_state_params.return_value = car_mock_data.VEHICLE_STATE
@@ -44,21 +45,22 @@ def setup_mock_controller(mock_controller):
     }
 
     instance.generate_car_objects.return_value = {
-        car_mock_data.VIN: TeslaCar(
-            car_mock_data.SAMPLE_VEHICLE, mock_controller.return_value
-        )
+        car_mock_data.VIN: TeslaCar(car_mock_data.VEHICLE, mock_controller.return_value)
     }
 
     instance.generate_energysite_objects.return_value = {
         12345: SolarSite(
             mock_controller.api,
             energysite_mock_data.ENERGYSITE_SOLAR,
+            energysite_mock_data.SITE_CONFIG_SOLAR,
             energysite_mock_data.SITE_DATA,
         ),
         67890: SolarPowerwallSite(
             mock_controller.api,
             energysite_mock_data.ENERGYSITE_BATTERY,
+            energysite_mock_data.SITE_CONFIG_POWERWALL,
             energysite_mock_data.BATTERY_DATA,
+            energysite_mock_data.BATTERY_SUMMARY,
         ),
     }
 

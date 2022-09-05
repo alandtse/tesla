@@ -123,7 +123,7 @@ class TeslaCarCharger(TeslaCarEntity, SwitchEntity):
         await self._car.stop_charge()
 
         # Do a non-blocking update to get the latest Charging state.
-        self.update_controller(wake_if_asleep=True, force=True, blocking=False)
+        await self.update_controller(wake_if_asleep=True, force=True, blocking=False)
 
 
 class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
