@@ -25,15 +25,10 @@ class TeslaBaseEntity(CoordinatorEntity):
         """Initialise the Tesla device."""
         super().__init__(coordinator)
         self._coordinator = coordinator
-        self.hass = hass
-        # reset the device type. If its not already set, it sets it to the
-        # default device.
-        self.type: str = getattr(self, "type", DEFAULT_DEVICE)
-
-        self.attrs: dict[str, str] = {}
         self._enabled_by_default: bool = True
-        self.config_entry_id = None
-        self._attributes = {}
+        self.attrs: dict[str, str] = {}
+        self.hass = hass
+        self.type = None
 
     def refresh(self) -> None:
         """Refresh the device data.
@@ -43,7 +38,6 @@ class TeslaBaseEntity(CoordinatorEntity):
         This assumes the controller has already been updated. This should be
         called by inherited classes so the overall device information is updated.
         """
-
         self.async_write_ha_state()
 
     @property
@@ -56,15 +50,8 @@ class TeslaBaseEntity(CoordinatorEntity):
         """Set entity registry to default."""
         return self._enabled_by_default
 
-    @property
-    def extra_state_attributes(self) -> dict[str, str]:
-        """Return device state attributes."""
-        attr = self._attributes
-        return attr
-
     async def async_added_to_hass(self) -> None:
         """Register state update callback."""
-
         self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
 
 
@@ -86,11 +73,10 @@ class TeslaCarEntity(TeslaBaseEntity):
     ) -> None:
         """Get the latest data from Tesla.
 
-        This does a controller update,
-        then a coordinator update.
-        the coordinator triggers a call to the refresh function.
+        This does a controller update then a coordinator update.
+        The coordinator triggers a call to the refresh function.
 
-        Setting the Blocking param to False will create a background task for the update.
+        Setting the blocking param to False will create a background task for the update.
         """
 
         if blocking is False:
@@ -121,7 +107,7 @@ class TeslaCarEntity(TeslaBaseEntity):
 
     @property
     def unique_id(self) -> str:
-        """Return unique id for car device."""
+        """Return unique id for car entity."""
         return slugify(
             f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
         )

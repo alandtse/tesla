@@ -2,14 +2,14 @@
 
 SPDX-License-Identifier: Apache-2.0
 """
-
 import logging
+import voluptuous as vol
+
+from teslajsonpy import Controller
 
 from homeassistant.const import ATTR_COMMAND, CONF_EMAIL, CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
-from teslajsonpy import Controller
-import voluptuous as vol
 
 from .const import (
     ATTR_PARAMETERS,

@@ -10,6 +10,8 @@ from teslajsonpy.energy import PowerwallSite
 
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.core import HomeAssistant
+from homeassistant.const import ELECTRIC_CURRENT_AMPERE, PERCENTAGE
+from homeassistant.helpers.icon import icon_for_battery_level
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -25,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for car in cars.values():
         entities.append(TeslaCarChargeLimit(hass, car, coordinator))
-        entities.append(TeslaCarCurrentLimit(hass, car, coordinator))
+        entities.append(TeslaCarChargingAmps(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -69,9 +71,14 @@ class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
         """Return max charge limit."""
         return self._car.charge_limit_soc_max
 
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return percentage."""
+        return PERCENTAGE
 
-class TeslaCarCurrentLimit(TeslaCarEntity, NumberEntity):
-    """Representation of a Tesla car current limit number."""
+
+class TeslaCarChargingAmps(TeslaCarEntity, NumberEntity):
+    """Representation of a Tesla car charging amps number."""
 
     def __init__(
         self,
@@ -79,32 +86,36 @@ class TeslaCarCurrentLimit(TeslaCarEntity, NumberEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize current limit entity."""
+        """Initialize charging amps entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "current limit"
+        self.type = "charging amps"
         self._attr_icon = "mdi:ev-station"
         self._attr_mode = NumberMode.AUTO
         self._attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
-        """Update current limit."""
+        """Update charging amps."""
         await self._car.set_charging_amps(value)
 
     @property
     def native_value(self) -> int:
-        """Return current limit."""
+        """Return charging amps."""
         return self._car.charge_current_request
 
     @property
     def native_min_value(self) -> int:
-        """Return min current limitt."""
-        # Not in API but Tesla app allows minimum of 5
+        """Return min charging ampst."""
         return CHARGE_CURRENT_MIN
 
     @property
     def native_max_value(self) -> int:
-        """Return max current limit."""
+        """Return max charging amps."""
         return self._car.charge_current_request_max
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return percentage."""
+        return ELECTRIC_CURRENT_AMPERE
 
 
 class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
@@ -141,3 +152,13 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
     def native_max_value(self) -> int:
         """Return max backup reserve percentage."""
         return BACKUP_RESERVE_MAX
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return percentage."""
+        return PERCENTAGE
+
+    @property
+    def icon(self):
+        """Return icon for the backup reserve."""
+        return icon_for_battery_level(battery_level=self.native_value)

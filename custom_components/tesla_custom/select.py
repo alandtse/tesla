@@ -164,7 +164,6 @@ class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
         super().__init__(hass, energysite, coordinator)
         self.type = "grid charging"
         self._attr_options = GRID_CHARGING
-        self._attr_icon = "mdi:battery-charging"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -179,6 +178,13 @@ class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
         if self._energysite.grid_charging:
             return GRID_CHARGING[0]
         return GRID_CHARGING[1]
+
+    @property
+    def icon(self):
+        """Return icon for the grid charging."""
+        if self._energysite.grid_charging:
+            return "mdi:transmission-tower-export"
+        return "mdi:transmission-tower-off"
 
 
 class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
