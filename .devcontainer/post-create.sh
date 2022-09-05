@@ -4,7 +4,7 @@ source /opt/container/helpers/common/paths.sh
 mkdir -p /config
 
 # Required to get automations to work
-echo "Creatin automations.yaml"
+echo "Creating automations.yaml"
 touch /config/automations.yaml
 
 # source: /opt/container/helpers/commons/homeassistant/start.sh
