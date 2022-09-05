@@ -55,6 +55,7 @@ class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
     async def async_set_native_value(self, value: int) -> None:
         """Update charge limit."""
         await self._car.change_charge_limit(value)
+        await self.async_update_ha_state()
 
     @property
     def native_value(self) -> int:
@@ -96,6 +97,7 @@ class TeslaCarChargingAmps(TeslaCarEntity, NumberEntity):
     async def async_set_native_value(self, value: int) -> None:
         """Update charging amps."""
         await self._car.set_charging_amps(value)
+        await self.async_update_ha_state()
 
     @property
     def native_value(self) -> int:
@@ -137,6 +139,7 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
     async def async_set_native_value(self, value: int) -> None:
         """Update backup reserve percentage."""
         await self._energysite.set_reserve_percent(value)
+        await self.async_update_ha_state()
 
     @property
     def native_value(self) -> int:
