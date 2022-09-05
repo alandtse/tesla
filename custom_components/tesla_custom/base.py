@@ -1,5 +1,6 @@
 """Support for Tesla cars."""
 from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite
 
 from homeassistant.core import HomeAssistant
@@ -158,6 +159,13 @@ class TeslaEnergyEntity(TeslaBaseEntity):
         return self._energysite != {}
 
     @property
+    def sw_version(self) -> bool:
+        """Return firmware version."""
+        if self._energysite.resource_type == RESOURCE_TYPE_BATTERY:
+            return self._energysite.version
+        return "Unavailable"
+
+    @property
     def device_info(self) -> DeviceInfo:
         """Return device info."""
         model = f"{self._energysite.resource_type.title()} {self._energysite.solar_type.replace('_', ' ')}"
@@ -166,4 +174,5 @@ class TeslaEnergyEntity(TeslaBaseEntity):
             manufacturer="Tesla",
             model=model,
             name=self._energysite.site_name,
+            sw_version=self.sw_version,
         )
