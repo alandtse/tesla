@@ -390,7 +390,7 @@ class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
     @property
     def icon(self):
         """Return icon for the battery."""
-        charging = self._energysite.battery_power < 0
+        charging = self._energysite.battery_power < -100
 
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging
@@ -421,7 +421,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
     @property
     def icon(self):
         """Return icon for the battery remaining."""
-        charging = self._energysite.battery_power < 0
+        charging = self._energysite.battery_power < -100
 
         return icon_for_battery_level(
             battery_level=self._energysite.percentage_charged, charging=charging
