@@ -148,7 +148,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         await self.update_controller(force=True, wake_if_asleep=True)
 
     @property
-    def preset_mode(self) -> str | None:
+    def preset_mode(self):
         """Return the current preset mode, e.g., home, away, temp.
 
         Requires SUPPORT_PRESET_MODE.
@@ -165,7 +165,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         return "Normal"
 
     @property
-    def preset_modes(self) -> list[str] | None:
+    def preset_modes(self):
         """Return a list of available preset modes.
 
         Requires SUPPORT_PRESET_MODE.
@@ -179,13 +179,13 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         if preset_mode == "Normal":
             # If setting Normal, we need to check Defrost And Keep modes.
             if self._car.defrost_mode != 0:
-                await self._car.set_max_defrost(False)
+                await self._car.set_max_defrost(0)
 
             if self._car.climate_keeper_mode != 0:
                 await self._car.set_climate_keeper_mode(0)
 
         elif preset_mode == "Defrost":
-            await self._car.set_max_defrost(True)
+            await self._car.set_max_defrost(2)
 
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])

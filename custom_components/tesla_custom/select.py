@@ -47,11 +47,11 @@ OPERATION_MODE = [
 SEAT_ID_MAP = {
     "left": 0,
     "right": 1,
-    "rear_left": 2,
-    "rear_center": 4,
-    "rear_right": 5,
-    "third_row_left": 6,
-    "third_row_right": 7,
+    "rear left": 2,
+    "rear center": 4,
+    "rear right": 5,
+    "third row left": 6,
+    "third row right": 7,
 }
 
 
@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
-            if "third_row" in seat_name and not car.third_row_seats:
+            if "third" in seat_name and car.third_row_seats == "None":
                 continue
             entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
 
@@ -116,10 +116,6 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
         return HEATER_OPTIONS[current_value]
 
     @property
-    def _seat_key(self):
-        return f"seat_heater_{self._seat_name}"
-
-    @property
     def options(self):
         """Return heated seat options."""
         return HEATER_OPTIONS
@@ -144,6 +140,7 @@ class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
         await self._car.set_cabin_overheat_protection(option)
+        await self.async_update_ha_state()
 
     @property
     def current_option(self):
@@ -171,6 +168,8 @@ class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
             await self._energysite.set_grid_charging(True)
         else:
             await self._energysite.set_grid_charging(False)
+
+        await self.async_update_ha_state()
 
     @property
     def current_option(self):
@@ -209,6 +208,8 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
         if option == EXPORT_RULE[1]:
             await self._energysite.set_export_rule("battery_ok")
 
+        await self.async_update_ha_state()
+
     @property
     def current_option(self):
         """Return current energy export rule setting."""
@@ -241,6 +242,8 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
             await self._energysite.set_operation_mode("autonomous")
         if option == OPERATION_MODE[2]:
             await self._energysite.set_operation_mode("backup")
+
+        await self.async_update_ha_state()
 
     @property
     def current_option(self):

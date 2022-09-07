@@ -26,7 +26,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarFlashLights(hass, car, coordinator))
         entities.append(TeslaCarWakeUp(hass, car, coordinator))
         entities.append(TeslaCarForceDataUpdate(hass, car, coordinator))
-        entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
+        if car.homelink_device_count:
+            entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -128,7 +129,6 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
         self.type = "trigger homelink"
         self._attr_icon = "mdi:garage"
         self.__waiting = False
-        self._enabled_by_default = False
 
     @property
     def available(self) -> bool:

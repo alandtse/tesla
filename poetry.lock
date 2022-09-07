@@ -70,7 +70,7 @@ pytz = "*"
 
 [[package]]
 name = "astroid"
-version = "2.12.6"
+version = "2.12.8"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -512,7 +512,7 @@ bleak = ">=0.14.3"
 
 [[package]]
 name = "homeassistant"
-version = "2022.9.0b4"
+version = "2022.9.0b5"
 description = "Open-source home automation platform running on Python 3."
 category = "dev"
 optional = false
@@ -584,7 +584,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "identify"
-version = "2.5.4"
+version = "2.5.5"
 description = "File identification library for Python"
 category = "dev"
 optional = false
@@ -1156,7 +1156,7 @@ pytest = ">=3.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.11.16"
+version = "0.11.17"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 category = "dev"
 optional = false
@@ -1166,7 +1166,7 @@ python-versions = ">=3.9"
 coverage = "6.4.4"
 fnvhash = "0.1.0"
 freezegun = "1.2.1"
-homeassistant = "2022.9.0b4"
+homeassistant = "2022.9.0b5"
 mock-open = "1.4.0"
 paho-mqtt = "1.6.1"
 pipdeptree = "2.2.1"
@@ -1739,8 +1739,8 @@ anyio = [
 ]
 astral = []
 astroid = [
-    {file = "astroid-2.12.6-py3-none-any.whl", hash = "sha256:bf0fe7ff5d28f697f5eddc9f33140ad6086941c472f53e9dbbb9aaa6bc8952cb"},
-    {file = "astroid-2.12.6.tar.gz", hash = "sha256:cfef6fa5aeba225d01f217e435472da458711bceb949c6eccb07dc93701edd29"},
+    {file = "astroid-2.12.8-py3-none-any.whl", hash = "sha256:a72ad3d290ba1fcf778e569301152f21dc9e67344d57589f490215aa1f8bd9c4"},
+    {file = "astroid-2.12.8.tar.gz", hash = "sha256:92945e6847c57083a0adddbb9428e4d1b89bbacf4cb6c655b62baa4ad2d81ece"},
 ]
 async-timeout = [
     {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
@@ -1914,8 +1914,8 @@ h11 = [
 ]
 home-assistant-bluetooth = []
 homeassistant = [
-    {file = "homeassistant-2022.9.0b4-py3-none-any.whl", hash = "sha256:91ea38ac82083bbaab6bda2b2e72ce3ea839b64557fd52871f13efb6f7fc474d"},
-    {file = "homeassistant-2022.9.0b4.tar.gz", hash = "sha256:d7d8936e32c0e68e47525f787c6792622a279b9711607a3dc038eaa4b53ca970"},
+    {file = "homeassistant-2022.9.0b5-py3-none-any.whl", hash = "sha256:7df542d2c24961bf4ff0b758e6ff8cd3ccdf07da0f08d2f1234c807b598e8d5e"},
+    {file = "homeassistant-2022.9.0b5.tar.gz", hash = "sha256:cbc0c9739cadefe0c047bf71c98df19f235db6e30c780ecc0453f16fcf2f22fe"},
 ]
 httpcore = [
     {file = "httpcore-0.15.0-py3-none-any.whl", hash = "sha256:1105b8b73c025f23ff7c36468e4432226cbb959176eab66864b8e31c4ee27fa6"},
@@ -1926,8 +1926,8 @@ httpx = [
     {file = "httpx-0.23.0.tar.gz", hash = "sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef"},
 ]
 identify = [
-    {file = "identify-2.5.4-py2.py3-none-any.whl", hash = "sha256:962d9bec27ccd1fcceff9b11f8c635afeb163ea3d8b6b30d8f1eee37ec7fac47"},
-    {file = "identify-2.5.4.tar.gz", hash = "sha256:b020e876cec2b11dadb3324fa0427eb744b7d66ef19ac579a748dfff774b6dcf"},
+    {file = "identify-2.5.5-py2.py3-none-any.whl", hash = "sha256:ef78c0d96098a3b5fe7720be4a97e73f439af7cf088ebf47b620aeaa10fadf97"},
+    {file = "identify-2.5.5.tar.gz", hash = "sha256:322a5699daecf7c6fd60e68852f36f2ecbb6a36ff6e6e973e0d2bb6fca203ee6"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -2229,8 +2229,8 @@ pytest-cov = [
 pytest-forked = []
 pytest-freezegun = []
 pytest-homeassistant-custom-component = [
-    {file = "pytest-homeassistant-custom-component-0.11.16.tar.gz", hash = "sha256:6e0d8a6cd2693442271b7883ed8f866df50ba2229a3b08fd11075f0f76537d0b"},
-    {file = "pytest_homeassistant_custom_component-0.11.16-py3-none-any.whl", hash = "sha256:6c70135592bae4d14b9a6e2fcd728efb3bc84b692bf1b778878eacc3164e49f1"},
+    {file = "pytest-homeassistant-custom-component-0.11.17.tar.gz", hash = "sha256:64abf422e2cc4e129a8466f7848aaf1f227160318b6dfa7bb64dd31f67bff9c6"},
+    {file = "pytest_homeassistant_custom_component-0.11.17-py3-none-any.whl", hash = "sha256:92ccdba279b768dfde33cb47f12e9c96eba5e3bc542f2058760b76bec4152b66"},
 ]
 pytest-socket = []
 pytest-sugar = []
