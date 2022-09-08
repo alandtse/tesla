@@ -187,14 +187,16 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "energy added"
         self._attr_device_class = SensorDeviceClass.ENERGY
-        self._attr_state_class = SensorStateClass.TOTAL
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
         self._attr_icon = "mdi:lightning-bolt"
 
     @property
     def native_value(self) -> int:
         """Return the Charge Energy Added."""
-        return self._car.charge_energy_added
+        if self._car.charging_state == "Charging":
+            return self._car.charge_energy_added
+        return 0
 
 
 class TeslaCarMileage(TeslaCarEntity, SensorEntity):
