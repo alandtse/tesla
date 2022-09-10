@@ -101,7 +101,6 @@ class TeslaCarBattery(TeslaCarEntity, SensorEntity):
     @property
     def icon(self):
         """Return icon for the battery."""
-
         charging = self._car.battery_level == "Charging"
 
         return icon_for_battery_level(

@@ -125,15 +125,10 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature:
             _LOGGER.debug("%s: Setting temperature to %s", self.name, temperature)
-
             temp = round(temperature, 1)
 
             await self._car.set_temperature(temp)
-            # We'll create a non-blocking update call so we don't hold up
-            # the current call.
-            await self.update_controller(
-                force=True, wake_if_asleep=True, blocking=False
-            )
+            await self.async_update_ha_state()
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
@@ -142,10 +137,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             await self._car.set_hvac_mode("off")
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self._car.set_hvac_mode("on")
-
-        # Changing the HVAC mode can change alot of climate parms
-        # So we'll do a blocking update.
-        await self.update_controller(force=True, wake_if_asleep=True)
+        await self.async_update_ha_state()
 
     @property
     def preset_mode(self):
@@ -189,6 +181,5 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
 
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
-        # Changing the Climate modes mode can change alot of climate parms
-        # So we'll do a blocking update.
-        await self.update_controller(force=True, wake_if_asleep=True)
+
+        await self.async_update_ha_state()

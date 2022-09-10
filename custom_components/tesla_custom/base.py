@@ -109,9 +109,7 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def unique_id(self) -> str:
         """Return unique id for car entity."""
-        return slugify(
-            f"Tesla Model {str(self._car.vin[3]).upper()} {self._car.vin[-6:]} {self.type}"
-        )
+        return slugify(f"{self._car.vin} {self.type}")
 
     @property
     def device_info(self) -> DeviceInfo:

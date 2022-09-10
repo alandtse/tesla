@@ -126,7 +126,7 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
     ) -> None:
         """Initialise Homelink button."""
         super().__init__(hass, car, coordinator)
-        self.type = "trigger homelink"
+        self.type = "homelink"
         self._attr_icon = "mdi:garage"
         self.__waiting = False
 
