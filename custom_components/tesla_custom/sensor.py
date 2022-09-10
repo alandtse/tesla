@@ -195,7 +195,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         """Return the Charge Energy Added."""
         if self._car.charging_state == "Charging":
             return self._car.charge_energy_added
-        return 0
+        return "0"
 
 
 class TeslaCarMileage(TeslaCarEntity, SensorEntity):
