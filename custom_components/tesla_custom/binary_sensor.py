@@ -74,17 +74,12 @@ class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "charger"
         self._attr_icon = "mdi:ev-station"
-        self._attr_device_class = None
+        self._attr_device_class = BinarySensorDeviceClass.PLUG
 
     @property
     def is_on(self):
         """Return True if charger connected."""
-        # Checking just charging_state will sometimes result in
-        # showing "On" (connected) when it's actually not
-        return (
-            self._car.charging_state != "Disconnected"
-            and self._car.charge_port_latch == "Engaged"
-        )
+        return self._car.charging_state != "Disconnected"
 
     @property
     def extra_state_attributes(self):
