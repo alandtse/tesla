@@ -20,7 +20,7 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get(DEVICE_ID)
-    assert entry.unique_id == "tesla_model_s_111111_hvac_climate_system"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_hvac_climate_system"
 
 
 async def test_climate_properties(hass: HomeAssistant) -> None:
@@ -33,19 +33,19 @@ async def test_climate_properties(hass: HomeAssistant) -> None:
 
     assert (
         state.attributes.get("min_temp")
-        == car_mock_data.CLIMATE_STATE["min_avail_temp"]
+        == car_mock_data.VEHICLE_DATA["climate_state"]["min_avail_temp"]
     )
     assert (
         state.attributes.get("max_temp")
-        == car_mock_data.CLIMATE_STATE["max_avail_temp"]
+        == car_mock_data.VEHICLE_DATA["climate_state"]["max_avail_temp"]
     )
     assert (
         state.attributes.get("current_temperature")
-        == car_mock_data.CLIMATE_STATE["inside_temp"]
+        == car_mock_data.VEHICLE_DATA["climate_state"]["inside_temp"]
     )
     assert (
         state.attributes.get("temperature")
-        == car_mock_data.CLIMATE_STATE["driver_temp_setting"]
+        == car_mock_data.VEHICLE_DATA["climate_state"]["driver_temp_setting"]
     )
 
 
@@ -132,7 +132,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
             },
             blocking=True,
         )
-        mock_set_max_defrost.assert_awaited_once_with(True)
+        mock_set_max_defrost.assert_awaited_once_with(2)
 
     with patch(
         "teslajsonpy.car.TeslaCar.set_climate_keeper_mode"

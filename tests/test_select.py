@@ -7,6 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
 from .common import setup_platform
+from .mock_data import car as car_mock_data
 
 
 async def test_registry_entries(hass: HomeAssistant) -> None:
@@ -15,13 +16,13 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("select.my_model_s_heated_seat_left")
-    assert entry.unique_id == "tesla_model_s_111111_heated_seat_left"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_heated_seat_left"
 
     entry = entity_registry.async_get("select.my_model_s_heated_seat_right")
-    assert entry.unique_id == "tesla_model_s_111111_heated_seat_right"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_heated_seat_right"
 
     entry = entity_registry.async_get("select.my_model_s_cabin_overheat_protection")
-    assert entry.unique_id == "tesla_model_s_111111_cabin_overheat_protection"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_cabin_overheat_protection"
 
     entry = entity_registry.async_get("select.battery_home_grid_charging")
     assert entry.unique_id == "67890_grid_charging"

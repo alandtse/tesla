@@ -27,12 +27,12 @@ def setup_mock_controller(mock_controller):
 
     instance = mock_controller.return_value
 
-    instance.get_state_params.return_value = car_mock_data.VEHICLE_STATE
-    instance.get_config_params.return_value = car_mock_data.VEHICLE_CONFIG
-    instance.get_charging_params.return_value = car_mock_data.CHARGE_STATE
-    instance.get_climate_params.return_value = car_mock_data.CLIMATE_STATE
-    instance.get_gui_params.return_value = car_mock_data.GUI_SETTINGS
-    instance.get_drive_params.return_value = car_mock_data.DRIVE_STATE
+    # instance.get_state_params.return_value = car_mock_data.VEHICLE_STATE
+    # instance.get_config_params.return_value = car_mock_data.VEHICLE_CONFIG
+    # instance.get_charging_params.return_value = car_mock_data.CHARGE_STATE
+    # instance.get_climate_params.return_value = car_mock_data.CLIMATE_STATE
+    # instance.get_gui_params.return_value = car_mock_data.GUI_SETTINGS
+    # instance.get_drive_params.return_value = car_mock_data.DRIVE_STATE
     instance.is_car_online.return_value = True
     instance.get_last_update_time.return_value = datetime.now()
     instance.get_last_update_time.return_value = datetime.now()
@@ -45,7 +45,11 @@ def setup_mock_controller(mock_controller):
     }
 
     instance.generate_car_objects.return_value = {
-        car_mock_data.VIN: TeslaCar(car_mock_data.VEHICLE, mock_controller.return_value)
+        car_mock_data.VIN: TeslaCar(
+            car_mock_data.VEHICLE,
+            mock_controller.return_value,
+            car_mock_data.VEHICLE_DATA,
+        )
     }
 
     instance.generate_energysite_objects.return_value = {

@@ -19,10 +19,10 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("number.my_model_s_charge_limit")
-    assert entry.unique_id == "tesla_model_s_111111_charge_limit"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charge_limit"
 
     entry = entity_registry.async_get("number.my_model_s_charging_amps")
-    assert entry.unique_id == "tesla_model_s_111111_charging_amps"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charging_amps"
 
     entry = entity_registry.async_get("number.battery_home_backup_reserve")
     assert entry.unique_id == "67890_backup_reserve"
@@ -33,16 +33,18 @@ async def test_charge_limit(hass: HomeAssistant) -> None:
     await setup_platform(hass, NUMBER_DOMAIN)
 
     state = hass.states.get("number.my_model_s_charge_limit")
-    assert state.state == str(car_mock_data.CHARGE_STATE["charge_limit_soc"])
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["charge_limit_soc"]
+    )
 
     assert (
         state.attributes.get("min")
-        == car_mock_data.CHARGE_STATE["charge_limit_soc_min"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_limit_soc_min"]
     )
 
     assert (
         state.attributes.get("max")
-        == car_mock_data.CHARGE_STATE["charge_limit_soc_max"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_limit_soc_max"]
     )
 
 
@@ -67,13 +69,15 @@ async def test_charging_amps(hass: HomeAssistant) -> None:
     await setup_platform(hass, NUMBER_DOMAIN)
 
     state = hass.states.get("number.my_model_s_charging_amps")
-    assert state.state == str(car_mock_data.CHARGE_STATE["charge_current_request"])
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["charge_current_request"]
+    )
 
     assert state.attributes.get("min") == CHARGE_CURRENT_MIN
 
     assert (
         state.attributes.get("max")
-        == car_mock_data.CHARGE_STATE["charge_current_request_max"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_current_request_max"]
     )
 
 

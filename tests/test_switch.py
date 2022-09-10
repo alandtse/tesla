@@ -7,9 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
 from .common import setup_platform
-
-# from .mock_data import car as car_mock_data
-
+from .mock_data import car as car_mock_data
 
 async def test_registry_entries(hass: HomeAssistant) -> None:
     """Tests devices are registered in the entity registry."""
@@ -17,16 +15,16 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("switch.my_model_s_heated_steering")
-    assert entry.unique_id == "tesla_model_s_111111_heated_steering"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_heated_steering"
 
     entry = entity_registry.async_get("switch.my_model_s_polling")
-    assert entry.unique_id == "tesla_model_s_111111_polling"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_polling"
 
     entry = entity_registry.async_get("switch.my_model_s_charger")
-    assert entry.unique_id == "tesla_model_s_111111_charger"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charger"
 
     entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
-    assert entry.unique_id == "tesla_model_s_111111_sentry_mode"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_sentry_mode"
 
 
 async def test_heated_steering(hass: HomeAssistant) -> None:

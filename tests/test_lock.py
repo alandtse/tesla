@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
 from .common import setup_platform
+from .mock_data import car as car_mock_data
 
 
 async def test_registry_entries(hass: HomeAssistant) -> None:
@@ -18,17 +19,17 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     await setup_platform(hass, LOCK_DOMAIN)
     entity_registry = er.async_get(hass)
 
-    entry = entity_registry.async_get("lock.my_model_s_trunk_lock")
-    assert entry.unique_id == "tesla_model_s_111111_trunk_lock"
+    entry = entity_registry.async_get("lock.my_model_s_trunk")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_trunk"
 
-    entry = entity_registry.async_get("lock.my_model_s_frunk_lock")
-    assert entry.unique_id == "tesla_model_s_111111_frunk_lock"
+    entry = entity_registry.async_get("lock.my_model_s_frunk")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_frunk"
 
-    entry = entity_registry.async_get("lock.my_model_s_door_lock")
-    assert entry.unique_id == "tesla_model_s_111111_door_lock"
+    entry = entity_registry.async_get("lock.my_model_s_doors")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_doors"
 
-    entry = entity_registry.async_get("lock.my_model_s_charger_door_lock")
-    assert entry.unique_id == "tesla_model_s_111111_charger_door_lock"
+    entry = entity_registry.async_get("lock.my_model_s_charger_door")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charger_door"
 
 
 async def test_car_trunk(hass: HomeAssistant) -> None:
@@ -39,7 +40,7 @@ async def test_car_trunk(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_trunk_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_trunk"},
             blocking=True,
         )
         mock_toggle_trunk.assert_awaited_once()
@@ -55,7 +56,7 @@ async def test_car_frunk(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_frunk_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_frunk"},
             blocking=True,
         )
         mock_toggle_frunk.assert_awaited_once()
@@ -71,7 +72,7 @@ async def test_car_door(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_door_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_doors"},
             blocking=True,
         )
         mock_unlock.assert_awaited_once()
@@ -80,7 +81,7 @@ async def test_car_door(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_LOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_door_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_doors"},
             blocking=True,
         )
         mock_unlock.assert_awaited_once()
@@ -96,7 +97,7 @@ async def test_charger_door(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_charger_door_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_charger_door"},
             blocking=True,
         )
         mock_charge_port_door_open.assert_awaited_once()
@@ -107,7 +108,7 @@ async def test_charger_door(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_LOCK,
-            {ATTR_ENTITY_ID: "lock.my_model_s_charger_door_lock"},
+            {ATTR_ENTITY_ID: "lock.my_model_s_charger_door"},
             blocking=True,
         )
         mock_charge_port_door_close.assert_awaited_once()

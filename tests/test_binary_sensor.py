@@ -18,16 +18,16 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("binary_sensor.my_model_s_parking_brake")
-    assert entry.unique_id == "tesla_model_s_111111_parking_brake"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_parking_brake"
 
     entry = entity_registry.async_get("binary_sensor.my_model_s_charger")
-    assert entry.unique_id == "tesla_model_s_111111_charger"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charger"
 
     entry = entity_registry.async_get("binary_sensor.my_model_s_charging")
-    assert entry.unique_id == "tesla_model_s_111111_charging"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_charging"
 
     entry = entity_registry.async_get("binary_sensor.my_model_s_online")
-    assert entry.unique_id == "tesla_model_s_111111_online"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_online"
 
     entry = entity_registry.async_get("binary_sensor.battery_home_battery_charging")
     assert entry.unique_id == "67890_battery_charging"
@@ -51,28 +51,28 @@ async def test_charger_connection(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charger")
-    assert state.state == "off"
+    assert state.state == "on"
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) is None
     assert (
         state.attributes.get("charging_state")
-        == car_mock_data.CHARGE_STATE["charging_state"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charging_state"]
     )
     assert (
         state.attributes.get("conn_charge_cable")
-        == car_mock_data.CHARGE_STATE["conn_charge_cable"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["conn_charge_cable"]
     )
     assert (
         state.attributes.get("fast_charger_present")
-        == car_mock_data.CHARGE_STATE["fast_charger_present"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["fast_charger_present"]
     )
     assert (
         state.attributes.get("fast_charger_brand")
-        == car_mock_data.CHARGE_STATE["fast_charger_brand"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["fast_charger_brand"]
     )
     assert (
         state.attributes.get("fast_charger_type")
-        == car_mock_data.CHARGE_STATE["fast_charger_type"]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["fast_charger_type"]
     )
 
 
@@ -81,7 +81,7 @@ async def test_charging(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charging")
-    assert state.state == "off"
+    assert state.state == "on"
 
     assert (
         state.attributes.get(ATTR_DEVICE_CLASS)

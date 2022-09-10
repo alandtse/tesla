@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
 from .common import setup_platform
+from .mock_data import car as car_mock_data
 
 
 async def test_registry_entries(hass: HomeAssistant) -> None:
@@ -17,19 +18,19 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("button.my_model_s_horn")
-    assert entry.unique_id == "tesla_model_s_111111_horn"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_horn"
 
     entry = entity_registry.async_get("button.my_model_s_flash_lights")
-    assert entry.unique_id == "tesla_model_s_111111_flash_lights"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_flash_lights"
 
     entry = entity_registry.async_get("button.my_model_s_wake_up")
-    assert entry.unique_id == "tesla_model_s_111111_wake_up"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_wake_up"
 
     entry = entity_registry.async_get("button.my_model_s_force_data_update")
-    assert entry.unique_id == "tesla_model_s_111111_force_data_update"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_force_data_update"
 
-    entry = entity_registry.async_get("button.my_model_s_trigger_homelink")
-    assert entry.unique_id == "tesla_model_s_111111_trigger_homelink"
+    entry = entity_registry.async_get("button.my_model_s_homelink")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_homelink"
 
 
 async def test_horn_press(hass: HomeAssistant) -> None:

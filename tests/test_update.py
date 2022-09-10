@@ -17,14 +17,14 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("update.my_model_s_software_update")
-    assert entry.unique_id == "tesla_model_s_111111_software_update"
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_software_update"
 
 
 async def test_software_update_properties(hass: HomeAssistant) -> None:
     """Tests software update properties."""
     await setup_platform(hass, UPDATE_DOMAIN)
 
-    version = car_mock_data.VEHICLE_STATE["software_update"]["version"]
+    version = car_mock_data.VEHICLE_DATA["vehicle_state"]["software_update"]["version"]
 
     state = hass.states.get("update.my_model_s_software_update")
     # assert state.state == str(car_mock_data.VEHICLE_STATE["software_update"])
