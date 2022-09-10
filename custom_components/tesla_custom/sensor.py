@@ -132,7 +132,6 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     def native_value(self) -> int:
         """Return charge rate."""
         charge_rate = self._car.charge_rate
-
         # If we don't have anything, just return None.
         if charge_rate is None:
             return charge_rate
@@ -157,20 +156,10 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
                 convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS), 2
             )
 
-        data = {
+        return {
             "time_left": self._car.time_to_full_charge,
             "added_range": added_range,
-            "charge_energy_added": self._car.charge_energy_added,
-            "charge_current_request": self._car.charge_current_request,
-            "charge_current_request_max": self._car.charge_current_request_max,
-            "charger_actual_current": self._car.charger_actual_current,
-            "charger_voltage": self._car.charger_voltage,
-            "charger_power": self._car.charger_power,
-            "charger_phases": self._car.charger_phases,
-            "charge_limit_soc": self._car.charge_limit_soc,
         }
-        self.attrs.update(data)
-        return self.attrs
 
 
 class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
@@ -196,6 +185,16 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         if self._car.charging_state == "Charging":
             return self._car.charge_energy_added
         return "0"
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "time_left": self._car.time_to_full_charge,
+            "charger_actual_current": self._car.charger_actual_current,
+            "charger_voltage": self._car.charger_voltage,
+            "charger_power": self._car.charger_power,
+        }
 
 
 class TeslaCarMileage(TeslaCarEntity, SensorEntity):

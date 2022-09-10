@@ -56,8 +56,9 @@ class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):
 
     @property
     def is_on(self):
-        """Return True if car shift state in park."""
-        return self._car.shift_state == "P"
+        """Return True if car shift state in park or None."""
+        # When car is parked and off, Tesla API reports shift_state None
+        return self._car.shift_state == "P" or self._car.shift_state is None
 
 
 class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
@@ -88,15 +89,13 @@ class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        attrs = {
+        return {
             "charging_state": self._car.charging_state,
             "conn_charge_cable": self._car.conn_charge_cable,
             "fast_charger_present": self._car.fast_charger_present,
             "fast_charger_brand": self._car.fast_charger_brand,
             "fast_charger_type": self._car.fast_charger_type,
         }
-
-        return attrs
 
 
 class TeslaCarCharging(TeslaCarEntity, BinarySensorEntity):
@@ -142,13 +141,11 @@ class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        attrs = {
-            "vehicle_id": self._car.vehicle_id,
+        return {
+            "vehicle_id": str(self._car.vehicle_id),
             "vin": self._car.vin,
-            "id": self._car.id,
+            "id": str(self._car.id),
         }
-
-        return attrs
 
 
 class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):

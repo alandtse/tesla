@@ -69,12 +69,10 @@ class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
         # else:
         #     heading = self._car.heading
 
-        attr = {
+        return {
             "heading": self._car.heading,
             "speed": self._car.speed,
         }
-
-        return attr
 
     @property
     def force_update(self):
