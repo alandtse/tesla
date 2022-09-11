@@ -1,4 +1,4 @@
-"""Support for Tesla cars."""
+"""Support for Tesla cars and energy sites."""
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite
@@ -10,8 +10,6 @@ from homeassistant.util import slugify
 
 from . import TeslaDataUpdateCoordinator
 from .const import ATTRIBUTION, DOMAIN
-
-DEFAULT_DEVICE = "device"
 
 
 class TeslaBaseEntity(CoordinatorEntity):
@@ -93,7 +91,7 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def available(self) -> bool:
         """Return availability of data."""
-        return self._car.data_available != {}
+        return self._car.data_available
 
     @property
     def vehicle_name(self) -> str:
@@ -153,13 +151,14 @@ class TeslaEnergyEntity(TeslaBaseEntity):
     @property
     def available(self) -> bool:
         """Return availability of data."""
-        return self._energysite != {}
+        return self._energysite.data_available
 
     @property
     def sw_version(self) -> bool:
         """Return firmware version."""
         if self._energysite.resource_type == RESOURCE_TYPE_BATTERY:
             return self._energysite.version
+        # Non-Powerwall sites do not provide version info
         return "Unavailable"
 
     @property

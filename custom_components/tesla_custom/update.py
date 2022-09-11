@@ -64,7 +64,6 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     def latest_version(self) -> str:
         """Get the latest version."""
         version_str: str = self._car.software_update.get("version")
-
         # If we don't have a software_update version, then we're running the latest version.
         if version_str is None or version_str.strip() == "":
             version_str = self.installed_version
@@ -75,7 +74,6 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     def installed_version(self) -> str:
         """Get the installed version."""
         version_str = self._car.car_version
-
         # We will split out the version Hash, purely cause it looks nicer in the UI.
         if version_str is not None:
             version_str = version_str.split(" ")[0]
@@ -86,16 +84,13 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     def in_progress(self):
         """Get Progress, if updating."""
         update_status = self._car.software_update.get("status")
-
         # If the update is scheduled, then its Simply In Progress
         if update_status == "scheduled":
             return True
-
         # If its actually installing, we can use the install_perc
         if update_status == "installing":
             progress = self._car.software_update.get("install_perc")
             return progress
-
         # Otherwise, we're not updating, so return False
         return False
 
@@ -103,6 +98,5 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
         """Install an Update."""
         # Ask Tesla to start the update now.
         await self._car.schedule_software_update(offset_sec=0)
-
         # Do a controller refresh, to get the latest data from Tesla.
         await self.update_controller(force=True)

@@ -137,7 +137,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             await self._car.set_hvac_mode("off")
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self._car.set_hvac_mode("on")
-        # Multiple state changes so refreshing all entities is required
+        # set_hvac_mode changes multiple states so refresh all entities
         await self._coordinator.async_refresh()
 
     @property
@@ -182,5 +182,5 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
 
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
-        # Multiple state changes so refreshing all entities is required
+        # max_defrost changes multiple states so refresh all entities
         await self._coordinator.async_refresh()
