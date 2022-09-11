@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.3 (2022-09-11)
+### Fix
+* Fix Chinese location offset ([#263](https://github.com/alandtse/tesla/issues/263)) ([`3feba57`](https://github.com/alandtse/tesla/commit/3feba57298de38a8fc3601e8d3080b97344f0a91))
+
 ## v2.4.2 (2022-08-29)
 ### Fix
 * Fix grid status issue ([#258](https://github.com/alandtse/tesla/issues/258)) ([`f889173`](https://github.com/alandtse/tesla/commit/f88917321369d0faaf280e1139967eebf6df8be5))
