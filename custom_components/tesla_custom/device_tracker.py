@@ -29,6 +29,10 @@ class TeslaDeviceEntity(TeslaDevice, TrackerEntity):
 
     def __init__(self, tesla_device, coordinator):
         super().__init__(tesla_device, coordinator)
+        if str(tesla_device._controller._Controller__connection.auth_domain) == "https://auth.tesla.cn":
+            self.in_china = True
+        else:
+            self.in_china = False
         self.location_converter = LocationConverter()
 
     @property
@@ -40,7 +44,7 @@ class TeslaDeviceEntity(TeslaDevice, TrackerEntity):
     def latitude(self) -> float | None:
         """Return latitude value of the device."""
         location = self.tesla_device.get_location()
-        if location and self.in_china(location):
+        if location and self.in_china:
             location = self.location_converter.gcj02towgs84(location)
         return location.get("latitude") if location else None
 
@@ -48,7 +52,7 @@ class TeslaDeviceEntity(TeslaDevice, TrackerEntity):
     def longitude(self) -> float | None:
         """Return longitude value of the device."""
         location = self.tesla_device.get_location()
-        if location and self.in_china(location):
+        if location and self.in_china:
             location = self.location_converter.gcj02towgs84(location)
         return location.get("longitude") if location else None
 
@@ -71,17 +75,6 @@ class TeslaDeviceEntity(TeslaDevice, TrackerEntity):
                 }
             )
         return attr
-
-    @staticmethod
-    def in_china(location):
-        """Return whether the location is in China."""
-        longitude = location.get("longitude")
-        latitude = location.get("latitude")
-        if longitude < 72.004 or longitude > 137.8347:
-            return False
-        if latitude < 0.8293 or latitude > 55.8271:
-            return False
-        return True
 
 
 class LocationConverter:
