@@ -42,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerRate(hass, car, coordinator))
         entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
         entities.append(TeslaCarChargerPower(hass, car, coordinator))
-        entities.append(TeslaCarMileage(hass, car, coordinator))
+        entities.append(TeslaCarOdometer(hass, car, coordinator))
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
@@ -128,8 +128,8 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:lightning-bolt"
 
     @property
-    def native_value(self) -> int:
-        """Return the Charge Energy Added."""
+    def native_value(self) -> float:
+        """Return the charge energy added."""
         if self._car.charging_state == "Charging":
             return self._car.charge_energy_added
         return "0"
@@ -143,12 +143,10 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
             added_range = self._car.charge_miles_added_rated
 
         if self.unit_of_measurement == "km/hr":
-            added_range = round(
-                convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS), 2
-            )
+            added_range = convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS)
 
         return {
-            "added_range": added_range,
+            "added_range": round(added_range, 2),
         }
 
 
@@ -177,8 +175,9 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         return {
-            "charger amps": self._car.charger_actual_current,
-            "charger volts": self._car.charger_voltage,
+            "charger_amps_requsted": self._car.charge_current_request,
+            "charger_amps_actual": self._car.charger_actual_current,
+            "charger_volts": self._car.charger_voltage,
             "charger_phases": self._car.charger_phases,
         }
 
@@ -200,40 +199,28 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:speedometer"
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float:
         """Return charge rate."""
         charge_rate = self._car.charge_rate
-        # If we don't have anything, just return None.
+
         if charge_rate is None:
             return charge_rate
 
         if self.unit_of_measurement == "km/hr":
-            charge_rate = round(
-                convert(charge_rate, LENGTH_MILES, LENGTH_KILOMETERS), 2
-            )
+            charge_rate = convert(charge_rate, LENGTH_MILES, LENGTH_KILOMETERS)
 
-        return charge_rate
+        return round(charge_rate, 2)
 
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        added_range = self._car.charge_miles_added_ideal
-
-        if self._car.gui_range_display == "Rated":
-            added_range = self._car.charge_miles_added_rated
-
-        if self.unit_of_measurement == "km/hr":
-            added_range = round(
-                convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS), 2
-            )
-
         return {
             "time_left": self._car.time_to_full_charge,
         }
 
 
-class TeslaCarMileage(TeslaCarEntity, SensorEntity):
-    """Representation of the Tesla car mileage added sensor."""
+class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car odometer sensor."""
 
     def __init__(
         self,
@@ -241,25 +228,23 @@ class TeslaCarMileage(TeslaCarEntity, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize mileage added entity."""
+        """Initialize odometer entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "mileage"
+        self.type = "odometer"
         self._attr_device_class = None
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         self._attr_icon = "mdi:counter"
 
     @property
-    def native_value(self) -> int:
-        """Return the charge energy added."""
+    def native_value(self) -> float:
+        """Return the odometer."""
         odometer_value = self._car.odometer
 
         if odometer_value is None:
             return None
 
         if self.native_unit_of_measurement == LENGTH_KILOMETERS:
-            odometer_value = round(
-                convert(odometer_value, LENGTH_MILES, LENGTH_KILOMETERS), 2
-            )
+            odometer_value = convert(odometer_value, LENGTH_MILES, LENGTH_KILOMETERS)
 
         return round(odometer_value, 2)
 
@@ -289,7 +274,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:gauge"
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float:
         """Return range."""
         range_value = self._car.battery_range
 
@@ -300,11 +285,9 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
             return None
 
         if self.native_unit_of_measurement == LENGTH_KILOMETERS:
-            range_value = round(
-                convert(range_value, LENGTH_MILES, LENGTH_KILOMETERS), 2
-            )
+            range_value = convert(range_value, LENGTH_MILES, LENGTH_KILOMETERS)
 
-        return range_value
+        return round(range_value, 2)
 
     @property
     def native_unit_of_measurement(self) -> str:
@@ -342,7 +325,7 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:thermometer"
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float:
         """Return car temperature."""
         if self.inside is True:
             return self._car.inside_temp
@@ -377,7 +360,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
             self._attr_icon = "mdi:home-battery"
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float:
         """Return power in Watts."""
         if self.type == "solar power":
             return round(self._energysite.solar_power)
