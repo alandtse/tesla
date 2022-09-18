@@ -14,6 +14,7 @@ from homeassistant.const import (
     LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
+    POWER_KILO_WATT,
     TEMP_CELSIUS,
     POWER_WATT,
 )
@@ -40,6 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarBattery(hass, car, coordinator))
         entities.append(TeslaCarChargerRate(hass, car, coordinator))
         entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
+        entities.append(TeslaCarChargerPower(hass, car, coordinator))
         entities.append(TeslaCarMileage(hass, car, coordinator))
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
@@ -108,6 +110,79 @@ class TeslaCarBattery(TeslaCarEntity, SensorEntity):
         )
 
 
+class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
+    """Representation of a Tesla car energy added sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize energy added entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "energy added"
+        self._attr_device_class = SensorDeviceClass.ENERGY
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+        self._attr_icon = "mdi:lightning-bolt"
+
+    @property
+    def native_value(self) -> int:
+        """Return the Charge Energy Added."""
+        if self._car.charging_state == "Charging":
+            return self._car.charge_energy_added
+        return "0"
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        added_range = self._car.charge_miles_added_ideal
+
+        if self._car.gui_range_display == "Rated":
+            added_range = self._car.charge_miles_added_rated
+
+        if self.unit_of_measurement == "km/hr":
+            added_range = round(
+                convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS), 2
+            )
+
+        return {
+            "added_range": added_range,
+        }
+
+
+class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
+    """Representation of a Tesla car charger power."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize energy added entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "charger power"
+        self._attr_device_class = SensorDeviceClass.POWER
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = POWER_KILO_WATT
+
+    @property
+    def native_value(self) -> int:
+        """Return the charger power."""
+        return self._car.charger_power
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "charger amps": self._car.charger_actual_current,
+            "charger volts": self._car.charger_voltage,
+            "charger_phases": self._car.charger_phases,
+        }
+
+
 class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car charging rate."""
 
@@ -121,12 +196,8 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "charging rate"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = self._car.gui_distance_units
         self._attr_icon = "mdi:speedometer"
-
-    @property
-    def native_unit_of_measurement(self) -> str:
-        """Return distance units from car settings."""
-        return self._car.gui_distance_units
 
     @property
     def native_value(self) -> int:
@@ -158,42 +229,6 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
 
         return {
             "time_left": self._car.time_to_full_charge,
-            "added_range": added_range,
-        }
-
-
-class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
-    """Representation of a Tesla car energy added sensor."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize energy added entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "energy added"
-        self._attr_device_class = SensorDeviceClass.ENERGY
-        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
-        self._attr_icon = "mdi:lightning-bolt"
-
-    @property
-    def native_value(self) -> int:
-        """Return the Charge Energy Added."""
-        if self._car.charging_state == "Charging":
-            return self._car.charge_energy_added
-        return "0"
-
-    @property
-    def extra_state_attributes(self):
-        """Return device state attributes."""
-        return {
-            "time_left": self._car.time_to_full_charge,
-            "charger_actual_current": self._car.charger_actual_current,
-            "charger_voltage": self._car.charger_voltage,
-            "charger_power": self._car.charger_power,
         }
 
 
@@ -303,6 +338,7 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
 
         self._attr_device_class = SensorDeviceClass.TEMPERATURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = TEMP_CELSIUS
         self._attr_icon = "mdi:thermometer"
 
     @property
@@ -312,14 +348,6 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
             return self._car.inside_temp
 
         return self._car.outside_temp
-
-    @property
-    def native_unit_of_measurement(self):
-        """Return the unit of measurement.
-
-        Tesla API always returns in Celsius.
-        """
-        return TEMP_CELSIUS
 
 
 class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
