@@ -145,11 +145,7 @@ async def async_setup_entry(hass, config_entry):
                 CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
         )
-        result = await controller.connect(
-            wake_if_asleep=config_entry.options.get(
-                CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
-            )
-        )
+        result = await controller.connect()
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
         expiration = result["expiration"]
@@ -192,8 +188,12 @@ async def async_setup_entry(hass, config_entry):
         hass, config_entry=config_entry, controller=controller
     )
 
-    cars = controller.generate_car_objects()
-    energysites = controller.generate_energysite_objects()
+    cars = await controller.generate_car_objects(
+        wake_if_asleep=config_entry.options.get(
+            CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
+        )
+    )
+    energysites = await controller.generate_energysite_objects()
 
     hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
