@@ -152,7 +152,7 @@ async def async_setup_entry(hass, config_entry):
     except IncompleteCredentials as ex:
         await async_client.aclose()
         raise ConfigEntryAuthFailed from ex
-    except httpx.ConnectTimeout as ex:
+    except (httpx.ConnectTimeout, httpx.ConnectError) as ex:
         await async_client.aclose()
         raise ConfigEntryNotReady from ex
     except TeslaException as ex:
