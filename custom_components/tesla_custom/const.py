@@ -7,7 +7,7 @@ DOMAIN = "tesla_custom"
 ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
-DEFAULT_WAKE_ON_START = True
+DEFAULT_WAKE_ON_START = False
 ERROR_URL_NOT_DETECTED = "url_not_detected"
 MIN_SCAN_INTERVAL = 10
 

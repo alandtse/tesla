@@ -188,11 +188,28 @@ async def async_setup_entry(hass, config_entry):
         hass, config_entry=config_entry, controller=controller
     )
 
-    cars = await controller.generate_car_objects(
-        wake_if_asleep=config_entry.options.get(
-            CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
+    try:
+        cars = await controller.generate_car_objects(
+            wake_if_asleep=config_entry.options.get(
+                CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
+            )
         )
-    )
+    except TeslaException as ex:
+        await async_client.aclose()
+        if ex.code == HTTPStatus.UNAUTHORIZED:
+            raise ConfigEntryAuthFailed from ex
+        if ex.message in [
+            "VEHICLE_UNAVAILABLE",
+            "TOO_MANY_REQUESTS",
+            "SERVICE_MAINTENANCE",
+            "UPSTREAM_TIMEOUT",
+        ]:
+            raise ConfigEntryNotReady(
+                f"Temporarily unable to communicate with Tesla API: {ex.message}"
+            ) from ex
+        _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+        return False
+
     energysites = await controller.generate_energysite_objects()
 
     hass.data[DOMAIN][config_entry.entry_id] = {
