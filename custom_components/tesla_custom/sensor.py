@@ -9,14 +9,17 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    CONF_UNIT_SYSTEM_METRIC,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
     LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
-    POWER_KILO_WATT,
-    TEMP_CELSIUS,
     POWER_WATT,
+    POWER_KILO_WATT,
+    SPEED_KILOMETERS_PER_HOUR,
+    SPEED_MILES_PER_HOUR,
+    TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
@@ -142,7 +145,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         if self._car.gui_range_display == "Rated":
             added_range = self._car.charge_miles_added_rated
 
-        if self.unit_of_measurement == "km/hr":
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             added_range = convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS)
 
         return {
@@ -195,7 +198,6 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "charging rate"
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = self._car.gui_distance_units
         self._attr_icon = "mdi:speedometer"
 
     @property
@@ -206,10 +208,18 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
         if charge_rate is None:
             return charge_rate
 
-        if self.unit_of_measurement == "km/hr":
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             charge_rate = convert(charge_rate, LENGTH_MILES, LENGTH_KILOMETERS)
 
         return round(charge_rate, 2)
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return distance units."""
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
+            return SPEED_KILOMETERS_PER_HOUR
+
+        return SPEED_MILES_PER_HOUR
 
     @property
     def extra_state_attributes(self):
@@ -250,11 +260,11 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
 
     @property
     def native_unit_of_measurement(self) -> str:
-        """Return distance units from car settings."""
-        if self._car.gui_distance_units == "mi/hr":
-            return LENGTH_MILES
+        """Return distance units."""
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
+            return LENGTH_KILOMETERS
 
-        return LENGTH_KILOMETERS
+        return LENGTH_MILES
 
 
 class TeslaCarRange(TeslaCarEntity, SensorEntity):
@@ -284,18 +294,18 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
         if range_value is None:
             return None
 
-        if self.native_unit_of_measurement == LENGTH_KILOMETERS:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             range_value = convert(range_value, LENGTH_MILES, LENGTH_KILOMETERS)
 
         return round(range_value, 2)
 
     @property
     def native_unit_of_measurement(self) -> str:
-        """Return distance units from car settings."""
-        if self._car.gui_distance_units == "mi/hr":
-            return LENGTH_MILES
+        """Return distance units."""
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
+            return LENGTH_KILOMETERS
 
-        return LENGTH_KILOMETERS
+        return LENGTH_MILES
 
 
 class TeslaCarTemp(TeslaCarEntity, SensorEntity):

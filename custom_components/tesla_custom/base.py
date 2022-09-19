@@ -3,6 +3,7 @@ from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite
 
+from homeassistant.const import CONF_UNIT_SYSTEM_METRIC, CONF_UNIT_SYSTEM_IMPERIAL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -65,6 +66,11 @@ class TeslaCarEntity(TeslaBaseEntity):
         """Initialise the Tesla car device."""
         super().__init__(hass, coordinator)
         self._car = car
+        self._unit_system = (
+            CONF_UNIT_SYSTEM_METRIC
+            if self.hass.config.units.is_metric
+            else CONF_UNIT_SYSTEM_IMPERIAL
+        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True

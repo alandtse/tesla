@@ -24,25 +24,6 @@ PLATFORMS = [
     "number",
 ]
 
-ICONS = {
-    "battery sensor": "mdi:battery",
-    "range sensor": "mdi:gauge",
-    "mileage sensor": "mdi:counter",
-    "parking brake sensor": "mdi:car-brake-parking",
-    "charger sensor": "mdi:ev-station",
-    "charger switch": "mdi:battery-charging",
-    "update switch": "mdi:car-connected",
-    "maxrange switch": "mdi:gauge-full",
-    "temperature sensor": "mdi:thermometer",
-    "location tracker": "mdi:crosshairs-gps",
-    "charging rate sensor": "mdi:speedometer",
-    "sentry mode switch": "mdi:shield-car",
-    "horn": "mdi:bullhorn",
-    "flash lights": "mdi:car-light-high",
-    "trigger homelink": "mdi:garage",
-    "solar panel": "mdi:solar-panel",
-    "heated steering wheel": "mdi:steering",
-}
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
 AUTH_CALLBACK_NAME = "auth:tesla:callback"
 AUTH_PROXY_PATH = "/auth/tesla/proxy"
