@@ -1,13 +1,24 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "Konto er allerede konfigureret",
+      "reauth_successful": "Fornyelse af godkendelse lykkedes"
+    },
+    "error": {
+      "already_configured": "Konto er allerede konfigureret",
+      "cannot_connect": "Kunne ikke forbinde",
+      "invalid_auth": "Ugyldig godkendelse"
+    },
     "step": {
       "user": {
         "data": {
+          "mfa": "MFA Kode (Valgfri)",
           "password": "Adgangskode",
-          "username": "Email-adresse"
+          "username": "Email-addresse",
+          "token": "Opdaterings N\u00f8gle"
         },
-        "description": "Indtast dine oplysninger.",
-        "title": "Tesla - Konfiguration"
+        "description": "Brugh 'Auth App for Tesla' til iOS eller 'Tesla Tokens' til Android\r\n for at oprette en opdaterings n\u00f8gle, og indtast den nedenfor.",
+        "title": "Tesla - Indstillinger"
       }
     }
   },
@@ -15,9 +26,12 @@
     "step": {
       "init": {
         "data": {
-          "scan_interval": "Sekunder mellem scanninger"
+          "enable_wake_on_start": "Tving bil til at v\u00e5gne ved opstart",
+          "scan_interval": "Sekunder mellem scanninger",
+          "polling_policy": "Scannings politik. Se https://github.com/alandtse/tesla/wiki/Polling-policy"
         }
       }
     }
   }
 }
+
