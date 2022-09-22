@@ -64,13 +64,10 @@ class TeslaCarChargerDoor(TeslaCarEntity, CoverEntity):
     @property
     def is_closed(self):
         """Return True if charger door is open."""
-        charge_door_open = self._car.charge_port_door_open
-        charger_latched = self._car.charge_port_latch == "Engaged"
-
-        if charger_latched:
+        if self._car.charge_port_latch == "Engaged":
             return False
 
-        return charge_door_open is False
+        return self._car.is_charge_port_door_open is False
 
 
 class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
