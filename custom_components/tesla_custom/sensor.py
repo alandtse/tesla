@@ -178,7 +178,7 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         return {
-            "charger_amps_requsted": self._car.charge_current_request,
+            "charger_amps_request": self._car.charge_current_request,
             "charger_amps_actual": self._car.charger_actual_current,
             "charger_volts": self._car.charger_voltage,
             "charger_phases": self._car.charger_phases,
