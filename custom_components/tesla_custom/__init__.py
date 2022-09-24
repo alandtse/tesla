@@ -80,11 +80,14 @@ async def async_setup(hass, base_config):
             hass.config_entries.async_update_entry(entry, data=data, options=options)
 
     config = base_config.get(DOMAIN)
+
     if not config:
         return True
+
     email = config[CONF_USERNAME]
     token = config[CONF_TOKEN]
     scan_interval = config[CONF_SCAN_INTERVAL]
+
     if email in _async_configured_emails(hass):
         try:
             info = await validate_input(hass, config)
@@ -110,6 +113,7 @@ async def async_setup(hass, base_config):
         )
         hass.data.setdefault(DOMAIN, {})
         hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval}
+
     return True
 
 
@@ -122,14 +126,17 @@ async def async_setup_entry(hass, config_entry):
     # create a new session so they have separate cookies
     async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
     email = config_entry.title
+
     if not hass.data[DOMAIN]:
         async_setup_services(hass)
+
     if email in hass.data[DOMAIN] and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]:
         scan_interval = hass.data[DOMAIN][email][CONF_SCAN_INTERVAL]
         hass.config_entries.async_update_entry(
             config_entry, options={CONF_SCAN_INTERVAL: scan_interval}
         )
         hass.data[DOMAIN].pop(email)
+
     try:
         controller = TeslaAPI(
             async_client,
@@ -149,26 +156,31 @@ async def async_setup_entry(hass, config_entry):
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
         expiration = result["expiration"]
+
     except IncompleteCredentials as ex:
         await async_client.aclose()
         raise ConfigEntryAuthFailed from ex
+
     except (httpx.ConnectTimeout, httpx.ConnectError) as ex:
         await async_client.aclose()
         raise ConfigEntryNotReady from ex
+
     except TeslaException as ex:
         await async_client.aclose()
+
         if ex.code == HTTPStatus.UNAUTHORIZED:
             raise ConfigEntryAuthFailed from ex
+
         if ex.message in [
-            "VEHICLE_UNAVAILABLE",
             "TOO_MANY_REQUESTS",
-            "SERVICE_MAINTENANCE",
             "UPSTREAM_TIMEOUT",
         ]:
             raise ConfigEntryNotReady(
                 f"Temporarily unable to communicate with Tesla API: {ex.message}"
             ) from ex
+
         _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
         return False
 
     async def _async_close_client(*_):
@@ -196,8 +208,7 @@ async def async_setup_entry(hass, config_entry):
         )
     except TeslaException as ex:
         await async_client.aclose()
-        if ex.code == HTTPStatus.UNAUTHORIZED:
-            raise ConfigEntryAuthFailed from ex
+
         if ex.message in [
             "VEHICLE_UNAVAILABLE",
             "TOO_MANY_REQUESTS",
@@ -207,10 +218,29 @@ async def async_setup_entry(hass, config_entry):
             raise ConfigEntryNotReady(
                 f"Temporarily unable to communicate with Tesla API: {ex.message}"
             ) from ex
+
         _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
         return False
 
-    energysites = await controller.generate_energysite_objects()
+    try:
+        energysites = await controller.generate_energysite_objects()
+
+    except TeslaException as ex:
+        await async_client.aclose()
+
+        if ex.message in [
+            "TOO_MANY_REQUESTS",
+            "SERVICE_MAINTENANCE",
+            "UPSTREAM_TIMEOUT",
+        ]:
+            raise ConfigEntryNotReady(
+                f"Temporarily unable to communicate with Tesla API: {ex.message}"
+            ) from ex
+
+        _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
+        return False
 
     hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
