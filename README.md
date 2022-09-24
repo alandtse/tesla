@@ -68,7 +68,7 @@ This integration provides the following entities for energy sites:
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
 
 - Seconds between polling - referred to below as the `polling_interval`.
-- Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
+- Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain. Default is on.
 - Polling policy - When do we actively poll the car to get updates, and when do we try to allow the car to sleep. See [the Wiki](https://github.com/alandtse/tesla/wiki/Polling-policy) for more information.
 
 ## Potential Battery impacts
