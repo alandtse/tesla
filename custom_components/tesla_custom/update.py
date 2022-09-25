@@ -63,7 +63,10 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     @property
     def latest_version(self) -> str:
         """Get the latest version."""
-        version_str: str = self._car.software_update.get("version")
+        version_str = None
+
+        if self._car.software_update:
+            version_str: str = self._car.software_update.get("version")
         # If we don't have a software_update version, then we're running the latest version.
         if version_str is None or version_str.strip() == "":
             version_str = self.installed_version
@@ -83,7 +86,10 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     @property
     def in_progress(self):
         """Get Progress, if updating."""
-        update_status = self._car.software_update.get("status")
+        update_status = None
+
+        if self._car.software_update:
+            update_status = self._car.software_update.get("status")
         # If the update is scheduled, then its Simply In Progress
         if update_status == "scheduled":
             return True

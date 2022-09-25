@@ -89,6 +89,11 @@ class TeslaCarWakeUp(TeslaCarEntity, ButtonEntity):
         """Handle the button press."""
         await self._car.wake_up()
 
+    @property
+    def available(self) -> bool:
+        """Return True."""
+        return True
+
 
 class TeslaCarForceDataUpdate(TeslaCarEntity, ButtonEntity):
     """Representation of a Tesla car force data update button."""
@@ -128,22 +133,11 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
         super().__init__(hass, car, coordinator)
         self.type = "homelink"
         self._attr_icon = "mdi:garage"
-        self.__waiting = False
-
-    @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        return super().available and not self.__waiting
 
     async def async_press(self, **kwargs):
         """Send the command."""
-        self.__waiting = True
-        self.async_write_ha_state()
         try:
             await self.update_controller(wake_if_asleep=True, force=True, blocking=True)
             await self._car.trigger_homelink()
         except HomelinkError as ex:
             _LOGGER.error("%s", ex.message)
-        finally:
-            self.__waiting = False
-            self.async_write_ha_state()

@@ -95,11 +95,6 @@ class TeslaCarEntity(TeslaBaseEntity):
         await self._coordinator.async_refresh()
 
     @property
-    def available(self) -> bool:
-        """Return availability of data."""
-        return self._car.data_available
-
-    @property
     def vehicle_name(self) -> str:
         """Return vehicle name."""
         return (
@@ -153,11 +148,6 @@ class TeslaEnergyEntity(TeslaBaseEntity):
     def unique_id(self) -> str:
         """Return unique id for energy site device."""
         return slugify(f"{self._energysite.energysite_id} {self.type}")
-
-    @property
-    def available(self) -> bool:
-        """Return availability of data."""
-        return self._energysite.data_available
 
     @property
     def sw_version(self) -> bool:
