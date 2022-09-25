@@ -67,7 +67,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
-            if "third" in seat_name and car.third_row_seats == "None":
+            # Check for str "None" (car does not have third row seats)
+            # or None (car is asleep)
+            if "third" in seat_name and (
+                car.third_row_seats == "None" or car.third_row_seats is None
+            ):
                 continue
             entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
 

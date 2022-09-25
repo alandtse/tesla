@@ -1,13 +1,15 @@
 """Const file for Tesla cars."""
 VERSION = "2.1.1"
-CONF_WAKE_ON_START = "enable_wake_on_start"
 CONF_EXPIRATION = "expiration"
+CONF_INCLUDE_VEHICLES = "include_vehicles"
+CONF_INCLUDE_ENERGYSITES = "include_energysites"
 CONF_POLLING_POLICY = "polling_policy"
+CONF_WAKE_ON_START = "enable_wake_on_start"
 DOMAIN = "tesla_custom"
 ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
-DEFAULT_WAKE_ON_START = True
+DEFAULT_WAKE_ON_START = False
 ERROR_URL_NOT_DETECTED = "url_not_detected"
 MIN_SCAN_INTERVAL = 10
 

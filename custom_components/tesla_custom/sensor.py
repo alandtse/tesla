@@ -140,10 +140,15 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        added_range = self._car.charge_miles_added_ideal
-
-        if self._car.gui_range_display == "Rated":
+        if self._car.charge_miles_added_rated:
             added_range = self._car.charge_miles_added_rated
+        elif (
+            self._car.charge_miles_added_ideal
+            and self._car.gui_range_display == "Ideal"
+        ):
+            added_range = self._car.charge_miles_added_ideal
+        else:
+            added_range = 0
 
         if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             added_range = convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS)

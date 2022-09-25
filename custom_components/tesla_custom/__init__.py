@@ -26,6 +26,8 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
+    CONF_INCLUDE_VEHICLES,
+    CONF_INCLUDE_ENERGYSITES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DATA_LISTENER,
@@ -152,7 +154,10 @@ async def async_setup_entry(hass, config_entry):
                 CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
         )
-        result = await controller.connect()
+        result = await controller.connect(
+            include_vehicles=config.get(CONF_INCLUDE_VEHICLES),
+            include_energysites=config.get(CONF_INCLUDE_ENERGYSITES),
+        )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
         expiration = result["expiration"]
@@ -201,16 +206,23 @@ async def async_setup_entry(hass, config_entry):
     )
 
     try:
-        cars = await controller.generate_car_objects(
-            wake_if_asleep=config_entry.options.get(
+        if config_entry.data.get("initial_setup"):
+            wake_if_asleep = True
+        else:
+            wake_if_asleep = config_entry.options.get(
                 CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
             )
+
+        cars = await controller.generate_car_objects(wake_if_asleep=wake_if_asleep)
+
+        hass.config_entries.async_update_entry(
+            config_entry, data={**config_entry.data, "initial_setup": False}
         )
+
     except TeslaException as ex:
         await async_client.aclose()
 
         if ex.message in [
-            "VEHICLE_UNAVAILABLE",
             "TOO_MANY_REQUESTS",
             "SERVICE_MAINTENANCE",
             "UPSTREAM_TIMEOUT",
@@ -265,15 +277,20 @@ async def async_unload_entry(hass, config_entry) -> bool:
     await hass.data[DOMAIN].get(config_entry.entry_id)[
         "coordinator"
     ].controller.disconnect()
+
     for listener in hass.data[DOMAIN][config_entry.entry_id][DATA_LISTENER]:
         listener()
     username = config_entry.title
+
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
         _LOGGER.debug("Unloaded entry for %s", username)
+
         if not hass.data[DOMAIN]:
             async_unload_services(hass)
+
         return True
+
     return False
 
 
@@ -282,6 +299,7 @@ async def update_listener(hass, config_entry):
     controller = hass.data[DOMAIN][config_entry.entry_id]["coordinator"].controller
     old_update_interval = controller.update_interval
     controller.update_interval = config_entry.options.get(CONF_SCAN_INTERVAL)
+
     if old_update_interval != controller.update_interval:
         _LOGGER.debug(
             "Changing scan_interval from %s to %s",
