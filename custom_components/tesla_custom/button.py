@@ -136,8 +136,4 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
 
     async def async_press(self, **kwargs):
         """Send the command."""
-        try:
-            await self.update_controller(wake_if_asleep=True, force=True, blocking=True)
-            await self._car.trigger_homelink()
-        except HomelinkError as ex:
-            _LOGGER.error("%s", ex.message)
+        await self._car.trigger_homelink()
