@@ -23,7 +23,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from homeassistant.util.distance import convert
+from homeassistant.util.unit_conversion import DistanceConverter
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -151,7 +151,9 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
             added_range = 0
 
         if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
-            added_range = convert(added_range, LENGTH_MILES, LENGTH_KILOMETERS)
+            added_range = DistanceConverter.convert(
+                added_range, LENGTH_MILES, LENGTH_KILOMETERS
+            )
 
         return {
             "added_range": round(added_range, 2),
@@ -214,7 +216,9 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
             return charge_rate
 
         if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
-            charge_rate = convert(charge_rate, LENGTH_MILES, LENGTH_KILOMETERS)
+            charge_rate = DistanceConverter.convert(
+                charge_rate, LENGTH_MILES, LENGTH_KILOMETERS
+            )
 
         return round(charge_rate, 2)
 
@@ -259,7 +263,9 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
             return None
 
         if self.native_unit_of_measurement == LENGTH_KILOMETERS:
-            odometer_value = convert(odometer_value, LENGTH_MILES, LENGTH_KILOMETERS)
+            odometer_value = DistanceConverter.convert(
+                odometer_value, LENGTH_MILES, LENGTH_KILOMETERS
+            )
 
         return round(odometer_value, 2)
 
@@ -300,7 +306,9 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
             return None
 
         if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
-            range_value = convert(range_value, LENGTH_MILES, LENGTH_KILOMETERS)
+            range_value = DistanceConverter.convert(
+                range_value, LENGTH_MILES, LENGTH_KILOMETERS
+            )
 
         return round(range_value, 2)
 
