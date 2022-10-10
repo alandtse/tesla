@@ -2,7 +2,6 @@
 import logging
 
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.exceptions import HomelinkError
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
@@ -134,6 +133,6 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
         self.type = "homelink"
         self._attr_icon = "mdi:garage"
 
-    async def async_press(self, **kwargs):
+    async def async_press(self):
         """Send the command."""
         await self._car.trigger_homelink()
