@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.4 (2022-10-10)
+### Fix
+* Fix keyerror `charge_to_max_range` ([`0aa02c1`](https://github.com/alandtse/tesla/commit/0aa02c141680400b6ac10d43f8c99a474e379008))
+
+### Documentation
+* Update Danish Translation ([#269](https://github.com/alandtse/tesla/issues/269)) ([`73829e3`](https://github.com/alandtse/tesla/commit/73829e37c1e1a21715a069f6fed512b927d4a446))
+
 ## v2.4.3 (2022-09-11)
 ### Fix
 * Fix Chinese location offset ([#263](https://github.com/alandtse/tesla/issues/263)) ([`3feba57`](https://github.com/alandtse/tesla/commit/3feba57298de38a8fc3601e8d3080b97344f0a91))
