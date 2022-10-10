@@ -298,8 +298,9 @@ async def update_listener(hass, config_entry):
     """Update when config_entry options update."""
     controller = hass.data[DOMAIN][config_entry.entry_id]["coordinator"].controller
     old_update_interval = controller.update_interval
-    controller.update_interval = config_entry.options.get(CONF_SCAN_INTERVAL)
-
+    controller.update_interval = config_entry.options.get(
+        CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+    )
     if old_update_interval != controller.update_interval:
         _LOGGER.debug(
             "Changing scan_interval from %s to %s",

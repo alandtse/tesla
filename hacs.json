@@ -1,16 +1,6 @@
 {
   "name": "Tesla",
   "hacs": "1.6.0",
-  "domains": [
-    "sensor",
-    "lock",
-    "climate",
-    "binary_sensor",
-    "device_tracker",
-    "switch",
-    "button"
-  ],
-  "iot_class": "Cloud Polling",
   "homeassistant": "2021.9.0",
   "zip_release": true,
   "filename": "tesla_custom.zip"

@@ -65,6 +65,10 @@ This integration provides the following entities for energy sites:
 - Selects - grid charging, export rule and operation mode.
 - Sensors - solar power, grid power, load power, battery level, battery Wh remaining and backup reserve.
 
+This integration provies the following platforms for solar systems:
+
+- Sensors - solar production, grid import/export and home consumption (updates every 10 seconds)
+
 ## Options
 
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
@@ -95,7 +99,7 @@ _Component built with [integration_blueprint][integration_blueprint]._
 [buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
 [commits-shield]: https://img.shields.io/github/commit-activity/w/alandtse/tesla?style=for-the-badge
 [commits]: https://github.com/alandtse/tesla/commits/main
-[hacs]: https://github.com/custom-components/hacs
+[hacs]: https://github.com/hacs/integration
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 [discord]: https://discord.gg/Qa5fW2R
 [discord-shield]: https://img.shields.io/discord/330944238910963714.svg?style=for-the-badge
