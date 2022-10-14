@@ -110,6 +110,7 @@ class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
 
 
 class LocationConverter:
+    # pylint: disable=invalid-name
     """Convert gcj02 to wgs84 for Chinese users."""
 
     def __init__(self) -> None:
@@ -119,7 +120,7 @@ class LocationConverter:
         self.a = 6378245.0
         self.ee = 0.00669342162296594323
 
-    def gcj02towgs84(self, location):
+    def gcj02towgs84(self, location) -> dict:
         """Convert gcj02 to wgs84."""
         lng = location.get("longitude")
         lat = location.get("latitude")
