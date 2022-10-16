@@ -14,9 +14,7 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-A fork of the [official Tesla integration](https://www.home-assistant.io/integrations/tesla/) in Home Assistant.
-
-This is the successor to the core app which was removed due to Tesla login issues. Do not report issues to Home Assistant.
+A fork of the previous official Tesla integration in Home Assistant which has been removed due to Tesla login issues. Do not report issues to Home Assistant.
 
 To use the component, you will need an application to generate a Tesla refresh token:
 
@@ -36,32 +34,36 @@ To use the component, you will need an application to generate a Tesla refresh t
 7. Restart Home Assistant.
 8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration".
 
+Note: This integration will wake up your vehicle(s) during installation.
+
 <!---->
 
 ## Usage
 
 The `Tesla` integration offers integration with the [Tesla](https://auth.tesla.com/login) cloud service and provides presence detection as well as sensors such as charger state and temperature.
 
-This integration provides the following platforms:
+This integration provides the following entities for vehicles:
 
-- Binary sensors - such as update available, parking, and charger connection.
-- Sensors - such as Battery level, Inside/Outside temperature, odometer, estimated range, charging rate, and vehicle data
-- Device tracker - to track location of your car
-- Locks - Door lock, rear trunk lock, front trunk (frunk) lock and charger door lock. Enables you to control Tesla's door, trunks and charger door lock.
-- Climate - HVAC control. Allow you to control (turn on/off, set target temperature) your Tesla's HVAC system. Also enables preset modes to enable or disable max defrost mode `defrost` or `normal` operation mode. **NOTE:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
-- Switches - Charger and max range switch allow you to start/stop charging and set max range charging. Polling switch allows you to disable polling of vehicles to conserve battery. Sentry mode switch enables or disable Sentry mode.
-- Buttons - Horn, Flash lights, and Trigger homelink. **Note:** The homelink button is disabled by default as many vehicles don't have the homelink option. Enable via configuration/entities if desired.
+- Binary sensors - charger connection, charging status, car online and parking brake.
+- Buttons - horn, flash lights, wake up<sup>1</sup>, force data update<sup>1</sup> and trigger HomeLink. **Note:** The HomeLink button is disabled by default as some vehicles don't have this option. Enable via configuration/entities if desired.
+- Climate - turn HVAC on/off, set target temperature, set preset modes (defrost, keep on, dog mode and camp mode).
+- Device tracker - car location<sup>1</sup>.
+- Locks - door lock, rear trunk lock, front trunk (frunk) lock and charger door lock.
+**Note:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
+- Selects - seat heaters and cabin overheat protection<sup>2</sup>.
+- Sensors - battery level, charge rate, energy added, inside/outside temperature, odometer and estimated range.
+- Switches - heated steering wheel, charger, sentry mode and polling<sup>1</sup>.
+- Update - software update<sup>2</sup>
 
-The following sensors provide all available vehicle data as attributes. These sensors are disabled by default and need to be enabled in HASS first. It is also recommended to exclude these sensors from [recorder](https://www.home-assistant.io/integrations/recorder/).
+<sup>1</sup> *Diagnostics entities.*<br/>
+<sup>2</sup> *Configuration entities.*
 
-- Climate data sensor
-- Charge data sensor
-- Vehicle state data sensor
-- Software update data sensor
-- Speed Limit data sensor
-- Vehicle Config data sensor
-- Drive State data sensor
-- GUI Settings data sensor
+
+This integration provides the following entities for energy sites:
+
+- Binary sensors - Powerwall charging and grid status.
+- Selects - grid charging, export rule and operation mode.
+- Sensors - solar power, grid power, load power, battery level, battery Wh remaining and backup reserve.
 
 This integration provies the following platforms for solar systems:
 
@@ -72,9 +74,7 @@ This integration provies the following platforms for solar systems:
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
 
 - Seconds between polling - referred to below as the `polling_interval`.
-
 - Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
-
 - Polling policy - When do we actively poll the car to get updates, and when do we try to allow the car to sleep. See [the Wiki](https://github.com/alandtse/tesla/wiki/Polling-policy) for more information.
 
 ## Potential Battery impacts

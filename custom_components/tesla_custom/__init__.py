@@ -1,12 +1,11 @@
 """Support for Tesla cars."""
 import asyncio
-from collections import defaultdict
 from datetime import timedelta
 from http import HTTPStatus
 import logging
 
 import async_timeout
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
     CONF_DOMAIN,
@@ -15,9 +14,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     EVENT_HOMEASSISTANT_CLOSE,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
@@ -28,6 +26,8 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
+    CONF_INCLUDE_VEHICLES,
+    CONF_INCLUDE_ENERGYSITES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DATA_LISTENER,
@@ -39,7 +39,6 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
-from .tesla_device import device_identifier
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -83,11 +82,14 @@ async def async_setup(hass, base_config):
             hass.config_entries.async_update_entry(entry, data=data, options=options)
 
     config = base_config.get(DOMAIN)
+
     if not config:
         return True
+
     email = config[CONF_USERNAME]
     token = config[CONF_TOKEN]
     scan_interval = config[CONF_SCAN_INTERVAL]
+
     if email in _async_configured_emails(hass):
         try:
             info = await validate_input(hass, config)
@@ -113,6 +115,7 @@ async def async_setup(hass, base_config):
         )
         hass.data.setdefault(DOMAIN, {})
         hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval}
+
     return True
 
 
@@ -121,17 +124,21 @@ async def async_setup_entry(hass, config_entry):
     # pylint: disable=too-many-locals
     hass.data.setdefault(DOMAIN, {})
     config = config_entry.data
-    # Because users can have multiple accounts, we always create a new session so they have separate cookies
+    # Because users can have multiple accounts, we always
+    # create a new session so they have separate cookies
     async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
     email = config_entry.title
+
     if not hass.data[DOMAIN]:
         async_setup_services(hass)
+
     if email in hass.data[DOMAIN] and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]:
         scan_interval = hass.data[DOMAIN][email][CONF_SCAN_INTERVAL]
         hass.config_entries.async_update_entry(
             config_entry, options={CONF_SCAN_INTERVAL: scan_interval}
         )
         hass.data[DOMAIN].pop(email)
+
     try:
         controller = TeslaAPI(
             async_client,
@@ -148,33 +155,37 @@ async def async_setup_entry(hass, config_entry):
             ),
         )
         result = await controller.connect(
-            wake_if_asleep=config_entry.options.get(
-                CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
-            )
+            include_vehicles=config.get(CONF_INCLUDE_VEHICLES),
+            include_energysites=config.get(CONF_INCLUDE_ENERGYSITES),
         )
         refresh_token = result["refresh_token"]
         access_token = result["access_token"]
         expiration = result["expiration"]
+
     except IncompleteCredentials as ex:
         await async_client.aclose()
         raise ConfigEntryAuthFailed from ex
-    except httpx.ConnectTimeout as ex:
+
+    except (httpx.ConnectTimeout, httpx.ConnectError) as ex:
         await async_client.aclose()
         raise ConfigEntryNotReady from ex
+
     except TeslaException as ex:
         await async_client.aclose()
+
         if ex.code == HTTPStatus.UNAUTHORIZED:
             raise ConfigEntryAuthFailed from ex
+
         if ex.message in [
-            "VEHICLE_UNAVAILABLE",
             "TOO_MANY_REQUESTS",
-            "SERVICE_MAINTENANCE",
             "UPSTREAM_TIMEOUT",
         ]:
             raise ConfigEntryNotReady(
                 f"Temporarily unable to communicate with Tesla API: {ex.message}"
             ) from ex
+
         _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
         return False
 
     async def _async_close_client(*_):
@@ -193,23 +204,65 @@ async def async_setup_entry(hass, config_entry):
     coordinator = TeslaDataUpdateCoordinator(
         hass, config_entry=config_entry, controller=controller
     )
-    # Fetch initial data so we have data when entities subscribe
-    entry_data = hass.data[DOMAIN][config_entry.entry_id] = {
+
+    try:
+        if config_entry.data.get("initial_setup"):
+            wake_if_asleep = True
+        else:
+            wake_if_asleep = config_entry.options.get(
+                CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
+            )
+
+        cars = await controller.generate_car_objects(wake_if_asleep=wake_if_asleep)
+
+        hass.config_entries.async_update_entry(
+            config_entry, data={**config_entry.data, "initial_setup": False}
+        )
+
+    except TeslaException as ex:
+        await async_client.aclose()
+
+        if ex.message in [
+            "TOO_MANY_REQUESTS",
+            "SERVICE_MAINTENANCE",
+            "UPSTREAM_TIMEOUT",
+        ]:
+            raise ConfigEntryNotReady(
+                f"Temporarily unable to communicate with Tesla API: {ex.message}"
+            ) from ex
+
+        _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
+        return False
+
+    try:
+        energysites = await controller.generate_energysite_objects()
+
+    except TeslaException as ex:
+        await async_client.aclose()
+
+        if ex.message in [
+            "TOO_MANY_REQUESTS",
+            "SERVICE_MAINTENANCE",
+            "UPSTREAM_TIMEOUT",
+        ]:
+            raise ConfigEntryNotReady(
+                f"Temporarily unable to communicate with Tesla API: {ex.message}"
+            ) from ex
+
+        _LOGGER.error("Unable to communicate with Tesla API: %s", ex.message)
+
+        return False
+
+    hass.data[DOMAIN][config_entry.entry_id] = {
         "coordinator": coordinator,
-        "devices": defaultdict(list),
+        "cars": cars,
+        "energysites": energysites,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")
 
     await coordinator.async_config_entry_first_refresh()
-
-    all_devices = controller.get_homeassistant_components()
-
-    if not all_devices:
-        return False
-
-    for device in all_devices:
-        entry_data["devices"][device.hass_type].append(device)
 
     hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
 
@@ -224,15 +277,20 @@ async def async_unload_entry(hass, config_entry) -> bool:
     await hass.data[DOMAIN].get(config_entry.entry_id)[
         "coordinator"
     ].controller.disconnect()
+
     for listener in hass.data[DOMAIN][config_entry.entry_id][DATA_LISTENER]:
         listener()
     username = config_entry.title
+
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
         _LOGGER.debug("Unloaded entry for %s", username)
+
         if not hass.data[DOMAIN]:
             async_unload_services(hass)
+
         return True
+
     return False
 
 
@@ -254,7 +312,7 @@ async def update_listener(hass, config_entry):
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Tesla data."""
 
-    def __init__(self, hass, *, config_entry, controller):
+    def __init__(self, hass, *, config_entry, controller: TeslaAPI):
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
@@ -290,16 +348,3 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
-
-
-async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
-) -> bool:
-    """Remove tesla_custom config entry from a device."""
-    controller: TeslaAPI = hass.data[DOMAIN][config_entry.entry_id][
-        "coordinator"
-    ].controller
-    return not device_entry.identifiers.intersection(
-        device_identifier(telsa_device)
-        for telsa_device in controller.get_homeassistant_components()
-    )

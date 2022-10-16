@@ -2,27 +2,23 @@
 
 SPDX-License-Identifier: Apache-2.0
 """
-
 import logging
-from homeassistant.const import CONF_EMAIL
-
-from teslajsonpy import Controller
-from homeassistant.core import callback
-from homeassistant.helpers import config_validation as cv
 import voluptuous as vol
 
-from homeassistant.const import (
-    ATTR_COMMAND,
-    CONF_SCAN_INTERVAL,
-)
+from teslajsonpy import Controller
+
+from homeassistant.const import ATTR_COMMAND, CONF_EMAIL, CONF_SCAN_INTERVAL
+from homeassistant.core import callback
+from homeassistant.helpers import config_validation as cv
+
 from .const import (
     ATTR_PARAMETERS,
     ATTR_PATH_VARS,
     ATTR_VIN,
+    DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     SERVICE_API,
     SERVICE_SCAN_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,9 +36,12 @@ SCAN_INTERVAL_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_EMAIL): vol.All(cv.string, vol.Length(min=1)),
         vol.Optional(ATTR_VIN): vol.All(cv.string, vol.Length(min=1)),
-        vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(vol.Coerce(int), vol.Range(min=-1, max=3600)),
+        vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
+            vol.Coerce(int), vol.Range(min=-1, max=3600)
+        ),
     }
 )
+
 
 @callback
 def async_setup_services(hass) -> None:
@@ -155,10 +154,11 @@ def async_setup_services(hass) -> None:
                 "Changing update_interval from %s to %s for %s",
                 old_update_interval,
                 update_interval,
-                vin
+                vin,
             )
             controller.set_update_interval_vin(vin=vin, value=update_interval)
         return True
+
 
 @callback
 def async_unload_services(hass) -> None:

@@ -24,6 +24,8 @@ from .const import (
     ATTR_POLLING_POLICY_CONNECTED,
     ATTR_POLLING_POLICY_NORMAL,
     CONF_EXPIRATION,
+    CONF_INCLUDE_VEHICLES,
+    CONF_INCLUDE_ENERGYSITES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DEFAULT_POLLING_POLICY,
@@ -61,6 +63,8 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 info = await validate_input(self.hass, user_input)
+                # Used for only forcing cars awake on initial setup in async_setup_entry
+                info.update({"initial_setup": True})
             except CannotConnect:
                 errors["base"] = "cannot_connect"
             except InvalidAuth:
@@ -105,6 +109,8 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_USERNAME, default=self.username): str,
                 vol.Required(CONF_TOKEN): str,
                 vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): str,
+                vol.Required(CONF_INCLUDE_VEHICLES, default=True): bool,
+                vol.Required(CONF_INCLUDE_ENERGYSITES, default=True): bool,
             }
         )
 
@@ -160,7 +166,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(step_id="init", data_schema=data_schema)
 
 
-async def validate_input(hass: core.HomeAssistant, data):
+async def validate_input(hass: core.HomeAssistant, data) -> dict:
     """Validate the user input allows us to connect.
 
     Data has the keys from DATA_SCHEMA with values provided by the user.
@@ -185,6 +191,8 @@ async def validate_input(hass: core.HomeAssistant, data):
         config[CONF_EXPIRATION] = result[CONF_EXPIRATION]
         config[CONF_USERNAME] = data[CONF_USERNAME]
         config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
+        config[CONF_INCLUDE_VEHICLES] = data[CONF_INCLUDE_VEHICLES]
+        config[CONF_INCLUDE_ENERGYSITES] = data[CONF_INCLUDE_ENERGYSITES]
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)

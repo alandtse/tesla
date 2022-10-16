@@ -57,6 +57,10 @@ hs_err_pid*
 *.jl.mem
 deps/deps.jl
 
+# User settings
+/.vscode/settings.json
+
+
 # Keep these config files
 !/.gitignore
 !/.travis.yml
@@ -72,3 +76,4 @@ deps/deps.jl
 !/.scrutinizer.yml
 !/.prospector.yml
 !/.devcontainer
+!/.vscode
