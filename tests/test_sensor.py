@@ -10,7 +10,7 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
-    LENGTH_MILES,
+    LENGTH_KILOMETERS,
     PERCENTAGE,
     POWER_WATT,
     TEMP_CELSIUS,
@@ -39,8 +39,8 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("sensor.my_model_s_energy_added")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_energy_added"
 
-    entry = entity_registry.async_get("sensor.my_model_s_mileage")
-    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_mileage"
+    entry = entity_registry.async_get("sensor.my_model_s_odometer")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_odometer"
 
     entry = entity_registry.async_get("sensor.my_model_s_temperature_outside")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_temperature_outside"
@@ -70,173 +70,18 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     assert entry.unique_id == "67890_backup_reserve"
 
 
-async def test_battery_value(hass: HomeAssistant) -> None:
+async def test_battery(hass: HomeAssistant) -> None:
     """Tests battery is getting the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
 
-    state = hass.states.get("sensor.my_model_s_battery")
+    state = hass.states.get("sensor.battery_home_battery")
     assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+        round(energysite_mock_data.BATTERY_SUMMARY["percentage_charged"])
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
-
-
-async def test_charger_rate_value(hass: HomeAssistant) -> None:
-    """Tests charger_rate is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_charging_rate")
-    assert state.state == str(car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"])
-
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-
-    assert (
-        state.attributes.get("time_left")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
-    )
-    assert (
-        state.attributes.get("added_range")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_miles_added_rated"]
-    )
-    assert (
-        state.attributes.get("charge_energy_added")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_energy_added"]
-    )
-    assert (
-        state.attributes.get("charge_current_request")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_current_request"]
-    )
-    assert (
-        state.attributes.get("charge_current_request_max")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_current_request_max"]
-    )
-    assert (
-        state.attributes.get("charger_actual_current")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_actual_current"]
-    )
-    assert (
-        state.attributes.get("charger_voltage")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_voltage"]
-    )
-    assert (
-        state.attributes.get("charger_power")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_power"]
-    )
-    assert (
-        state.attributes.get("charger_phases")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_phases"]
-    )
-    assert (
-        state.attributes.get("charge_limit_soc")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_limit_soc"]
-    )
-
-
-async def test_charger_energy_value(hass: HomeAssistant) -> None:
-    """Tests charger_energy is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_energy_added")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["charge_energy_added"]
-    )
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
-
-
-async def test_mileage_value(hass: HomeAssistant) -> None:
-    """Tests mileage is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_mileage")
-    assert state.state == str(
-        round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 2)
-    )
-
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
-
-
-async def test_range_value(hass: HomeAssistant) -> None:
-    """Tests range is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_range")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
-    )
-
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
-
-
-async def test_inside_temp_value(hass: HomeAssistant) -> None:
-    """Tests inside_temp is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_temperature_inside")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["climate_state"]["inside_temp"]
-    )
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
-
-
-async def test_outside_temp_value(hass: HomeAssistant) -> None:
-    """Tests outside_temp is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_temperature_outside")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["climate_state"]["outside_temp"]
-    )
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
-
-
-async def test_solar_power_value(hass: HomeAssistant) -> None:
-    """Tests solar_power is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_home_solar_power")
-    assert state.state == str(round(energysite_mock_data.SITE_DATA["solar_power"]))
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
-
-
-async def test_grid_power_value(hass: HomeAssistant) -> None:
-    """Tests grid_power is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_home_grid_power")
-    assert state.state == str(round(energysite_mock_data.SITE_DATA["grid_power"]))
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
-
-
-async def test_load_power_value(hass: HomeAssistant) -> None:
-    """Tests load_power is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_home_load_power")
-    assert state.state == str(round(energysite_mock_data.SITE_DATA["load_power"]))
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
 
 
 async def test_battery_power_value(hass: HomeAssistant) -> None:
@@ -251,20 +96,6 @@ async def test_battery_power_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
-
-
-async def test_battery(hass: HomeAssistant) -> None:
-    """Tests battery is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.battery_home_battery")
-    assert state.state == str(
-        round(energysite_mock_data.BATTERY_SUMMARY["percentage_charged"])
-    )
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
 
 
 async def test_battery_remaining(hass: HomeAssistant) -> None:
@@ -293,3 +124,167 @@ async def test_backup_reserve(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
+
+
+async def test_battery_value(hass: HomeAssistant) -> None:
+    """Tests battery is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_battery")
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
+
+
+async def test_charger_energy_value(hass: HomeAssistant) -> None:
+    """Tests charger_energy is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_energy_added")
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["charge_energy_added"]
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+
+
+async def test_charger_power_value(hass: HomeAssistant) -> None:
+    """Tests charger_power is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_charger_power")
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["charger_power"]
+    )
+
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+
+    assert (
+        state.attributes.get("charger_amps_request")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charge_current_request"]
+    )
+    assert (
+        state.attributes.get("charger_amps_actual")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_actual_current"]
+    )
+    assert (
+        state.attributes.get("charger_volts")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_voltage"]
+    )
+    assert (
+        state.attributes.get("charger_phases")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["charger_phases"]
+    )
+
+
+async def test_charger_rate_value(hass: HomeAssistant) -> None:
+    """Tests charger_rate is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_charging_rate")
+    # Test state against km/hr
+    # Tesla API returns in miles so manually set charge rate to km/hr
+    assert state.state == "37.34"
+
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+
+    assert (
+        state.attributes.get("time_left")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
+    )
+
+
+async def test_grid_power_value(hass: HomeAssistant) -> None:
+    """Tests grid_power is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_home_grid_power")
+    assert state.state == str(round(energysite_mock_data.SITE_DATA["grid_power"]))
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_inside_temp_value(hass: HomeAssistant) -> None:
+    """Tests inside_temp is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_temperature_inside")
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["climate_state"]["inside_temp"]
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
+
+
+async def test_load_power_value(hass: HomeAssistant) -> None:
+    """Tests load_power is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_home_load_power")
+    assert state.state == str(round(energysite_mock_data.SITE_DATA["load_power"]))
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_odometer_value(hass: HomeAssistant) -> None:
+    """Tests odometer is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_odometer")
+    # Test state against odometer in kilometers
+    # Tesla API returns in miles so manually set range in kilometers
+    assert state.state == "114127.59"
+
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS
+
+
+async def test_outside_temp_value(hass: HomeAssistant) -> None:
+    """Tests outside_temp is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_temperature_outside")
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["climate_state"]["outside_temp"]
+    )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
+
+
+async def test_range_value(hass: HomeAssistant) -> None:
+    """Tests range is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_range")
+    # Test state against range in kilometers
+    # Tesla API returns in miles so manually set range in kilometers
+    assert state.state == "272.11"
+
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS
+
+
+async def test_solar_power_value(hass: HomeAssistant) -> None:
+    """Tests solar_power is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_home_solar_power")
+    assert state.state == str(round(energysite_mock_data.SITE_DATA["solar_power"]))
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
