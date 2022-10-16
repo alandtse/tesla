@@ -6,11 +6,11 @@ authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 teslajsonpy = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
-homeassistant = ">=2021.3.4"
+homeassistant = ">=2021.10.0"
 pytest-homeassistant-custom-component = ">=0.3.1"
 bandit = ">=1.7.0"
 black = {version = ">=21.12b0", allow-prereleases = true}
@@ -36,7 +36,7 @@ commit_subject="[skip ci] {version}"
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py310']
 exclude = '''
 
 (
