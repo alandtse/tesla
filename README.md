@@ -65,10 +65,6 @@ This integration provides the following entities for energy sites:
 - Selects - grid charging, export rule and operation mode.
 - Sensors - solar power, grid power, load power, battery level, battery Wh remaining and backup reserve.
 
-This integration provies the following platforms for solar systems:
-
-- Sensors - solar production, grid import/export and home consumption (updates every 10 seconds)
-
 ## Options
 
 Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> **Options**.
