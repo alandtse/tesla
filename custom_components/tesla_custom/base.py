@@ -160,7 +160,7 @@ class TeslaEnergyEntity(TeslaBaseEntity):
     @property
     def device_info(self) -> DeviceInfo:
         """Return device info."""
-        model = f"{self._energysite.resource_type.title()} {self._energysite.solar_type.replace('_', ' ')}"
+        model = f"{self._energysite.resource_type.title()}"
         return DeviceInfo(
             identifiers={(DOMAIN, self._energysite.energysite_id)},
             manufacturer="Tesla",
