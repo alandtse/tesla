@@ -1,9 +1,10 @@
 {
-  "image": "ludeeus/container:integration-debian",
   "name": "Tesla Custom Component development",
-  "context": "..",
-  "appPort": ["9123:8123"],
-  "postCreateCommand": "container install && pip install poetry && poetry config virtualenvs.create false && poetry install",
+  "image": "ghcr.io/ludeeus/devcontainer/integration:stable",
+  "appPort": [
+    "9123:8123"
+  ],
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "extensions": [
     "ms-python.python",
     "github.vscode-pull-request-github",

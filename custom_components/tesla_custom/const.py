@@ -1,9 +1,12 @@
 """Const file for Tesla cars."""
-VERSION = "2.4.4"
-CONF_WAKE_ON_START = "enable_wake_on_start"
+VERSION = "2.1.1"
 CONF_EXPIRATION = "expiration"
+CONF_INCLUDE_VEHICLES = "include_vehicles"
+CONF_INCLUDE_ENERGYSITES = "include_energysites"
 CONF_POLLING_POLICY = "polling_policy"
+CONF_WAKE_ON_START = "enable_wake_on_start"
 DOMAIN = "tesla_custom"
+ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
 DEFAULT_WAKE_ON_START = False
@@ -14,34 +17,19 @@ PLATFORMS = [
     "sensor",
     "lock",
     "climate",
+    "cover",
     "binary_sensor",
     "device_tracker",
     "switch",
     "button",
     "select",
+    "update",
+    "number",
 ]
 
-ICONS = {
-    "battery sensor": "mdi:battery",
-    "range sensor": "mdi:gauge",
-    "mileage sensor": "mdi:counter",
-    "parking brake sensor": "mdi:car-brake-parking",
-    "charger sensor": "mdi:ev-station",
-    "charger switch": "mdi:battery-charging",
-    "update switch": "mdi:car-connected",
-    "maxrange switch": "mdi:gauge-full",
-    "temperature sensor": "mdi:thermometer",
-    "location tracker": "mdi:crosshairs-gps",
-    "charging rate sensor": "mdi:speedometer",
-    "sentry mode switch": "mdi:shield-car",
-    "horn": "mdi:bullhorn",
-    "flash lights": "mdi:car-light-high",
-    "trigger homelink": "mdi:garage",
-    "solar panel": "mdi:solar-panel",
-    "heated steering wheel": "mdi:steering",
-}
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
 AUTH_CALLBACK_NAME = "auth:tesla:callback"
+AUTH_DOMAIN_CHINA = "https://auth.tesla.cn"
 AUTH_PROXY_PATH = "/auth/tesla/proxy"
 AUTH_PROXY_NAME = "auth:tesla:proxy"
 

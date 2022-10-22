@@ -18,6 +18,8 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from custom_components.tesla_custom.const import (
     ATTR_POLLING_POLICY_CONNECTED,
     CONF_EXPIRATION,
+    CONF_INCLUDE_ENERGYSITES,
+    CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DEFAULT_POLLING_POLICY,
@@ -68,6 +70,9 @@ async def test_form(hass):
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         CONF_DOMAIN: AUTH_DOMAIN,
+        CONF_INCLUDE_VEHICLES: True,
+        CONF_INCLUDE_ENERGYSITES: True,
+        "initial_setup": True,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -206,7 +211,12 @@ async def test_import(hass):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": config_entries.SOURCE_IMPORT},
-            data={CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: TEST_USERNAME},
+            data={
+                CONF_TOKEN: TEST_TOKEN,
+                CONF_USERNAME: TEST_USERNAME,
+                CONF_INCLUDE_VEHICLES: True,
+                CONF_INCLUDE_ENERGYSITES: True,
+            },
         )
     assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
     assert result["title"] == TEST_USERNAME

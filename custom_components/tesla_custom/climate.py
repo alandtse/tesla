@@ -1,63 +1,66 @@
-"""Support for Tesla HVAC system."""
-from __future__ import annotations
-
+"""Support for Tesla climate."""
 import logging
+
+from teslajsonpy.car import TeslaCar
 
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
+    DEFAULT_MAX_TEMP,
+    DEFAULT_MIN_TEMP,
     HVAC_MODE_HEAT_COOL,
     HVAC_MODE_OFF,
     SUPPORT_PRESET_MODE,
     SUPPORT_TARGET_TEMPERATURE,
 )
-from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS, TEMP_FAHRENHEIT
-from homeassistant.util import slugify
+from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.core import HomeAssistant
 
-from teslajsonpy.exceptions import UnknownPresetMode
-
-from . import DOMAIN as TESLA_DOMAIN
-from .tesla_device import TeslaDevice
-from .helpers import get_device, enable_entity
+from . import TeslaDataUpdateCoordinator
+from .base import TeslaCarEntity
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
+SUPPORT_PRESET = ["Normal", "Defrost", "Keep On", "Dog Mode", "Camp Mode"]
 
-CLIMATE_DEVICES = [
-    ["switch", "heated steering switch", "steering_wheel_heater"],
-    ["select", "heated seat left", "seat_heater_left"],
-    ["select", "heated seat right", "seat_heater_right"],
-    ["select", "heated seat rear_left", "seat_heater_rear_left"],
-    ["select", "heated seat rear_center", "seat_heater_rear_center"],
-    ["select", "heated seat rear_right", "seat_heater_rear_right"],
-    ["select", "heated seat third_row_left", "seat_heater_third_row_left"],
-    ["select", "heated seat third_row_right", "seat_heater_third_row_right"],
-]
+KEEPER_MAP = {
+    "Keep On": 1,
+    "Dog Mode": 2,
+    "Camp Mode": 3,
+}
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Set up the Tesla binary_sensors by config_entry."""
-    async_add_entities(
-        [
-            TeslaThermostat(
-                device,
-                hass.data[TESLA_DOMAIN][config_entry.entry_id]["coordinator"],
-            )
-            for device in hass.data[TESLA_DOMAIN][config_entry.entry_id]["devices"][
-                "climate"
-            ]
-        ],
-        True,
-    )
+async def async_setup_entry(
+    hass: HomeAssistant, config_entry, async_add_entities
+) -> None:
+    """Set up the Tesla climate by config_entry."""
+    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+
+    entities = [
+        TeslaCarClimate(
+            hass,
+            car,
+            coordinator,
+        )
+        for car in cars.values()
+    ]
+    async_add_entities(entities, True)
 
 
-class TeslaThermostat(TeslaDevice, ClimateEntity):
-    """Representation of a Tesla climate."""
+class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
+    """Representation of a Tesla car climate."""
 
-    def __init__(self, tesla_device, coordinator):
-        """Initialize of the sensor."""
-        super().__init__(tesla_device, coordinator)
-        self._entities_enabled = False
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize climate entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "HVAC (climate) system"
 
     @property
     def supported_features(self):
@@ -70,13 +73,14 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
 
         Need to be one of HVAC_MODE_*.
         """
-        if self.tesla_device.is_hvac_enabled():
+        if self._car.is_climate_on:
             return HVAC_MODE_HEAT_COOL
+
         return HVAC_MODE_OFF
 
     @property
     def hvac_modes(self):
-        """Return the list of available hvac operation modes.
+        """Return list of available hvac operation modes.
 
         Need to be a subset of HVAC_MODES.
         """
@@ -84,143 +88,99 @@ class TeslaThermostat(TeslaDevice, ClimateEntity):
 
     @property
     def temperature_unit(self):
-        """Return the unit of measurement."""
-        if self.tesla_device.measurement == "F":
-            return TEMP_FAHRENHEIT
+        """Return unit of measurement.
+
+        Tesla API always returns in Celsius.
+        """
         return TEMP_CELSIUS
 
     @property
     def current_temperature(self):
-        """Return the current temperature."""
-        return self.tesla_device.get_current_temp()
+        """Return current temperature."""
+        return self._car.inside_temp
+
+    @property
+    def max_temp(self):
+        """Return max temperature."""
+        if self._car.max_avail_temp:
+            return self._car.max_avail_temp
+
+        return DEFAULT_MAX_TEMP
+
+    @property
+    def min_temp(self):
+        """Return min temperature"""
+        if self._car.min_avail_temp:
+            return self._car.min_avail_temp
+
+        return DEFAULT_MIN_TEMP
 
     @property
     def target_temperature(self):
-        """Return the temperature we try to reach."""
-        return self.tesla_device.get_goal_temp()
+        """Return target temperature."""
+        return self._car.driver_temp_setting
 
-    @TeslaDevice.Decorators.check_for_reauth
     async def async_set_temperature(self, **kwargs):
-        """Set new target temperatures."""
+        """Set new target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature:
             _LOGGER.debug("%s: Setting temperature to %s", self.name, temperature)
-            await self.tesla_device.set_temperature(temperature)
-            self.async_write_ha_state()
+            temp = round(temperature, 1)
 
-    @TeslaDevice.Decorators.check_for_reauth
+            await self._car.set_temperature(temp)
+            await self.async_update_ha_state()
+
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         _LOGGER.debug("%s: Setting hvac mode to %s", self.name, hvac_mode)
         if hvac_mode == HVAC_MODE_OFF:
-            await self.tesla_device.set_status(False)
+            await self._car.set_hvac_mode("off")
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
-            await self.tesla_device.set_status(True)
-        await self.update_climate_related_devices()
-        self.async_write_ha_state()
-
-    @TeslaDevice.Decorators.check_for_reauth
-    async def async_set_preset_mode(self, preset_mode: str) -> None:
-        """Set new preset mode."""
-        _LOGGER.debug("%s: Setting preset_mode to: %s", self.name, preset_mode)
-        try:
-            await self.tesla_device.set_preset_mode(preset_mode)
-            self.async_write_ha_state()
-        except UnknownPresetMode as ex:
-            _LOGGER.error("%s", ex.message)
+            await self._car.set_hvac_mode("on")
+        # set_hvac_mode changes multiple states so refresh all entities
+        await self._coordinator.async_refresh()
 
     @property
-    def preset_mode(self) -> str | None:
+    def preset_mode(self):
         """Return the current preset mode, e.g., home, away, temp.
 
         Requires SUPPORT_PRESET_MODE.
         """
-        return self.tesla_device.preset_mode
+        if self._car.defrost_mode == 2:
+            return "Defrost"
+        if self._car.climate_keeper_mode == "dog":
+            return "Dog Mode"
+        if self._car.climate_keeper_mode == "camp":
+            return "Camp Mode"
+        if self._car.climate_keeper_mode == "on":
+            return "Keep On"
+
+        return "Normal"
 
     @property
-    def preset_modes(self) -> list[str] | None:
+    def preset_modes(self):
         """Return a list of available preset modes.
 
         Requires SUPPORT_PRESET_MODE.
         """
-        return self.tesla_device.preset_modes
+        return SUPPORT_PRESET
 
-    def refresh(self) -> None:
-        """Refresh data."""
+    async def async_set_preset_mode(self, preset_mode: str) -> None:
+        """Set new preset mode."""
+        _LOGGER.debug("%s: Setting preset_mode to: %s", self.name, preset_mode)
 
-        super().refresh()
+        if preset_mode == "Normal":
+            # If setting Normal, we need to check Defrost And Keep modes.
+            if self._car.defrost_mode != 0:
+                await self._car.set_max_defrost(0)
 
-        if self._entities_enabled:
-            # Already enabled all required entities before.
-            return
+            if self._car.climate_keeper_mode != 0:
+                await self._car.set_climate_keeper_mode(0)
 
-        vin = self.tesla_device.vin()
+        elif preset_mode == "Defrost":
+            await self._car.set_max_defrost(2)
 
-        # Get all the climate parameters so we can determine what is supported by this vin.
-        # pylint: disable=protected-access
-        climate_params = self.tesla_device._controller.get_climate_params(vin=vin)
-        if climate_params is None or len(climate_params) == 0:
-            # No data available
-            _LOGGER.debug("No data available for vin %s", vin)
-            return
-
-        # Loop through the climate devices
-        for c_device in CLIMATE_DEVICES:
-            if climate_params.get(c_device[2], None) is None:
-                # This climate device is not available.
-                _LOGGER.debug(
-                    "Device %s (%s) not available for vin %s",
-                    c_device[1],
-                    c_device[2],
-                    vin,
-                )
-                continue
-
-            # Determine unique id for this entity.
-            unique_id = slugify(
-                f"Tesla Model {str(vin[3]).upper()} {vin[-6:]} {c_device[1]}"
-            )
-            enable_entity(self.hass, c_device[0], TESLA_DOMAIN, unique_id)
-        self._entities_enabled = True
-
-    async def update_climate_related_devices(self):
-        """Reset the Manual Update time on climate related devices.
-
-        This way, their states are correctly reflected if they are dependant on the Climate state.
-        """
-
-        # This is really gross, and i kinda hate it.
-        # but its the only way i could figure out how to force an update on the underlying device
-        # thats in the teslajsonpy library.
-        # This could be fixed by doing a pr in the underlying library,
-        # but is ok for now.
-
-        # This works by reseting the last update time in the underlying device.
-        # this does not cause an api call, but instead enabled the undering device
-        # to read from the shared climate data cache in the teslajsonpy library.
-
-        # First, we need to force the controller to update, as the refresh functions asume it
-        # has been uddated.
-        # We have to manually update the controller becuase changing the HVAC state only updates its state in Home assistant,
-        # and not the underlying cache in cliamte_parms. This does mean we talk to Tesla, but we only do so Once.
-
-        # pylint: disable=protected-access
-        await self.tesla_device._controller.update(
-            self.tesla_device._id, wake_if_asleep=False, force=True
-        )
-
-        vin = self.tesla_device.vin()
-
-        for c_device in CLIMATE_DEVICES:
-            _LOGGER.debug("Refreshing Device: %s.%s", c_device[0], c_device[1])
-
-            device = await get_device(
-                self.hass, self.config_entry_id, c_device[0], c_device[1], vin
-            )
-            if device is not None:
-                class_name = device.__class__.__name__
-                attr_str = f"_{class_name}__manual_update_time"
-                setattr(device, attr_str, 0)
-
-                # Does not cause an API call.
-                device.refresh()
+        else:
+            await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
+        # max_defrost changes multiple states so refresh all entities
+        await self._coordinator.async_refresh()
