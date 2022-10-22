@@ -29,7 +29,6 @@ PLATFORMS = [
 
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
 AUTH_CALLBACK_NAME = "auth:tesla:callback"
-AUTH_DOMAIN_CHINA = "https://auth.tesla.cn"
 AUTH_PROXY_PATH = "/auth/tesla/proxy"
 AUTH_PROXY_NAME = "auth:tesla:proxy"
 
