@@ -190,6 +190,7 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.my_model_s_charging_rate")
     assert state.state == str(car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"])
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.SPEED
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
     assert (
@@ -245,6 +246,7 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
         round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
     )
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
@@ -272,6 +274,7 @@ async def test_range_value(hass: HomeAssistant) -> None:
         car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
     )
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
