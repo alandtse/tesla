@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v3.0.0 (2022-10-22)
+### Feature
+* Rewrite to add support for energy sites ([#250](https://github.com/alandtse/tesla/issues/250)) ([`6a1f9c3`](https://github.com/alandtse/tesla/commit/6a1f9c3cb663ed5543a2e778bdbaf750699b1438))
+
+### Breaking
+* This is a rewrite. Multiple entitiy_ids were changed. It is recommended you remove and reinstall. Changed trunk, frunk and charger door from lock to cover entities. Created separate sensor (`TeslaCarChargerPower` class) for charger power. Moved charger amps, charger volts and charger phases extra state attributes to the new charger power sensor. Moved added range extra state attributes to the charger energy added sensor.  ([`6a1f9c3`](https://github.com/alandtse/tesla/commit/6a1f9c3cb663ed5543a2e778bdbaf750699b1438))
+
+### Documentation
+* Remove duplicate info from README ([#278](https://github.com/alandtse/tesla/issues/278)) ([`616d3a5`](https://github.com/alandtse/tesla/commit/616d3a5761432a06589bbad3f9bbe886f3621384))
+
 ## v2.4.4 (2022-10-10)
 ### Fix
 * Fix keyerror `charge_to_max_range` ([`0aa02c1`](https://github.com/alandtse/tesla/commit/0aa02c141680400b6ac10d43f8c99a474e379008))
