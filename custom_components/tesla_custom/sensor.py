@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    CONF_UNIT_SYSTEM_METRIC,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
     LENGTH_KILOMETERS,
@@ -26,7 +27,7 @@ from homeassistant.util.unit_conversion import DistanceConverter
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
-from .const import DISTANCE_UNITS_KM_HR, DOMAIN
+from .const import DOMAIN
 
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
@@ -149,7 +150,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         else:
             added_range = 0
 
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             added_range = DistanceConverter.convert(
                 added_range, LENGTH_MILES, LENGTH_KILOMETERS
             )
@@ -214,7 +215,7 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
         if charge_rate is None:
             return charge_rate
 
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             charge_rate = DistanceConverter.convert(
                 charge_rate, LENGTH_MILES, LENGTH_KILOMETERS
             )
@@ -224,7 +225,7 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     @property
     def native_unit_of_measurement(self) -> str:
         """Return distance units."""
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             return SPEED_KILOMETERS_PER_HOUR
 
         return SPEED_MILES_PER_HOUR
@@ -261,7 +262,7 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
         if odometer_value is None:
             return None
 
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self.native_unit_of_measurement == LENGTH_KILOMETERS:
             odometer_value = DistanceConverter.convert(
                 odometer_value, LENGTH_MILES, LENGTH_KILOMETERS
             )
@@ -271,7 +272,7 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
     @property
     def native_unit_of_measurement(self) -> str:
         """Return distance units."""
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             return LENGTH_KILOMETERS
 
         return LENGTH_MILES
@@ -304,7 +305,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
         if range_value is None:
             return None
 
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             range_value = DistanceConverter.convert(
                 range_value, LENGTH_MILES, LENGTH_KILOMETERS
             )
@@ -314,7 +315,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
     @property
     def native_unit_of_measurement(self) -> str:
         """Return distance units."""
-        if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
+        if self._unit_system == CONF_UNIT_SYSTEM_METRIC:
             return LENGTH_KILOMETERS
 
         return LENGTH_MILES
