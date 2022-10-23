@@ -78,7 +78,6 @@ class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
         self.type = "frunk"
         self._attr_device_class = CoverDeviceClass.DOOR
         self._attr_icon = "mdi:car"
-        self._attr_supported_features = CoverEntityFeature.OPEN
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
@@ -91,6 +90,15 @@ class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
     def is_closed(self):
         """Return True if frunk is closed."""
         return self._car.is_frunk_closed
+
+    @property
+    def supported_features(self) -> int:
+        """Return supported features."""
+        # This check is for the trunk, need to find one for frunk
+        if self._car.powered_lift_gate:
+            return CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+
+        return CoverEntityFeature.OPEN
 
 
 class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
