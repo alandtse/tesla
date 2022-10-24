@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v3.0.1 (2022-10-24)
+### Fix
+* Add open feature for frunk ([`769858f`](https://github.com/alandtse/tesla/commit/769858f442a65ee0a5bd95ae7b6d797b02fc8088))
+* Set sensor device class ([#292](https://github.com/alandtse/tesla/issues/292)) ([`658295f`](https://github.com/alandtse/tesla/commit/658295f785ae5348d73b1dc18f37ad14a1990f70))
+* Use GPS coords from Tesla API ([#289](https://github.com/alandtse/tesla/issues/289)) ([`1bc6d7f`](https://github.com/alandtse/tesla/commit/1bc6d7fd64977844102e70a3a62fd553745a15ce))
+* Use car distance units & fix solar type ([`2617d71`](https://github.com/alandtse/tesla/commit/2617d71bbc8ff1bee247c599e11077617bf6eba5))
+
 ## v3.0.0 (2022-10-22)
 ### Feature
 * Rewrite to add support for energy sites ([#250](https://github.com/alandtse/tesla/issues/250)) ([`6a1f9c3`](https://github.com/alandtse/tesla/commit/6a1f9c3cb663ed5543a2e778bdbaf750699b1438))
