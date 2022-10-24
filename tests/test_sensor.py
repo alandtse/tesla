@@ -10,7 +10,7 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
-    LENGTH_KILOMETERS,
+    LENGTH_MILES,
     PERCENTAGE,
     POWER_WATT,
     TEMP_CELSIUS,
@@ -188,10 +188,9 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_charging_rate")
-    # Test state against km/hr
-    # Tesla API returns in miles so manually set charge rate to km/hr
-    assert state.state == "37.34"
+    assert state.state == str(car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"])
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.SPEED
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
     assert (
@@ -243,12 +242,13 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_odometer")
-    # Test state against odometer in kilometers
-    # Tesla API returns in miles so manually set range in kilometers
-    assert state.state == "114127.59"
+    assert state.state == str(
+        round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
+    )
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
 
 async def test_outside_temp_value(hass: HomeAssistant) -> None:
@@ -270,12 +270,13 @@ async def test_range_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_range")
-    # Test state against range in kilometers
-    # Tesla API returns in miles so manually set range in kilometers
-    assert state.state == "272.11"
+    assert state.state == str(
+        car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
+    )
 
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
 
 async def test_solar_power_value(hass: HomeAssistant) -> None:
