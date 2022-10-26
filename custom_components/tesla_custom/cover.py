@@ -79,6 +79,13 @@ class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
         self._attr_device_class = CoverDeviceClass.DOOR
         self._attr_icon = "mdi:car"
 
+    async def async_close_cover(self, **kwargs):
+        """Send close cover command."""
+        _LOGGER.debug("Closing cover: %s", self.name)
+        if self.is_closed is False:
+            await self._car.toggle_frunk()
+            await self.async_update_ha_state()        
+        
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
