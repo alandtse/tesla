@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.0.2 (2022-10-27)
+### Fix
+* Add missing close_cover for frunks ([`3257775`](https://github.com/alandtse/tesla/commit/325777598d13b0e2ac3b817fb4996ab60e019b2f))
+
 ## v3.0.1 (2022-10-24)
 ### Fix
 * Add open feature for frunk ([`769858f`](https://github.com/alandtse/tesla/commit/769858f442a65ee0a5bd95ae7b6d797b02fc8088))
