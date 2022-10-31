@@ -78,3 +78,26 @@ async def test_trunk(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_toggle_trunk.assert_awaited_once()
+
+
+async def test_windows(hass: HomeAssistant) -> None:
+    """Tests windows cover."""
+    await setup_platform(hass, COVER_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.vent_windows") as mock_open_cover:
+        assert await hass.services.async_call(
+            COVER_DOMAIN,
+            SERVICE_OPEN_COVER,
+            {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
+            blocking=True,
+        )
+        mock_open_cover.assert_awaited_once()
+
+    with patch("teslajsonpy.car.TeslaCar.close_windows") as mock_close_cover:
+        assert await hass.services.async_call(
+            COVER_DOMAIN,
+            SERVICE_CLOSE_COVER,
+            {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
+            blocking=True,
+        )
+        mock_close_cover.assert_awaited_once()
