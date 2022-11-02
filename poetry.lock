@@ -1485,7 +1485,7 @@ tests = ["pytest-cov", "pytest"]
 
 [[package]]
 name = "teslajsonpy"
-version = "3.0.0"
+version = "3.1.0"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
