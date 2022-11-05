@@ -97,7 +97,7 @@ async def test_windows(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
-            {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
+            {ATTR_ENTITY_ID: "cover.my_model_s_window"},
             blocking=True,
         )
         mock_close_cover.assert_awaited_once()
