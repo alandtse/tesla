@@ -48,7 +48,7 @@ This integration provides the following entities for vehicles:
 - Buttons - horn, flash lights, wake up<sup>1</sup>, force data update<sup>1</sup> and trigger HomeLink. **Note:** The HomeLink button is disabled by default as some vehicles don't have this option. Enable via configuration/entities if desired.
 - Climate - turn HVAC on/off, set target temperature, set preset modes (defrost, keep on, dog mode and camp mode).
 - Device tracker - car location<sup>1</sup>.
-- Locks - door lock, rear trunk lock, front trunk (frunk) lock and charger door lock.
+- Locks - door lock, and charge port latch lock.
 **Note:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
 - Selects - seat heaters and cabin overheat protection<sup>2</sup>.
 - Sensors - battery level, charge rate, energy added, inside/outside temperature, odometer and estimated range.

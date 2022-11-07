@@ -54,3 +54,30 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
     def is_locked(self):
         """Return True if door is locked."""
         return self._car.is_locked
+
+
+class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
+    """Representation of a Tesla charge port latch."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize charge port latch (lock) entity."""
+        super().__init__(hass, car, coordinator)
+        self._attr_icon = "mdi:ev-plug-tesla"
+
+    async def async_unlock(self, **kwargs):
+        """Send unlock command."""
+        _LOGGER.debug("Unlocking: %s", self.name)
+        await self._car.charge_port_door_open()
+        await self.async_update_ha_state()
+
+    @property
+    def is_locked(self):
+        """Return True if charge port latch is engaged."""
+        if self._car.charge_port_latch == "Engaged":
+            return True
+        return False
