@@ -163,7 +163,7 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
     ) -> None:
         """Initialize window cover entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "window"
+        self.type = "windows"
         self._attr_device_class = CoverDeviceClass.WINDOW
         self._attr_icon = "mdi:window-closed"
 
