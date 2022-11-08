@@ -166,6 +166,9 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
         self.type = "windows"
         self._attr_device_class = CoverDeviceClass.WINDOW
         self._attr_icon = "mdi:window-closed"
+        self._attr_supported_features = (
+            CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+        )
 
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
