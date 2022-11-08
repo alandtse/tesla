@@ -28,8 +28,8 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("cover.my_model_s_trunk")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_trunk"
 
-    entry = entity_registry.async_get("cover.my_model_s_window")
-    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_window"
+    entry = entity_registry.async_get("cover.my_model_s_windows")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_windows"
 
 
 async def test_charger_door(hass: HomeAssistant) -> None:
