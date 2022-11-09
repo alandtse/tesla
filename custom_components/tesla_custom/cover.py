@@ -173,16 +173,14 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
         _LOGGER.debug("Closing cover: %s", self.name)
-        if self.is_closed is False:
-            await self._car.close_windows()
-            await self.async_update_ha_state()
+        await self._car.close_windows()
+        await self.async_update_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
-        if self.is_closed is True:
-            await self._car.vent_windows()
-            await self.async_update_ha_state()
+        await self._car.vent_windows()
+        await self.async_update_ha_state()
 
     @property
     def is_closed(self):
