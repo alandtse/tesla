@@ -1,7 +1,7 @@
 {
   "name": "Tesla",
   "hacs": "1.6.0",
-  "homeassistant": "2022.10.0",
+  "homeassistant": "2022.11.2",
   "zip_release": true,
   "filename": "tesla_custom.zip"
 }
