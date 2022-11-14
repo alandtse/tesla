@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v3.1.0 (2022-11-14)
+### Feature
+* Add window cover ([#318](https://github.com/alandtse/tesla/issues/318)) ([`bea6824`](https://github.com/alandtse/tesla/commit/bea68240d68e727e5cda803fe9df2b711ba0c6ff))
+* Add charge port latch lock ([`df7d06e`](https://github.com/alandtse/tesla/commit/df7d06ead2f7ddb499e9e254f645bd969886a86a))
+
+### Fix
+* Fix typo telsafi.com -> teslafi.com ([#314](https://github.com/alandtse/tesla/issues/314)) ([`9c1514a`](https://github.com/alandtse/tesla/commit/9c1514a051a1f953ab91cd1463e03da350680eda))
+
 ## v3.0.2 (2022-10-27)
 ### Fix
 * Add missing close_cover for frunks ([`3257775`](https://github.com/alandtse/tesla/commit/325777598d13b0e2ac3b817fb4996ab60e019b2f))
