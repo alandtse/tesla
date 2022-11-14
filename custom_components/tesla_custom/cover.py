@@ -27,6 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerDoor(hass, car, coordinator))
         entities.append(TeslaCarFrunk(hass, car, coordinator))
         entities.append(TeslaCarTrunk(hass, car, coordinator))
+        entities.append(TeslaCarWindows(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -84,8 +85,8 @@ class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Closing cover: %s", self.name)
         if self.is_closed is False:
             await self._car.toggle_frunk()
-            await self.async_update_ha_state()        
-        
+            await self.async_update_ha_state()
+
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
@@ -149,3 +150,41 @@ class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
             return CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
         return CoverEntityFeature.OPEN
+
+
+class TeslaCarWindows(TeslaCarEntity, CoverEntity):
+    """Representation of a Tesla car window cover."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize window cover entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "windows"
+        self._attr_device_class = CoverDeviceClass.WINDOW
+        self._attr_icon = "mdi:window-closed"
+        self._attr_supported_features = (
+            CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+        )
+
+    async def async_close_cover(self, **kwargs):
+        """Send close cover command."""
+        _LOGGER.debug("Closing cover: %s", self.name)
+        if self.is_closed == False:
+            await self._car.close_windows()
+            await self.async_update_ha_state()
+
+    async def async_open_cover(self, **kwargs):
+        """Send open cover command."""
+        _LOGGER.debug("Opening cover: %s", self.name)
+        if self.is_closed == True:
+            await self._car.vent_windows()
+            await self.async_update_ha_state()
+
+    @property
+    def is_closed(self):
+        """Return True if all windows are closed."""
+        return self._car.is_window_closed
