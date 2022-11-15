@@ -75,6 +75,10 @@ async def test_charger_connection(hass: HomeAssistant) -> None:
         state.attributes.get("fast_charger_type")
         == car_mock_data.VEHICLE_DATA["charge_state"]["fast_charger_type"]
     )
+    assert (
+        state.attributes.get("time_to_full_charge")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
+    )
 
 
 async def test_charging(hass: HomeAssistant) -> None:

@@ -90,6 +90,7 @@ class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
             "fast_charger_present": self._car.fast_charger_present,
             "fast_charger_brand": self._car.fast_charger_brand,
             "fast_charger_type": self._car.fast_charger_type,
+            "time_to_full_charge": self._car.time_to_full_charge
         }
 
 
