@@ -206,11 +206,11 @@ async def test_time_charge_complete(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_time_charge_complete")
-    charge_complete = datetime.now() + timedelta(
+    charge_complete = datetime.utcnow() + timedelta(
         minutes=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
 
-    assert state.state == charge_complete
+    assert state.state == charge_complete.isoformat()
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
