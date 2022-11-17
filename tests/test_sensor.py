@@ -209,9 +209,8 @@ async def test_time_charge_complete(hass: HomeAssistant) -> None:
     charge_complete = datetime.utcnow() + timedelta(
         hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
-    charge_complete_str = datetime.strftime(charge_complete, "%y-%m-%dT%H:%M:%S+00:00")
-    print(type(charge_complete_str))
-    print(charge_complete_str)
+    charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
     assert state.state == charge_complete_str
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
