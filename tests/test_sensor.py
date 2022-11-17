@@ -14,7 +14,6 @@ from homeassistant.const import (
     PERCENTAGE,
     POWER_WATT,
     TEMP_CELSIUS,
-    TIME_HOURS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -22,6 +21,8 @@ from homeassistant.helpers import entity_registry as er
 from .common import setup_platform
 from .mock_data import car as car_mock_data
 from .mock_data import energysite as energysite_mock_data
+
+from datetime import datetime, timedelta
 
 ATTR_STATE_CLASS = "state_class"
 
@@ -200,18 +201,19 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     )
 
 
-async def test_time_to_full_charge(hass: HomeAssistant) -> None:
-    """Tests time to full charge is the correct value."""
+async def test_time_charge_complete(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
 
-    state = hass.states.get("sensor.my_model_s_time_to_full_charge")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    charge_complete = datetime.now() + timedelta(
+        minutes=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
 
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DURATION
+    assert state.state == charge_complete
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TIME_HOURS
 
 
 async def test_grid_power_value(hass: HomeAssistant) -> None:

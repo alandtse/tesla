@@ -23,11 +23,13 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.unit_conversion import DistanceConverter
-
+from homeassistant.util import dt
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DISTANCE_UNITS_KM_HR, DOMAIN
+
+from datetime import datetime, timedelta
 
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
@@ -49,7 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
-        entities.append(TeslaCarTimeToFullCharge(hass, car, coordinator))
+        entities.append(TeslaCarTimeChargeComplete(hass, car, coordinator))
 
     for energysite in energysites.values():
         if (
@@ -455,8 +457,8 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
         return icon_for_battery_level(battery_level=self.native_value)
 
 
-class TeslaCarTimeToFullCharge(TeslaCarEntity, SensorEntity):
-    """Representation of the Tesla car time to full charge."""
+class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car time charge complete."""
 
     def __init__(
         self,
@@ -464,15 +466,19 @@ class TeslaCarTimeToFullCharge(TeslaCarEntity, SensorEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
-        """Initialize time to full charge entity."""
+        """Initialize time charge complete entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "time to full charge"
-        self._attr_device_class = SensorDeviceClass.DURATION
+        self.type = "time charge complete"
+        self._attr_device_class = SensorDeviceClass.TIMESTAMP
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = TIME_HOURS
         self._attr_icon = "mdi:timer-plus"
 
     @property
     def native_value(self) -> float:
-        """Return time to full charge."""
-        return self._car.time_to_full_charge
+        """Return time charge complete."""
+        if self._car.time_to_full_charge is None:
+            charge_min = 0
+        else:
+            charge_min = float(self._car.time_to_full_charge) * 60
+
+        return dt.now() + timedelta(minutes=charge_min)
