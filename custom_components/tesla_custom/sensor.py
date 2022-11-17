@@ -477,8 +477,8 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
     def native_value(self) -> float:
         """Return time charge complete."""
         if self._car.time_to_full_charge is None:
-            charge_min = 0
+            charge_hours = 0
         else:
-            charge_min = float(self._car.time_to_full_charge) * 60
+            charge_hours = float(self._car.time_to_full_charge)
 
-        return dt.now() + timedelta(minutes=charge_min)
+        return dt.now() + timedelta(hours=charge_hours)
