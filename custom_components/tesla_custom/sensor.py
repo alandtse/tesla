@@ -18,10 +18,12 @@ from homeassistant.const import (
     POWER_KILO_WATT,
     SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
+    TIME_HOURS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.unit_conversion import DistanceConverter
+
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -47,6 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
+        entities.append(TeslaCarTimeToFullCharge(hass, car, coordinator))
 
     for energysite in energysites.values():
         if (
@@ -450,3 +453,26 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
     def icon(self):
         """Return icon for the backup reserve."""
         return icon_for_battery_level(battery_level=self.native_value)
+
+
+class TeslaCarTimeToFullCharge(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car time to full charge."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize time to full charge entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "time to full charge"
+        self._attr_device_class = SensorDeviceClass.DURATION
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = TIME_HOURS
+        self._attr_icon = "mdi:timer-plus"
+
+    @property
+    def native_value(self) -> float:
+        """Return time to full charge."""
+        return self._car.time_to_full_charge
