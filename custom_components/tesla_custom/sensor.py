@@ -175,7 +175,7 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
         self._attr_native_unit_of_measurement = POWER_KILO_WATT
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float:
         """Return the charger power."""
         return self._car.charger_power
 
