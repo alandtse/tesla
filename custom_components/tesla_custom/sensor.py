@@ -99,16 +99,24 @@ class TeslaCarBattery(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return battery level."""
-        return self._car.battery_level
+        # usable_battery_level matches the Tesla app and car display
+        return self._car.usable_battery_level
 
     @property
     def icon(self):
         """Return icon for the battery."""
-        charging = self._car.battery_level == "Charging"
+        charging = self._car.charging_state == "Charging"
 
         return icon_for_battery_level(
             battery_level=self.native_value, charging=charging
         )
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "raw_soc": self._car.battery_level,
+        }
 
 
 class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
