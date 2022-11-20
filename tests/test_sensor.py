@@ -132,12 +132,16 @@ async def test_battery_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_battery")
     assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+        car_mock_data.VEHICLE_DATA["charge_state"]["usable_battery_level"]
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
+    assert (
+        state.attributes.get("raw_soc")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+    )
 
 
 async def test_charger_energy_value(hass: HomeAssistant) -> None:

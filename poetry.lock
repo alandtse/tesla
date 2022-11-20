@@ -1507,7 +1507,7 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "teslajsonpy"
-version = "3.1.0"
+version = "3.2.0"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -2923,8 +2923,8 @@ termcolor = [
     {file = "termcolor-2.0.1.tar.gz", hash = "sha256:6b2cf769e93364a2676e1de56a7c0cff2cf5bd07f37e9cc80b0dd6320ebfe388"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-3.1.0-py3-none-any.whl", hash = "sha256:343004a24ca5dbd26f2a3e5f9c3dc6b522422600040565575494cbfb9c0a7e75"},
-    {file = "teslajsonpy-3.1.0.tar.gz", hash = "sha256:efd1e43e5ef7d2bae24990c5a8394494722583b5d4af767742bfa3044cb4fc1f"},
+    {file = "teslajsonpy-3.2.0-py3-none-any.whl", hash = "sha256:0e5edc405f5dc603ab22e3dba9e918e0090d5831041f455b37bf470120c528c9"},
+    {file = "teslajsonpy-3.2.0.tar.gz", hash = "sha256:cdb87845c9c875fc752fb96499608f309913259784a00bef33beb2afc664fdcb"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
