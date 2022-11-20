@@ -83,7 +83,7 @@ VEHICLE_DATA = {
         "time_to_full_charge": 0.25,
         "timestamp": 1661641175268,
         "trip_charging": False,
-        "usable_battery_level": 78,
+        "usable_battery_level": 77,
         "user_charge_enable_request": None,
     },
     "climate_state": {
