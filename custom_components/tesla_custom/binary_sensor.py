@@ -158,6 +158,7 @@ class TeslaCarAsleep(TeslaCarEntity, BinarySensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "asleep"
         self._attr_device_class = None
+        self._attr_icon = "mdi:sleep"
 
     @property
     def is_on(self):
