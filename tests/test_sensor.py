@@ -10,13 +10,17 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
+    LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
     POWER_WATT,
+    SPEED_KILOMETERS_PER_HOUR,
+    SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util.unit_conversion import DistanceConverter, SpeedConverter
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data
@@ -192,7 +196,23 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_charging_rate")
-    assert state.state == str(car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"])
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_KILOMETERS_PER_HOUR:
+        assert state.state == str(
+            round(
+                SpeedConverter.convert(
+                    car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"],
+                    SPEED_MILES_PER_HOUR,
+                    SPEED_KILOMETERS_PER_HOUR,
+                ),
+                1,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_MILES_PER_HOUR
+        assert state.state == str(
+            car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"]
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.SPEED
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
@@ -246,13 +266,26 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_odometer")
-    assert state.state == str(
-        round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
-    )
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+        assert state.state == str(
+            round(
+                DistanceConverter.convert(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"],
+                    LENGTH_MILES,
+                    LENGTH_KILOMETERS,
+                ),
+                1,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.state == str(
+            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
 
 async def test_outside_temp_value(hass: HomeAssistant) -> None:
@@ -274,13 +307,26 @@ async def test_range_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_range")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
-    )
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+        assert state.state == str(
+            round(
+                DistanceConverter.convert(
+                    car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"],
+                    LENGTH_MILES,
+                    LENGTH_KILOMETERS,
+                ),
+                2,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.state == str(
+            car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
 
 async def test_solar_power_value(hass: HomeAssistant) -> None:
