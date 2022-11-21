@@ -25,8 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarFlashLights(hass, car, coordinator))
         entities.append(TeslaCarWakeUp(hass, car, coordinator))
         entities.append(TeslaCarForceDataUpdate(hass, car, coordinator))
-        if car.homelink_device_count:
-            entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
+        entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -132,6 +131,13 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
         super().__init__(hass, car, coordinator)
         self.type = "homelink"
         self._attr_icon = "mdi:garage"
+        # Entity is only enabled upon first install if garages have been paired to homelink
+        self._enabled_by_default = self._car.homelink_device_count
+
+    @property
+    def available(self) -> bool:
+        """Return True if Homelink devices are nearby"""
+        return super().available and self._car.homelink_nearby
 
     async def async_press(self):
         """Send the command."""
