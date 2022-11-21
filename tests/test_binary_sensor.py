@@ -105,6 +105,15 @@ async def test_car_online(hass: HomeAssistant) -> None:
     )
     assert state.attributes.get("vin") == car_mock_data.VEHICLE["vin"]
     assert state.attributes.get("id") == str(car_mock_data.VEHICLE["id"])
+    assert state.attributes.get("state") == car_mock_data.VEHICLE["state"]
+
+
+async def test_car_asleep(hass: HomeAssistant) -> None:
+    """Tests car asleep is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+
+    state = hass.states.get("binary_sensor.my_model_s_asleep")
+    assert state.state == "off"
 
 
 async def test_battery_charging(hass: HomeAssistant) -> None:
