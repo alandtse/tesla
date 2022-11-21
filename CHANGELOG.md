@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v3.2.0 (2022-11-21)
+### Feature
+* Add binary_sensor.<car>_asleep ([#361](https://github.com/alandtse/tesla/issues/361)) ([`43deefb`](https://github.com/alandtse/tesla/commit/43deefb9a0b306c0d867413bfbc6ecb67b15fd50))
+
+### Fix
+* Persist entities when reloaded while car is asleep ([#365](https://github.com/alandtse/tesla/issues/365)) ([`f0fc6e4`](https://github.com/alandtse/tesla/commit/f0fc6e49895547a3861a3592dcde7269b05b9305))
+* Fix usable_battery_level to match app ([#362](https://github.com/alandtse/tesla/issues/362)) ([`c9e4abb`](https://github.com/alandtse/tesla/commit/c9e4abbacba8df7571943f3008eaa1df410c9b28))
+* Update car-asleep binary sensor icon ([#364](https://github.com/alandtse/tesla/issues/364)) ([`30f319c`](https://github.com/alandtse/tesla/commit/30f319c893012c154faea0d5d6c3ef88efdb7ccd))
+
 ## v3.1.0 (2022-11-14)
 ### Feature
 * Add window cover ([#318](https://github.com/alandtse/tesla/issues/318)) ([`bea6824`](https://github.com/alandtse/tesla/commit/bea68240d68e727e5cda803fe9df2b711ba0c6ff))
