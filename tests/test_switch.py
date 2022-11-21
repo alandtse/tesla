@@ -9,6 +9,7 @@ from homeassistant.helpers import entity_registry as er
 from .common import setup_platform
 from .mock_data import car as car_mock_data
 
+
 async def test_registry_entries(hass: HomeAssistant) -> None:
     """Tests devices are registered in the entity registry."""
     await setup_platform(hass, SWITCH_DOMAIN)
@@ -27,8 +28,41 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_sentry_mode"
 
 
+async def test_enabled_by_default(hass: HomeAssistant) -> None:
+    """Tests devices are registered in the entity registry."""
+    await setup_platform(hass, SWITCH_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("switch.my_model_s_heated_steering")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("switch.my_model_s_polling")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("switch.my_model_s_charger")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
+    assert not entry.disabled
+
+
+async def test_disabled_by_default(hass: HomeAssistant) -> None:
+    """Tests devices are disabled by default when appropriate."""
+    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heater"] = None
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["sentry_mode_available"] = False
+    await setup_platform(hass, SWITCH_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("switch.my_model_s_heated_steering")
+    assert entry.disabled
+
+    entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
+    assert entry.disabled
+
+
 async def test_heated_steering(hass: HomeAssistant) -> None:
     """Tests car heated steering switch."""
+    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heater"] = False
     await setup_platform(hass, SWITCH_DOMAIN)
 
     with patch(
@@ -96,6 +130,7 @@ async def test_charger(hass: HomeAssistant) -> None:
 
 async def test_sentry_mode(hass: HomeAssistant) -> None:
     """Tests car sentry mode switch."""
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["sentry_mode_available"] = True
     await setup_platform(hass, SWITCH_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.set_sentry_mode") as mock_set_sentry_mode:
