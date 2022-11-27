@@ -30,6 +30,7 @@ from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DISTANCE_UNITS_KM_HR, DOMAIN
 
 from datetime import datetime, timedelta
+from typing import Optional
 
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
@@ -480,13 +481,19 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-plus"
+        self._value: Optional[datetime] = None
 
     @property
-    def native_value(self) -> datetime:
+    def native_value(self) -> Optional[datetime]:
         """Return time charge complete."""
         if self._car.time_to_full_charge is None:
             charge_hours = 0
         else:
             charge_hours = float(self._car.time_to_full_charge)
-
-        return dt.now() + timedelta(hours=charge_hours)
+        if self._car.charging_state == "Charging" and charge_hours > 0:
+            new_value = dt.now() + timedelta(hours=charge_hours)
+            if self._value is None or (new_value - self._value).total_seconds() >= 60:
+                self._value = new_value
+        if self._car.charging_state in ["Charging", "Complete"]:
+            return self._value
+        return None
