@@ -26,6 +26,8 @@ from .common import setup_platform
 from .mock_data import car as car_mock_data
 from .mock_data import energysite as energysite_mock_data
 
+from datetime import datetime, timedelta
+
 ATTR_STATE_CLASS = "state_class"
 
 
@@ -221,6 +223,22 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
         state.attributes.get("time_left")
         == car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
     )
+
+
+async def test_time_charge_complete(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    charge_complete = datetime.utcnow() + timedelta(
+        hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
+    )
+    charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
+    assert state.state == charge_complete_str
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
 
 async def test_grid_power_value(hass: HomeAssistant) -> None:
