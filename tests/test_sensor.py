@@ -16,6 +16,7 @@ from homeassistant.const import (
     POWER_WATT,
     SPEED_KILOMETERS_PER_HOUR,
     SPEED_MILES_PER_HOUR,
+    STATE_UNKNOWN,
     TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
@@ -225,7 +226,7 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     )
 
 
-async def test_time_charge_complete(hass: HomeAssistant) -> None:
+async def test_time_charge_complete_charging(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
 
@@ -239,6 +240,24 @@ async def test_time_charge_complete(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+
+async def test_time_charge_completed(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.0
+    car_mock_data.VEHICLE_DATA["charge_state"]["charging_state"] = "Complete"
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    assert state.state == STATE_UNKNOWN
+
+async def test_time_charge_stopped(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.0
+    car_mock_data.VEHICLE_DATA["charge_state"]["charging_state"] = "Stopped"
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    assert state.state == STATE_UNKNOWN
 
 
 async def test_grid_power_value(hass: HomeAssistant) -> None:

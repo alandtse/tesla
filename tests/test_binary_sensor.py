@@ -4,7 +4,7 @@ from homeassistant.components.binary_sensor import (
     DOMAIN as BINARY_SENSOR_DOMAIN,
     BinarySensorDeviceClass,
 )
-from homeassistant.const import ATTR_DEVICE_CLASS
+from homeassistant.const import ATTR_DEVICE_CLASS, STATE_ON, STATE_OFF
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
@@ -41,7 +41,7 @@ async def test_parking_brake(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_parking_brake")
-    assert state.state == "on"
+    assert state.state == STATE_ON
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) is None
 
@@ -51,7 +51,7 @@ async def test_charger_connection(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charger")
-    assert state.state == "on"
+    assert state.state == STATE_ON
 
     # Not sure why this one is failing - checking device class works with other tests
     # assert state.attributes.get(ATTR_DEVICE_CLASS) is BinarySensorDeviceClass.PLUG
@@ -82,7 +82,7 @@ async def test_charging(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_charging")
-    assert state.state == "on"
+    assert state.state == STATE_ON
 
     assert (
         state.attributes.get(ATTR_DEVICE_CLASS)
@@ -95,7 +95,7 @@ async def test_car_online(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_online")
-    assert state.state == "on"
+    assert state.state == STATE_ON
 
     assert (
         state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.CONNECTIVITY
@@ -113,7 +113,7 @@ async def test_car_asleep(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_asleep")
-    assert state.state == "off"
+    assert state.state == STATE_OFF
 
 
 async def test_battery_charging(hass: HomeAssistant) -> None:
@@ -121,7 +121,7 @@ async def test_battery_charging(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.battery_home_battery_charging")
-    assert state.state == "off"
+    assert state.state == STATE_OFF
 
     assert (
         state.attributes.get(ATTR_DEVICE_CLASS)
@@ -134,6 +134,6 @@ async def test_grid_status(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.battery_home_grid_status")
-    assert state.state == "on"
+    assert state.state == STATE_ON
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.POWER

@@ -73,9 +73,7 @@ class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
         super().__init__(hass, car, coordinator)
         self.type = "charge port latch"
         self._attr_icon = "mdi:ev-plug-tesla"
-        self._attr_supported_features = (
-            LockEntityFeature.OPEN
-        )
+        self._attr_supported_features = LockEntityFeature.OPEN
 
     async def async_open(self, **kwargs):
         """Send open command."""

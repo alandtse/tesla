@@ -4,7 +4,7 @@ from unittest.mock import patch
 from homeassistant.components.climate import (
     DOMAIN as CLIMATE_DOMAIN,
 )
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE
+from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
@@ -29,7 +29,7 @@ async def test_climate_properties(hass: HomeAssistant) -> None:
 
     state = hass.states.get(DEVICE_ID)
 
-    assert state.state == "off"
+    assert state.state == STATE_OFF
 
     assert (
         state.attributes.get("min_temp")
