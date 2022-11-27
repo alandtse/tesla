@@ -215,8 +215,8 @@ VEHICLE_DATA = {
             "download_perc": 0,
             "expected_duration_sec": 2700,
             "install_perc": 1,
-            "status": "",
-            "version": "2022.8.10.1",
+            "status": "available",
+            "version": "2022.36.20",
         },
         "speed_limit_mode": {
             "active": False,
