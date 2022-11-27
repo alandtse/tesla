@@ -482,7 +482,7 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:timer-plus"
 
     @property
-    def native_value(self) -> datetime.datetime:
+    def native_value(self) -> datetime:
         """Return time charge complete."""
         if self._car.time_to_full_charge is None:
             charge_hours = 0
