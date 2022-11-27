@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.3.1 (2022-11-27)
+### Fix
+* Change timestamp calculation ([`5f92774`](https://github.com/alandtse/tesla/commit/5f9277425df93fa9ece48e2d2d27eedd433c9abb))
+
 ## v3.3.0 (2022-11-27)
 ### Feature
 * Add time to full charge sensor ([#349](https://github.com/alandtse/tesla/issues/349)) ([`fbcf5fe`](https://github.com/alandtse/tesla/commit/fbcf5fe9b8345a13f9fed94dc65e9f2c93a62601))
