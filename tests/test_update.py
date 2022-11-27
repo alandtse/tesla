@@ -4,7 +4,7 @@ import pytest
 
 from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN
 
-from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
@@ -34,7 +34,7 @@ async def test_status_download_wait_wifi(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "on"
+    assert state.state == STATE_ON
     assert state.attributes.get("latest_version") == "2022.36.20 (Waiting on Wi-Fi)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
@@ -63,7 +63,7 @@ async def test_status_downloading(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "on"
+    assert state.state == STATE_ON
     assert state.attributes.get("latest_version") == "2022.36.20 (Downloading)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
@@ -92,7 +92,7 @@ async def test_status_available(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "on"
+    assert state.state == STATE_ON
     assert state.attributes.get("latest_version") == "2022.36.20 (Available to install)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
@@ -127,7 +127,7 @@ async def test_status_scheduled(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "on"
+    assert state.state == STATE_ON
     assert (
         state.attributes.get("latest_version") == "2022.36.20 (Scheduled for install)"
     )
@@ -162,7 +162,7 @@ async def test_status_installing(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "on"
+    assert state.state == STATE_ON
     assert state.attributes.get("latest_version") == "2022.36.20 (Installing)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") == 30
@@ -191,7 +191,7 @@ async def test_status_none(hass: HomeAssistant) -> None:
     await setup_platform(hass, UPDATE_DOMAIN)
 
     state = hass.states.get("update.my_model_s_software_update")
-    assert state.state == "off"
+    assert state.state == STATE_OFF
     assert state.attributes.get("latest_version") == "2022.8.10.1"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
