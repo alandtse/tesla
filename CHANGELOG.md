@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v3.3.0 (2022-11-27)
+### Feature
+* Add time to full charge sensor ([#349](https://github.com/alandtse/tesla/issues/349)) ([`fbcf5fe`](https://github.com/alandtse/tesla/commit/fbcf5fe9b8345a13f9fed94dc65e9f2c93a62601))
+* Show software update statuses in version info ([#370](https://github.com/alandtse/tesla/issues/370)) ([`fac9dd1`](https://github.com/alandtse/tesla/commit/fac9dd12c1baa6e3676fb30face39514200d1606))
+
+### Fix
+* Handle unresponsive cars/systems during setup ([`4d1270b`](https://github.com/alandtse/tesla/commit/4d1270b426cef4a00b8e84644aafdaa3a47407ca))
+
 ## v3.2.0 (2022-11-21)
 ### Feature
 * Add binary_sensor.<car>_asleep ([#361](https://github.com/alandtse/tesla/issues/361)) ([`43deefb`](https://github.com/alandtse/tesla/commit/43deefb9a0b306c0d867413bfbc6ecb67b15fd50))
