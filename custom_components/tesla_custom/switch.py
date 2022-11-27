@@ -21,10 +21,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        if car.steering_wheel_heater:
-            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
-        if car.sentry_mode_available:
-            entities.append(TeslaCarSentryMode(hass, car, coordinator))
+        entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
+        entities.append(TeslaCarSentryMode(hass, car, coordinator))
         entities.append(TeslaCarPolling(hass, car, coordinator))
         entities.append(TeslaCarCharger(hass, car, coordinator))
 
@@ -44,6 +42,13 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
         super().__init__(hass, car, coordinator)
         self.type = "heated steering"
         self._attr_icon = "mdi:steering"
+        # Entity is only enabled upon first install if steering wheel heater is available
+        self._enabled_by_default = self._car.steering_wheel_heater
+
+    @property
+    def available(self) -> bool:
+        """Return True if steering wheel heater is available"""
+        return super().available and self._car.steering_wheel_heater
 
     @property
     def is_on(self):
@@ -140,6 +145,13 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
         super().__init__(hass, car, coordinator)
         self.type = "sentry mode"
         self._attr_icon = "mdi:shield-car"
+        # Entity is only enabled upon first install if sentry mode is available
+        self._enabled_by_default = self._car.sentry_mode_available
+
+    @property
+    def available(self) -> bool:
+        """Return True if sentry mode switch is available"""
+        return super().available and self._car.sentry_mode_available
 
     @property
     def is_on(self):

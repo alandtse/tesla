@@ -28,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for car in cars.values():
         entities.append(TeslaCarParkingBrake(hass, car, coordinator))
         entities.append(TeslaCarOnline(hass, car, coordinator))
+        entities.append(TeslaCarAsleep(hass, car, coordinator))
         entities.append(TeslaCarChargerConnection(hass, car, coordinator))
         entities.append(TeslaCarCharging(hass, car, coordinator))
 
@@ -140,7 +141,29 @@ class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
             "vehicle_id": str(self._car.vehicle_id),
             "vin": self._car.vin,
             "id": str(self._car.id),
+            "state": self._car.state,
         }
+
+
+class TeslaCarAsleep(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car asleep binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize car asleep entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "asleep"
+        self._attr_device_class = None
+        self._attr_icon = "mdi:sleep"
+
+    @property
+    def is_on(self):
+        """Return True if car is asleep."""
+        return self._car.state == "asleep"
 
 
 class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):
