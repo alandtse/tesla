@@ -186,7 +186,7 @@ VEHICLE_DATA = {
         "center_display_state": 0,
         "dashcam_clip_save_available": False,
         "dashcam_state": "<invalid>",
-        "df": 0,
+        "df": 1,
         "dr": 0,
         "fd_window": 0,
         "feature_bitmask": "5,0",
