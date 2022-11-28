@@ -18,6 +18,7 @@ from homeassistant.const import (
     SPEED_MILES_PER_HOUR,
     STATE_UNKNOWN,
     TEMP_CELSIUS,
+    PRESSURE_BAR,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -241,6 +242,7 @@ async def test_time_charge_complete_charging(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
+
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
     car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.0
@@ -249,6 +251,7 @@ async def test_time_charge_completed(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_time_charge_complete")
     assert state.state == STATE_UNKNOWN
+
 
 async def test_time_charge_stopped(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
@@ -376,3 +379,64 @@ async def test_solar_power_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
+    """Tests tpms sensors are getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
+    assert state_fl == car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"]
+
+    assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+
+    assert (
+        state_fl.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_fl"
+        ]
+    )
+
+    state_fr = hass.states.get("sensor.my_model_s_tpms_front_right")
+    assert state_fr == car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fr"]
+
+    assert state_fr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+
+    assert (
+        state_fr.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_fr"
+        ]
+    )
+
+    state_rl = hass.states.get("sensor.my_model_s_tpms_rear_left")
+    assert state_rl == car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rl"]
+
+    assert state_rl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_rl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+
+    assert (
+        state_rl.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_rl"
+        ]
+    )
+
+    state_rr = hass.states.get("sensor.my_model_s_tpms_rear_right")
+    assert state_rr == car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rr"]
+
+    assert state_rr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_rr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+
+    assert (
+        state_rr.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_rr"
+        ]
+    )
