@@ -491,7 +491,7 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         else:
             charge_hours = float(self._car.time_to_full_charge)
         if self._car.charging_state == "Charging" and charge_hours > 0:
-            new_value = dt.now() + timedelta(hours=charge_hours)
+            new_value = dt.utcnow() + timedelta(hours=charge_hours)
             if self._value is None or (new_value - self._value).total_seconds() >= 60:
                 self._value = new_value
         if self._car.charging_state in ["Charging", "Complete"]:
