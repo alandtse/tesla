@@ -226,14 +226,7 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Return True if a car door is open."""
-        if (
-            self._car.door_df
-            or self._car.door_dr
-            or self._car.door_pf
-            or self._car.door_pr
-        ):
-            return True
-        return False
+        return self._car.door_df or self._car.door_dr or self._car.door_pf or self._car.door_pr
 
     @property
     def extra_state_attributes(self):
