@@ -36,12 +36,19 @@ from typing import Optional
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
 
-TPMS_SENSORS = [
-    "TPMS front left",
-    "TPMS front right",
-    "TPMS rear left",
-    "TPMS rear right",
-]
+TPMS_SENSORS = {
+    "TPMS front left": 'tpms_pressure_fl',
+    "TPMS front right": 'tpms_pressure_fr',
+    "TPMS rear left": 'tpms_pressure_rl',
+    "TPMS rear right": 'tpms_pressure_rr',
+}
+
+TPMS_SENSOR_ATTR = {
+    "TPMS front left": "tpms_last_seen_pressure_time_fl",
+    "TPMS front right": "tpms_last_seen_pressure_time_fr",
+    "TPMS rear left": "tpms_last_seen_pressure_time_rl",
+    "TPMS rear right": "tpms_last_seen_pressure_time_rr",
+}
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
@@ -526,30 +533,16 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = PRESSURE_BAR
         self._attr_icon = "mdi:gauge-full"
-        # self._value: Optional[datetime] = None
 
     @property
     def native_value(self) -> float:
         """Return TPMS Pressure."""
-        if self._tpms_sensor == "TPMS front left":
-            return self._car.tpms_pressure_fl
-        elif self._tpms_sensor == "TPMS front right":
-            return self._car.tpms_pressure_fr
-        elif self._tpms_sensor == "TPMS rear left":
-            return self._car.tpms_pressure_rl
-        return self._car.tpms_pressure_rr
+        return getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor))
 
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        if self._tpms_sensor == "TPMS front left":
-            timestamp = self._car._vehicle_data.get("vehicle_state", {}).get("tpms_last_seen_pressure_time_fl")
-        elif self._tpms_sensor == "TPMS front right":
-            timestamp = self._car._vehicle_data.get("vehicle_state", {}).get("tpms_last_seen_pressure_time_fr")
-        elif self._tpms_sensor == "TPMS rear left":
-            timestamp = self._car._vehicle_data.get("vehicle_state", {}).get("tpms_last_seen_pressure_time_rl")
-        else:
-            timestamp = self._car._vehicle_data.get("vehicle_state", {}).get("tpms_last_seen_pressure_time_rr")
+        timestamp = self._car._vehicle_data.get("vehicle_state", {}).get(TPMS_SENSOR_ATTR.get(self._tpms_sensor))
 
         return {
             "tpms_last_seen_pressure_timestamp": timestamp,
