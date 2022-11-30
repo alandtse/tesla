@@ -5,7 +5,7 @@
   "documentation": "https://github.com/alandtse/tesla/wiki",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "requirements": [
-    "teslajsonpy==3.2.2"
+    "teslajsonpy==3.3.0"
   ],
   "codeowners": [
     "@alandtse"
