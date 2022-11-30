@@ -137,3 +137,19 @@ async def test_grid_status(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.POWER
+
+async def test_car_doors(hass: HomeAssistant) -> None:
+    """Tests car door is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+
+    state = hass.states.get("binary_sensor.my_model_s_doors")
+    assert state.state == STATE_ON
+
+    assert (
+        state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.DOOR
+    )
+
+    assert state.attributes.get("Driver Front") == "Open"
+    assert state.attributes.get("Driver Rear") == "Closed"
+    assert state.attributes.get("Passenger Front") == "Closed"
+    assert state.attributes.get("Passenger Rear") == "Closed"
