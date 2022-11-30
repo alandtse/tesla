@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.3.2 (2022-11-29)
+### Fix
+* Use utc time zone for charge complete sensor ([`f13c618`](https://github.com/alandtse/tesla/commit/f13c618efe2071945eb5846fc0ff3c3b645da0f8))
+
 ## v3.3.1 (2022-11-27)
 ### Fix
 * Change timestamp calculation ([`5f92774`](https://github.com/alandtse/tesla/commit/5f9277425df93fa9ece48e2d2d27eedd433c9abb))
