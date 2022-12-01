@@ -18,7 +18,7 @@ from homeassistant.const import (
     SPEED_MILES_PER_HOUR,
     STATE_UNKNOWN,
     TEMP_CELSIUS,
-    PRESSURE_BAR,
+    PRESSURE_PSI,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -392,7 +392,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
     assert (
         state_fl.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -408,7 +408,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     assert state_fr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_fr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
     assert (
         state_fr.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -424,7 +424,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     assert state_rl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_rl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
     assert (
         state_rl.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -440,7 +440,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     assert state_rr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_rr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_BAR
+    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
     assert (
         state_rr.attributes.get("tpms_last_seen_pressure_timestamp")
