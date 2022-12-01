@@ -26,6 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarWakeUp(hass, car, coordinator))
         entities.append(TeslaCarForceDataUpdate(hass, car, coordinator))
         entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
+        entities.append(TeslaCarRemoteStart(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -142,3 +143,22 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
     async def async_press(self):
         """Send the command."""
         await self._car.trigger_homelink()
+
+
+class TeslaCarRemoteStart(TeslaCarEntity, ButtonEntity):
+    """Representation of a Tesla car remote start button."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialise remote start button."""
+        super().__init__(hass, car, coordinator)
+        self.type = "remote start"
+        self._attr_icon = "mdi:power"
+
+    async def async_press(self):
+        """Send the command."""
+        await self._car.remote_start()
