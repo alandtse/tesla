@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v3.5.0 (2022-12-01)
+### Feature
+* Add remote start button ([#385](https://github.com/alandtse/tesla/issues/385)) ([`42b7117`](https://github.com/alandtse/tesla/commit/42b7117fe16209ccf23070b22b58e576cd2709a8))
+
+## v3.4.0 (2022-11-30)
+### Feature
+* Add tpms pressure sensors ([#376](https://github.com/alandtse/tesla/issues/376)) ([`b2cbe95`](https://github.com/alandtse/tesla/commit/b2cbe9575ab6e2c4a780ec15f9ebc57f45235fa5))
+* Add doors binary sensor ([#377](https://github.com/alandtse/tesla/issues/377)) ([`8b77e3c`](https://github.com/alandtse/tesla/commit/8b77e3c7b1aff6aa6761d8f86592b891099137d4))
+
+## v3.3.2 (2022-11-29)
+### Fix
+* Use utc time zone for charge complete sensor ([`f13c618`](https://github.com/alandtse/tesla/commit/f13c618efe2071945eb5846fc0ff3c3b645da0f8))
+
 ## v3.3.1 (2022-11-27)
 ### Fix
 * Change timestamp calculation ([`5f92774`](https://github.com/alandtse/tesla/commit/5f9277425df93fa9ece48e2d2d27eedd433c9abb))

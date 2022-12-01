@@ -19,8 +19,8 @@ from homeassistant.const import (
     SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
     TIME_HOURS,
-    PRESSURE_BAR,
     PRESSURE_PSI,
+
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
@@ -38,10 +38,10 @@ SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
 
 TPMS_SENSORS = {
-    "TPMS front left": "tpms_pressure_fl",
-    "TPMS front right": "tpms_pressure_fr",
-    "TPMS rear left": "tpms_pressure_rl",
-    "TPMS rear right": "tpms_pressure_rr",
+    "TPMS front left": 'tpms_pressure_fl',
+    "TPMS front right": 'tpms_pressure_fr',
+    "TPMS rear left": 'tpms_pressure_rl',
+    "TPMS rear right": 'tpms_pressure_rr',
 }
 
 TPMS_SENSOR_ATTR = {
@@ -70,9 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
         entities.append(TeslaCarTimeChargeComplete(hass, car, coordinator))
         for tpms_sensor in TPMS_SENSORS:
-            entities.append(
-                TeslaCarTpmsPressureSensor(hass, car, coordinator, tpms_sensor)
-            )
+            entities.append(TeslaCarTpmsPressureSensor(hass, car, coordinator, tpms_sensor))
 
     for energysite in energysites.values():
         if (
@@ -511,7 +509,7 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         else:
             charge_hours = float(self._car.time_to_full_charge)
         if self._car.charging_state == "Charging" and charge_hours > 0:
-            new_value = dt.now() + timedelta(hours=charge_hours)
+            new_value = dt.utcnow() + timedelta(hours=charge_hours)
             if self._value is None or (new_value - self._value).total_seconds() >= 60:
                 self._value = new_value
         if self._car.charging_state in ["Charging", "Complete"]:
@@ -535,7 +533,7 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self.type = tpms_sensor
         self._attr_device_class = SensorDeviceClass.PRESSURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PRESSURE_PSI
+        self._attr_native_unit_of_measurement = PRESSURE_BAR
         self._attr_icon = "mdi:gauge-full"
 
     @property
@@ -545,12 +543,11 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
             getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor)) * 14.5038, 1
         )
 
+
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        timestamp = self._car._vehicle_data.get("vehicle_state", {}).get(
-            TPMS_SENSOR_ATTR.get(self._tpms_sensor)
-        )
+        timestamp = self._car._vehicle_data.get("vehicle_state", {}).get(TPMS_SENSOR_ATTR.get(self._tpms_sensor))
 
         return {
             "tpms_last_seen_pressure_timestamp": timestamp,
