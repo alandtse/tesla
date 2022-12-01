@@ -536,7 +536,7 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self.type = tpms_sensor
         self._attr_device_class = SensorDeviceClass.PRESSURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PRESSURE_BAR
+        self._attr_native_unit_of_measurement = PRESSURE_PSI
         self._attr_icon = "mdi:gauge-full"
 
     @property
