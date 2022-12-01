@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.5.0 (2022-12-01)
+### Feature
+* Add remote start button ([#385](https://github.com/alandtse/tesla/issues/385)) ([`42b7117`](https://github.com/alandtse/tesla/commit/42b7117fe16209ccf23070b22b58e576cd2709a8))
+
 ## v3.4.0 (2022-11-30)
 ### Feature
 * Add tpms pressure sensors ([#376](https://github.com/alandtse/tesla/issues/376)) ([`b2cbe95`](https://github.com/alandtse/tesla/commit/b2cbe9575ab6e2c4a780ec15f9ebc57f45235fa5))
