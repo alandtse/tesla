@@ -391,10 +391,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
     assert state_fl.state == str(
-        PressureConverter.convert(
-            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"], 2),
-            UnitOfPressure.BAR,
-            UnitOfPressure.PSI,
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"], 2
+                ),
+                UnitOfPressure.BAR,
+                UnitOfPressure.PSI,
+            ),
+            1,
         ),
     )
 
@@ -411,10 +416,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     state_fr = hass.states.get("sensor.my_model_s_tpms_front_right")
     assert state_fr.state == str(
-        PressureConverter.convert(
-            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fr"], 2),
-            UnitOfPressure.BAR,
-            UnitOfPressure.PSI,
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fr"], 2
+                ),
+                UnitOfPressure.BAR,
+                UnitOfPressure.PSI,
+            ),
+            1,
         ),
     )
 
@@ -431,10 +441,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     state_rl = hass.states.get("sensor.my_model_s_tpms_rear_left")
     assert state_rl.state == str(
-        PressureConverter.convert(
-            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rl"], 2),
-            UnitOfPressure.BAR,
-            UnitOfPressure.PSI,
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rl"], 2
+                ),
+                UnitOfPressure.BAR,
+                UnitOfPressure.PSI,
+            ),
+            1,
         ),
     )
 
@@ -451,10 +466,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
 
     state_rr = hass.states.get("sensor.my_model_s_tpms_rear_right")
     assert state_rr.state == str(
-        PressureConverter.convert(
-            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rr"], 2),
-            UnitOfPressure.BAR,
-            UnitOfPressure.PSI,
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rr"], 2
+                ),
+                UnitOfPressure.BAR,
+                UnitOfPressure.PSI,
+            ),
+            1,
         ),
     )
 
