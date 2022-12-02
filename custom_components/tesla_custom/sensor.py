@@ -534,23 +534,14 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self.type = tpms_sensor
         self._attr_device_class = SensorDeviceClass.PRESSURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = UnitOfPressure.PSI
+        self._attr_native_unit_of_measurement = UnitOfPressure.BAR
+        self._attr_suggested_unit_of_measurement = UnitOfPressure.PSI
         self._attr_icon = "mdi:gauge-full"
 
     @property
     def native_value(self) -> float:
         """Return TPMS Pressure."""
-        value = getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor))
-
-        try:
-            return round(
-                PressureConverter.convert(
-                    value, UnitOfPressure.BAR, UnitOfPressure.PSI
-                ),
-                1,
-            )
-        except:
-            return None
+        return round(getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor)), 2)
 
     @property
     def extra_state_attributes(self):
