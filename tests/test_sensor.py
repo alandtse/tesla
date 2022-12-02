@@ -390,6 +390,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
+    prec = len(state_fl.state) - value_s.index(".") - 1 if "." in state_fl.state else 0
     assert state_fl.state == str(
         round(
             PressureConverter.convert(
@@ -399,7 +400,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            1,
+            prec,
         ),
     )
 
@@ -415,6 +416,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     )
 
     state_fr = hass.states.get("sensor.my_model_s_tpms_front_right")
+    prec = len(state_fr.state) - value_s.index(".") - 1 if "." in state_fr.state else 0
     assert state_fr.state == str(
         round(
             PressureConverter.convert(
@@ -424,7 +426,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            1,
+            prec,
         ),
     )
 
@@ -440,6 +442,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     )
 
     state_rl = hass.states.get("sensor.my_model_s_tpms_rear_left")
+    prec = len(state_rl.state) - value_s.index(".") - 1 if "." in state_rl.state else 0
     assert state_rl.state == str(
         round(
             PressureConverter.convert(
@@ -449,7 +452,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            1,
+            prec,
         ),
     )
 
@@ -465,6 +468,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     )
 
     state_rr = hass.states.get("sensor.my_model_s_tpms_rear_right")
+    prec = len(state_rr.state) - value_s.index(".") - 1 if "." in state_rr.state else 0
     assert state_rr.state == str(
         round(
             PressureConverter.convert(
@@ -474,7 +478,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            1,
+            prec,
         ),
     )
 
