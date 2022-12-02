@@ -19,11 +19,11 @@ from homeassistant.const import (
     SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
     TIME_HOURS,
-    PRESSURE_PSI,
+    UnitOfPressure,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from homeassistant.util.unit_conversion import DistanceConverter
+from homeassistant.util.unit_conversion import DistanceConverter, PressureConverter
 from homeassistant.util import dt
 
 from . import TeslaDataUpdateCoordinator
@@ -49,8 +49,6 @@ TPMS_SENSOR_ATTR = {
     "TPMS rear left": "tpms_last_seen_pressure_time_rl",
     "TPMS rear right": "tpms_last_seen_pressure_time_rr",
 }
-
-BAR_TO_PSI = 14.5038
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
@@ -536,15 +534,23 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self.type = tpms_sensor
         self._attr_device_class = SensorDeviceClass.PRESSURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PRESSURE_PSI
+        self._attr_native_unit_of_measurement = UnitOfPressure.PSI
         self._attr_icon = "mdi:gauge-full"
 
     @property
     def native_value(self) -> float:
         """Return TPMS Pressure."""
-        return round(
-            getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor)) * BAR_TO_PSI, 1
-        )
+        value = getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor))
+
+        try:
+            return round(
+                PressureConverter.convert(
+                    value, UnitOfPressure.BAR, UnitOfPressure.PSI
+                ),
+                1,
+            )
+        except:
+            return None
 
     @property
     def extra_state_attributes(self):
