@@ -399,7 +399,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            2,
+            1,
         ),
     )
 
@@ -424,7 +424,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            2,
+            1,
         ),
     )
 
@@ -449,7 +449,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            2,
+            1,
         ),
     )
 
@@ -474,7 +474,7 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
                 UnitOfPressure.BAR,
                 UnitOfPressure.PSI,
             ),
-            2,
+            1,
         ),
     )
 
