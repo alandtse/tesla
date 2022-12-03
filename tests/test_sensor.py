@@ -508,3 +508,24 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
             "tpms_last_seen_pressure_time_rr"
         ]
     )
+
+
+async def test_tpms_pressure_none(hass: HomeAssistant) -> None:
+    """Tests tpms sensor data not available."""
+
+    # Because all 4 corners share the same logic, it's enough to just test 1
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"] = None
+    car_mock_data.VEHICLE_DATA["vehicle_state"][
+        "tpms_last_seen_pressure_time_fl"
+    ] = None
+
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
+    assert state_fl.state == STATE_UNKNOWN
+
+    assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
+
+    assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") == None
