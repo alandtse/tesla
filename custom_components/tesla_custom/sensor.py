@@ -541,7 +541,10 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return TPMS Pressure."""
-        return round(getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor)), 2)
+        value = getattr(self._car, TPMS_SENSORS.get(self._tpms_sensor))
+        if value is not None:
+            value = round(value, 2)
+        return value
 
     @property
     def extra_state_attributes(self):
