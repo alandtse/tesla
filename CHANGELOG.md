@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.5.2 (2022-12-03)
+### Fix
+* Don't round when tpms is unavailable ([#398](https://github.com/alandtse/tesla/issues/398)) ([`f5a3b0d`](https://github.com/alandtse/tesla/commit/f5a3b0d23071893d913895659efe3a4ced00bf79))
+
 ## v3.5.1 (2022-12-03)
 ### Fix
 * Set default pressure to PSI ([#391](https://github.com/alandtse/tesla/issues/391)) ([`e4adef7`](https://github.com/alandtse/tesla/commit/e4adef75dbfef9e03b5f8b73b0621181acf3fab1))
