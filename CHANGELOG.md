@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.5.1 (2022-12-03)
+### Fix
+* Set default pressure to PSI ([#391](https://github.com/alandtse/tesla/issues/391)) ([`e4adef7`](https://github.com/alandtse/tesla/commit/e4adef75dbfef9e03b5f8b73b0621181acf3fab1))
+
 ## v3.5.0 (2022-12-01)
 ### Feature
 * Add remote start button ([#385](https://github.com/alandtse/tesla/issues/385)) ([`42b7117`](https://github.com/alandtse/tesla/commit/42b7117fe16209ccf23070b22b58e576cd2709a8))
