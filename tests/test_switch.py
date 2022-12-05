@@ -27,6 +27,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_sentry_mode"
 
+    entry = entity_registry.async_get("switch.my_model_s_valet_mode")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_valet_mode"
+
 
 async def test_enabled_by_default(hass: HomeAssistant) -> None:
     """Tests devices are registered in the entity registry."""
@@ -43,6 +46,9 @@ async def test_enabled_by_default(hass: HomeAssistant) -> None:
     assert not entry.disabled
 
     entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("switch.my_model_s_valet_mode")
     assert not entry.disabled
 
 
@@ -150,3 +156,45 @@ async def test_sentry_mode(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_set_sentry_mode.assert_awaited_with(False)
+
+
+async def test_valet_mode(hass: HomeAssistant) -> None:
+    """Tests car valet mode switch."""
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["sentry_mode_available"] = True
+    await setup_platform(hass, SWITCH_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.valet_mode") as mock_valet_mode:
+        # Test switch on
+        assert await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_ON,
+            {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
+            blocking=True,
+        )
+        mock_valet_mode.assert_awaited_once_with(True)
+        # Test switch off
+        assert await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_OFF,
+            {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
+            blocking=True,
+        )
+        mock_valet_mode.assert_awaited_with(False)
+
+    with patch("teslajsonpy.car.TeslaCar.valet_mode") as mock_pin_required:
+        # Test pin required
+        car_mock_data.VEHICLE_DATA["vehicle_state"]["valet_pin_needed"] = True
+        assert await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_ON,
+            {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
+            blocking=True,
+        )
+        mock_pin_required.assert_not_awaited()
+        assert await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_OFF,
+            {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
+            blocking=True,
+        )
+        mock_pin_required.assert_not_awaited()
