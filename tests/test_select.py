@@ -84,7 +84,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Auto"},
             blocking=True,
         )
-        mock_remote_auto_seat_climate_request.assert_awaited_with(0, True)
+        mock_remote_auto_seat_climate_request.assert_awaited_once_with(0, True)
         # Test from "Auto" selection
         car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
         assert await hass.services.async_call(
@@ -103,7 +103,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Low"},
             blocking=True,
         )
-        mock_set_hvac_mode.assert_awaited_with("on")
+        mock_set_hvac_mode.assert_awaited_once_with("on")
 
 
 async def test_cabin_overheat_protection(hass: HomeAssistant) -> None:
