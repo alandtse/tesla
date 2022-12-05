@@ -121,6 +121,11 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 SEAT_ID_MAP[self._seat_name], True
             )
         else:
+            if self.current_option == FRONT_HEATER_OPTIONS[4]:
+                await self._car.remote_auto_seat_climate_request(
+                    SEAT_ID_MAP[self._seat_name], False
+                )
+
             level: int = HEATER_OPTIONS.index(option)
 
             _LOGGER.debug("Setting %s to %s", self.name, level)
