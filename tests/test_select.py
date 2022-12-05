@@ -86,6 +86,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         )
         mock_remote_auto_seat_climate_request.assert_awaited_with(0, True)
         # Test from "Auto" selection
+        car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
         assert await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
