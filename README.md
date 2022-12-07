@@ -50,7 +50,7 @@ This integration provides the following entities for vehicles:
 - Device tracker - car location<sup>1</sup>.
 - Locks - door lock, and charge port latch lock.
 **Note:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
-- Selects - seat heaters and cabin overheat protection<sup>2</sup>.
+- Selects - seat heaters and cabin overheat protection<sup>2</sup>. **Note:** Turning on a heated seat will cause the climate to turn on.
 - Sensors - battery level, charge rate, energy added, inside/outside temperature, odometer and estimated range.
 - Switches - heated steering wheel, charger, sentry mode and polling<sup>1</sup>.
 - Update - software update<sup>2</sup>
