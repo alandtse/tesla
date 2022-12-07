@@ -575,19 +575,33 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-sand"
-        self._value: Optional[datetime] = None
+        self._datetime_value: Optional[datetime] = None
+        self._last_known_value: Optional[int] = None
+        self._last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
         """Return route arrival time."""
         if self._car.active_route_minutes_to_arrival is None:
-            return self._value
+            return self._datetime_value
         else:
             min_duration = round(float(self._car.active_route_minutes_to_arrival), 2)
-        new_value = dt.utcnow() + timedelta(minutes=min_duration)
-        if self._value is None or (new_value - self._value).total_seconds() >= 60:
-            self._value = new_value
-        return self._value
+
+        if self._last_known_value != min_duration:
+            self._last_known_value = min_duration
+            self._last_update_time = dt.utcnow()
+
+        new_value = (
+            dt.utcnow()
+            + timedelta(minutes=min_duration)
+            - (dt.utcnow() - self._last_update_time)
+        )
+        if (
+            self._datetime_value is None
+            or (new_value - self._datetime_value).total_seconds() >= 60
+        ):
+            self._datetime_value = new_value
+        return self._datetime_value
 
     @property
     def extra_state_attributes(self):
