@@ -1,11 +1,11 @@
 {
-  "domain": "tesla_custom",
-  "name": "Tesla Custom Integration",
+  "domain": "tesla_custom_craig",
+  "name": "Tesla Custom Integration Craig",
   "config_flow": true,
   "documentation": "https://github.com/alandtse/tesla/wiki",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "requirements": [
-    "teslajsonpy==3.3.0"
+    "teslajsonpy==3.4.0"
   ],
   "codeowners": [
     "@alandtse"
@@ -28,5 +28,5 @@
     }
   ],
   "iot_class": "cloud_polling",
-  "version": "3.5.2"
+  "version": "3.5.2.1"
 }
