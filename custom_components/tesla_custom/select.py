@@ -38,6 +38,14 @@ HEATER_OPTIONS = [
     "High",
 ]
 
+FRONT_HEATER_OPTIONS = [
+    "Off",
+    "Low",
+    "Medium",
+    "High",
+    "Auto",
+]
+
 OPERATION_MODE = [
     "Self-Powered",
     "Time-Based Control",
@@ -100,31 +108,60 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
         self._attr_icon = "mdi:car-seat-heater"
+        if SEAT_ID_MAP[self._seat_name] < 2:
+            self._is_auto_available = True
+        else:
+            self._is_auto_available = False
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
-        level: int = HEATER_OPTIONS.index(option)
+        if self._is_auto_available and option == FRONT_HEATER_OPTIONS[4]:
+            _LOGGER.debug("Setting %s to %s", SEAT_ID_MAP[self._seat_name], option)
+            await self._car.remote_auto_seat_climate_request(
+                SEAT_ID_MAP[self._seat_name], True
+            )
+        else:
+            if self.current_option == FRONT_HEATER_OPTIONS[4]:
+                await self._car.remote_auto_seat_climate_request(
+                    SEAT_ID_MAP[self._seat_name], False
+                )
 
-        if not self._car.is_climate_on and level > 0:
-            await self._car.set_hvac_mode("on")
+            level: int = HEATER_OPTIONS.index(option)
 
-        _LOGGER.debug("Setting %s to %s", self.name, level)
-        await self._car.remote_seat_heater_request(level, SEAT_ID_MAP[self._seat_name])
+            if not self._car.is_climate_on and level > 0:
+                await self._car.set_hvac_mode("on")
+
+            _LOGGER.debug("Setting %s to %s", self.name, level)
+            await self._car.remote_seat_heater_request(
+                level, SEAT_ID_MAP[self._seat_name]
+            )
 
         await self.update_controller(force=True)
 
     @property
     def current_option(self):
         """Return current heated seat setting."""
-        current_value = self._car.get_seat_heater_status(SEAT_ID_MAP[self._seat_name])
+        if self._is_auto_available and getattr(
+            self._car, "is_auto_seat_climate_" + self._seat_name
+        ):
+            current_value = 4
+        else:
+            current_value = self._car.get_seat_heater_status(
+                SEAT_ID_MAP[self._seat_name]
+            )
 
         if current_value is None:
             return HEATER_OPTIONS[0]
+
+        if self._is_auto_available:
+            return FRONT_HEATER_OPTIONS[current_value]
         return HEATER_OPTIONS[current_value]
 
     @property
     def options(self):
         """Return heated seat options."""
+        if self._is_auto_available:
+            return FRONT_HEATER_OPTIONS
         return HEATER_OPTIONS
 
 
