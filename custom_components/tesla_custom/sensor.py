@@ -164,9 +164,9 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return the charge energy added."""
-        if self._car.charging_state == "Charging":
-            return self._car.charge_energy_added
-        return "0"
+        # The car will reset this to 0 automatically when charger
+        # goes from disconnected to connected
+        return self._car.charge_energy_added
 
     @property
     def extra_state_attributes(self):
