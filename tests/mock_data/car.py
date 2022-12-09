@@ -246,7 +246,7 @@ VEHICLE_DATA = {
         "tpms_soft_warning_rl": False,
         "tpms_soft_warning_rr": False,
         "valet_mode": False,
-        "valet_pin_needed": True,
+        "valet_pin_needed": False,
         "vehicle_name": "My Model S",
         "sentry_mode": True,
         "sentry_mode_available": True,

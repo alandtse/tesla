@@ -164,8 +164,8 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
         """Initialize window cover entity."""
         super().__init__(hass, car, coordinator)
         self.type = "windows"
-        self._attr_device_class = CoverDeviceClass.WINDOW
-        self._attr_icon = "mdi:window-closed"
+        self._attr_device_class = CoverDeviceClass.AWNING
+        self._attr_icon = "mdi:car-door"
         self._attr_supported_features = (
             CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
         )
