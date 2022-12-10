@@ -122,7 +122,7 @@ VEHICLE_DATA = {
         "active_route_energy_at_arrival": 40,
         "active_route_latitude": 34.111111,
         "active_route_longitude": -88.11111,
-        "active_route_miles_to_arrival": 19.80,
+        "active_route_miles_to_arrival": 19.83,
         "active_route_minutes_to_arrival": 34.13,
         "active_route_traffic_minutes_delay": 0.0,
         "gps_as_of": 1661641173,
