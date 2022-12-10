@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v3.6.0 (2022-12-09)
+### Feature
+* Add Auto seat heater option ([#404](https://github.com/alandtse/tesla/issues/404)) ([`7e02a42`](https://github.com/alandtse/tesla/commit/7e02a423cf59c8d70c58cc623da59389044da8b4))
+* Add valet mode switch ([#405](https://github.com/alandtse/tesla/issues/405)) ([`01116d1`](https://github.com/alandtse/tesla/commit/01116d1ff5b5ea66bba6d73ad4089a2c38f03ffe))
+
+### Fix
+* Always show charge energy for current and last session ([#414](https://github.com/alandtse/tesla/issues/414)) ([`be6c1f0`](https://github.com/alandtse/tesla/commit/be6c1f09e51cb4954a67573bed04ea4151a488b0))
+* Fix arrows for window cover ([#407](https://github.com/alandtse/tesla/issues/407)) ([`108567c`](https://github.com/alandtse/tesla/commit/108567cb1b53824665ebf2ae890efd1c4f0812e5))
+* Turn climate on when turning seat heater on ([#406](https://github.com/alandtse/tesla/issues/406)) ([`78e90e4`](https://github.com/alandtse/tesla/commit/78e90e47f12a6f7288fe2d3b55e56984c2560628))
+
 ## v3.5.2 (2022-12-03)
 ### Fix
 * Don't round when tpms is unavailable ([#398](https://github.com/alandtse/tesla/issues/398)) ([`f5a3b0d`](https://github.com/alandtse/tesla/commit/f5a3b0d23071893d913895659efe3a4ced00bf79))
