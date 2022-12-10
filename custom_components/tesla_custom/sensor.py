@@ -606,11 +606,14 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        if self._car.active_route_traffic_minutes_delay is None:
+            minutes = None
+        else:
+            minutes = round(self._car.active_route_traffic_minutes_delay, 1)
+
         return {
             "Energy at arrival": self._car.active_route_energy_at_arrival,
-            "Minutes traffic delay": round(
-                self._car.active_route_traffic_minutes_delay, 1
-            ),
+            "Minutes traffic delay": minutes,
             "Destination": self._car.active_route_destination,
         }
 
@@ -635,4 +638,6 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return the distance to arrival."""
+        if self._car.active_route_miles_to_arrival is None:
+            return None
         return round(self._car.active_route_miles_to_arrival, 2)
