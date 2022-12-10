@@ -16,10 +16,11 @@ from homeassistant.const import (
     PERCENTAGE,
     POWER_WATT,
     POWER_KILO_WATT,
+    PRESSURE_BAR,
+    PRESSURE_PSI,
     SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
     TIME_HOURS,
-    UnitOfPressure,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
@@ -534,8 +535,8 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         self.type = tpms_sensor
         self._attr_device_class = SensorDeviceClass.PRESSURE
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = UnitOfPressure.BAR
-        self._attr_suggested_unit_of_measurement = UnitOfPressure.PSI
+        self._attr_native_unit_of_measurement = PRESSURE_BAR
+        self._attr_suggested_unit_of_measurement = PRESSURE_PSI
         self._attr_icon = "mdi:gauge-full"
 
     @property
