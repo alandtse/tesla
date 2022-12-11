@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.6.1 (2022-12-11)
+### Fix
+* Use old pressure consts for ha < 2022.11 ([#418](https://github.com/alandtse/tesla/issues/418)) ([`ad9c41c`](https://github.com/alandtse/tesla/commit/ad9c41c71ea93db9294ff4203b61f1e6f6a4b697))
+
 ## v3.6.0 (2022-12-09)
 ### Feature
 * Add Auto seat heater option ([#404](https://github.com/alandtse/tesla/issues/404)) ([`7e02a42`](https://github.com/alandtse/tesla/commit/7e02a423cf59c8d70c58cc623da59389044da8b4))
