@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.7.0 (2022-12-11)
+### Feature
+* Add destination location entities ([#423](https://github.com/alandtse/tesla/issues/423)) ([`a4ec318`](https://github.com/alandtse/tesla/commit/a4ec318eb44838c6a6ad0164369e98aa563aff32))
+
 ## v3.6.1 (2022-12-11)
 ### Fix
 * Use old pressure consts for ha < 2022.11 ([#418](https://github.com/alandtse/tesla/issues/418)) ([`ad9c41c`](https://github.com/alandtse/tesla/commit/ad9c41c71ea93db9294ff4203b61f1e6f6a4b697))
