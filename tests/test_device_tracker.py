@@ -33,3 +33,9 @@
 #         state.attributes.get("speed")
 #         == car_mock_data.VEHICLE_DATA["drive_state"]["speed"]
 #     )
+
+# async def test_car_destination_location(hass: HomeAssistant) -> None:
+#     """Tests car destination location is getting the correct value."""
+#     await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
+
+#     state = hass.states.get("device_tracker.my_model_s_destination_location_tracker")
