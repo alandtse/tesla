@@ -22,6 +22,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for car in cars.values():
         entities.append(TeslaCarLocation(hass, car, coordinator))
+        entities.append(TeslaCarDestinationLocation(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -61,6 +62,40 @@ class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
             "heading": self._car.heading,
             "speed": self._car.speed,
         }
+
+    @property
+    def force_update(self):
+        """Disable forced updated since we are polling via the coordinator updates."""
+        return False
+
+
+class TeslaCarDestinationLocation(TeslaCarEntity, TrackerEntity):
+    """Representation of a Tesla car destination location device tracker."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize car destination location entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "destination location tracker"
+
+    @property
+    def source_type(self):
+        """Return device tracker source type."""
+        return SOURCE_TYPE_GPS
+
+    @property
+    def longitude(self):
+        """Return destination longitude."""
+        return self._car.active_route_longitude
+
+    @property
+    def latitude(self):
+        """Return destination latitude."""
+        return self._car.active_route_latitude
 
     @property
     def force_update(self):
