@@ -521,6 +521,8 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
         self._attr_icon = "mdi:timer-plus"
         self._value: Optional[datetime] = None
+        self._last_known_value: Optional[int] = None
+        self._last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
@@ -529,8 +531,17 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
             charge_hours = 0
         else:
             charge_hours = float(self._car.time_to_full_charge)
+
+        if self._last_known_value != charge_hours:
+            self._last_known_value = charge_hours
+            self._last_update_time = dt.utcnow()
+
         if self._car.charging_state == "Charging" and charge_hours > 0:
-            new_value = dt.utcnow() + timedelta(hours=charge_hours)
+            new_value = (
+                dt.utcnow()
+                + timedelta(hours=charge_hours)
+                - (dt.utcnow() - self._last_update_time)
+            )
             if self._value is None or (new_value - self._value).total_seconds() >= 60:
                 self._value = new_value
         if self._car.charging_state in ["Charging", "Complete"]:
