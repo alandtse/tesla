@@ -1506,7 +1506,7 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "teslajsonpy"
-version = "3.5.1"
+version = "3.4.1"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
@@ -1678,7 +1678,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "9cf41b6e3fabd3807396185cba1f43db696c0bb6cb3c640bcf79783ff927331d"
+content-hash = "8c8d7db623863241944928cd489ba210a169fa21d270293f7d7eea493d295320"
 
 [metadata.files]
 aiohttp = [
@@ -2012,7 +2012,6 @@ coverage = [
 cryptography = [
     {file = "cryptography-38.0.3-cp36-abi3-macosx_10_10_universal2.whl", hash = "sha256:984fe150f350a3c91e84de405fe49e688aa6092b3525f407a18b9646f6612320"},
     {file = "cryptography-38.0.3-cp36-abi3-macosx_10_10_x86_64.whl", hash = "sha256:ed7b00096790213e09eb11c97cc6e2b757f15f3d2f85833cd2d3ec3fe37c1722"},
-    {file = "cryptography-38.0.3-cp36-abi3-macosx_10_12_universal2.whl", hash = "sha256:726e3a1bfee0e919b278c8f766fdcf1fe30f8e6feea590e3f248d3636b58ffb3"},
     {file = "cryptography-38.0.3-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:bbf203f1a814007ce24bd4d51362991d5cb90ba0c177a9c08825f2cc304d871f"},
     {file = "cryptography-38.0.3-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:554bec92ee7d1e9d10ded2f7e92a5d70c1f74ba9524947c0ba0c850c7b011828"},
     {file = "cryptography-38.0.3-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b1b52c9e5f8aa2b802d48bd693190341fae201ea51c7a167d69fc48b60e8a959"},
@@ -2927,8 +2926,8 @@ termcolor = [
     {file = "termcolor-2.1.1.tar.gz", hash = "sha256:67cee2009adc6449c650f6bcf3bdeed00c8ba53a8cda5362733c53e0a39fb70b"},
 ]
 teslajsonpy = [
-    {file = "teslajsonpy-3.5.1-py3-none-any.whl", hash = "sha256:5a08fe43a84f617e8d6c03d794fac14681d9f73b0daae635e9f11fc431977735"},
-    {file = "teslajsonpy-3.5.1.tar.gz", hash = "sha256:4918b10e531d51fc09042b934db70d6d45994155093a177a46d5a5b5edade234"},
+    {file = "teslajsonpy-3.4.1-py3-none-any.whl", hash = "sha256:ef80d16460f347e582e331246311ad8973bbdbdf4bc1002b32c1cfb55da0fa6f"},
+    {file = "teslajsonpy-3.4.1.tar.gz", hash = "sha256:6ff768e522def412a96b2c0cda295b91fbdc309aecad75815bd3e57067b41a75"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},

@@ -82,12 +82,6 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("sensor.battery_home_backup_reserve")
     assert entry.unique_id == "67890_backup_reserve"
 
-    entry = entity_registry.async_get("sensor.my_model_s_arrival_time")
-    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_arrival_time"
-
-    entry = entity_registry.async_get("sensor.my_model_s_distance_to_arrival")
-    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_distance_to_arrival"
-
 
 async def test_battery(hass: HomeAssistant) -> None:
     """Tests battery is getting the correct value."""
@@ -536,72 +530,3 @@ async def test_tpms_pressure_none(hass: HomeAssistant) -> None:
     assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
     assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") == None
-
-
-async def test_arrival_time(hass: HomeAssistant) -> None:
-    """Tests arrival time is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_arrival_time")
-    arrival_time = datetime.utcnow() + timedelta(
-        minutes=round(
-            float(
-                car_mock_data.VEHICLE_DATA["drive_state"][
-                    "active_route_minutes_to_arrival"
-                ]
-            ),
-            2,
-        )
-    )
-    arrival_time_str = datetime.strftime(arrival_time, "%Y-%m-%dT%H:%M:%S+00:00")
-
-    assert state.state == arrival_time_str
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert (
-        state.attributes.get("Energy at arrival")
-        == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_energy_at_arrival"]
-    )
-    assert state.attributes.get("Minutes traffic delay") == round(
-        car_mock_data.VEHICLE_DATA["drive_state"]["active_route_traffic_minutes_delay"],
-        1,
-    )
-    assert (
-        state.attributes.get("Destination")
-        == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_destination"]
-    )
-
-
-async def test_distance_to_arrival(hass: HomeAssistant) -> None:
-    """Tests distance to arrival is getting the correct value."""
-    await setup_platform(hass, SENSOR_DOMAIN)
-
-    state = hass.states.get("sensor.my_model_s_distance_to_arrival")
-
-    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
-        assert state.state == str(
-            round(
-                DistanceConverter.convert(
-                    car_mock_data.VEHICLE_DATA["drive_state"][
-                        "active_route_miles_to_arrival"
-                    ],
-                    LENGTH_MILES,
-                    LENGTH_KILOMETERS,
-                ),
-                2,
-            )
-        )
-    else:
-        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
-        assert state.state == str(
-            round(
-                car_mock_data.VEHICLE_DATA["drive_state"][
-                    "active_route_miles_to_arrival"
-                ],
-                2,
-            )
-        )
-
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
