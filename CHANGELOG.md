@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v3.7.1 (2022-12-18)
+### Fix
+* Fix seat map for auto climate command ([#435](https://github.com/alandtse/tesla/issues/435)) ([`c96e5b0`](https://github.com/alandtse/tesla/commit/c96e5b0ac2794f7569846af5cf78f6f8f6545e3d))
+
+### Documentation
+* Update readme with new features ([`8a518c9`](https://github.com/alandtse/tesla/commit/8a518c93b05f31f2a0c9817d624a4b13dac944fc))
+
 ## v3.7.0 (2022-12-11)
 ### Feature
 * Add destination location entities ([#423](https://github.com/alandtse/tesla/issues/423)) ([`a4ec318`](https://github.com/alandtse/tesla/commit/a4ec318eb44838c6a6ad0164369e98aa563aff32))
