@@ -33,6 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarCharging(hass, car, coordinator))
         entities.append(TeslaCarDoors(hass, car, coordinator))
         entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
+        entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -278,4 +279,39 @@ class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
         """Return device state attributes."""
         return {
             "scheduled_charging_time": self._car.scheduled_charging_start_time_app,
+        }
+
+
+class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car scheduled departure binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize scheduled departure entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "scheduled departure"
+        self._attr_icon = "mdi:calendar-plus"
+        self._attr_device_class = None
+
+    @property
+    def is_on(self):
+        """Return True if scheduled departure enebaled."""
+        if self._car.scheduled_charging_mode == "DepartBy":
+            return True
+        return False
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "departure_timep": self._car.scheduled_departure_time_minutes,
+            "preconditioning_enabled": self._car.is_preconditioning_enabled,
+            "preconditioning_weekdays_only": self._car.is_preconditioning_weekday_only,
+            "off_peak_charging_enabled": self._car.is_off_peak_charging_enabled,
+            "off_peak_charging_weekdays_only": self._car.is_off_peak_charging_weekday_only,
+            "end_off_peak_time": self._car.off_peak_hours_end_time,
         }
