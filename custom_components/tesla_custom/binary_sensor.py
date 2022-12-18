@@ -308,7 +308,7 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         return {
-            "departure_timep": self._car.scheduled_departure_time_minutes,
+            "departure_time": self._car.scheduled_departure_time_minutes,
             "preconditioning_enabled": self._car.is_preconditioning_enabled,
             "preconditioning_weekdays_only": self._car.is_preconditioning_weekday_only,
             "off_peak_charging_enabled": self._car.is_off_peak_charging_enabled,
