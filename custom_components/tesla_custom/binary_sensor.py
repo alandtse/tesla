@@ -278,7 +278,7 @@ class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         return {
-            "scheduled_charging_time": self._car.scheduled_charging_start_time_app,
+            "Scheduled charging time": self._car.scheduled_charging_start_time_app,
         }
 
 
@@ -308,10 +308,10 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         return {
-            "departure_time": self._car.scheduled_departure_time_minutes,
-            "preconditioning_enabled": self._car.is_preconditioning_enabled,
-            "preconditioning_weekdays_only": self._car.is_preconditioning_weekday_only,
-            "off_peak_charging_enabled": self._car.is_off_peak_charging_enabled,
-            "off_peak_charging_weekdays_only": self._car.is_off_peak_charging_weekday_only,
-            "end_off_peak_time": self._car.off_peak_hours_end_time,
+            "Departure time": self._car.scheduled_departure_time_minutes,
+            "Preconditioning enabled": self._car.is_preconditioning_enabled,
+            "Preconditioning weekdays only": self._car.is_preconditioning_weekday_only,
+            "Off peak charging enabled": self._car.is_off_peak_charging_enabled,
+            "Off peak charging weekdays only": self._car.is_off_peak_charging_weekday_only,
+            "End off peak time": self._car.off_peak_hours_end_time,
         }
