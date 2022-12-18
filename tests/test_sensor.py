@@ -1,5 +1,9 @@
 """Tests for the Tesla sensor device."""
 
+from datetime import datetime, timedelta, timezone
+
+from pytest import MonkeyPatch
+
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
@@ -23,6 +27,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util import dt
 from homeassistant.util.unit_conversion import (
     DistanceConverter,
     SpeedConverter,
@@ -33,7 +38,6 @@ from .common import setup_platform
 from .mock_data import car as car_mock_data
 from .mock_data import energysite as energysite_mock_data
 
-from datetime import datetime, timedelta
 
 ATTR_STATE_CLASS = "state_class"
 
@@ -238,12 +242,16 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     )
 
 
-async def test_time_charge_complete_charging(hass: HomeAssistant) -> None:
+async def test_time_charge_complete_charging(
+    hass: HomeAssistant, monkeypatch: MonkeyPatch
+) -> None:
     """Tests time charge complete is the correct value."""
+    mock_now = datetime(2022, 12, 1, 2, 3, 4, 0, timezone.utc)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_now)
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_time_charge_complete")
-    charge_complete = datetime.utcnow() + timedelta(
+    charge_complete = mock_now + timedelta(
         hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
     charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
@@ -535,15 +543,17 @@ async def test_tpms_pressure_none(hass: HomeAssistant) -> None:
     assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
 
-    assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") == None
+    assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") is None
 
 
-async def test_arrival_time(hass: HomeAssistant) -> None:
+async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> None:
     """Tests arrival time is getting the correct value."""
+    mock_now = datetime(2022, 12, 1, 2, 3, 4, 0, timezone.utc)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_now)
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_arrival_time")
-    arrival_time = datetime.utcnow() + timedelta(
+    arrival_time = mock_now + timedelta(
         minutes=round(
             float(
                 car_mock_data.VEHICLE_DATA["drive_state"][
