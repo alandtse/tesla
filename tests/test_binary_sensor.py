@@ -32,6 +32,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("binary_sensor.my_model_s_scheduled_charging")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_scheduled_charging"
 
+    entry = entity_registry.async_get("binary_sensor.my_model_s_scheduled_departure")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_scheduled_departure"
+
     entry = entity_registry.async_get("binary_sensor.battery_home_battery_charging")
     assert entry.unique_id == "67890_battery_charging"
 
@@ -168,5 +171,61 @@ async def test_car_scheduled_charging(hass: HomeAssistant) -> None:
         state.attributes.get("Scheduled charging time")
         == car_mock_data.VEHICLE_DATA["charge_state"][
             "scheduled_charging_start_time_app"
+        ]
+    )
+
+
+async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
+    """Tests scheduled departure is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+
+    state = hass.states.get("binary_sensor.my_model_s_scheduled_departure")
+    assert state.state == STATE_ON
+
+    assert (
+        state.attributes.get("Departure time")
+        == car_mock_data.VEHICLE_DATA["charge_state"][
+            "scheduled_charging_start_time_app"
+        ]
+    )
+
+    assert (
+        state.attributes.get("Preconditioning enabled")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["preconditioning_enabled"]
+    )
+
+    if (
+        car_mock_data.VEHICLE_DATA["charge_state"]["preconditioning_times"]
+        == "weekdays"
+    ):
+        check_precondition_weekdays_only = True
+    else:
+        check_precondition_weekdays_only = False
+    assert (
+        state.attributes.get("Preconditioning weekdays only")
+        == check_precondition_weekdays_only
+    )
+
+    assert (
+        state.attributes.get("Off peak charging enabled")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["off_peak_charging_enabled"]
+    )
+
+    if (
+        car_mock_data.VEHICLE_DATA["charge_state"]["off_peak_charging_times"]
+        == "weekdays"
+    ):
+        check_off_peak_weekdays_only = True
+    else:
+        check_off_peak_weekdays_only = False
+    assert (
+        state.attributes.get("Off peak charging weekdays only")
+        == check_off_peak_weekdays_only
+    )
+
+    assert (
+        state.attributes.get("End off peak time")
+        == car_mock_data.VEHICLE_DATA["charge_state"][
+            "scheduled_departure_time_minutes"
         ]
     )
