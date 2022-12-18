@@ -62,6 +62,11 @@ SEAT_ID_MAP = {
     "third row right": 7,
 }
 
+AUTO_SEAT_ID_MAP = {
+    "left": 1,
+    "right": 2,
+}
+
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
@@ -118,12 +123,12 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
         if self._is_auto_available and option == FRONT_HEATER_OPTIONS[4]:
             _LOGGER.debug("Setting %s to %s", SEAT_ID_MAP[self._seat_name], option)
             await self._car.remote_auto_seat_climate_request(
-                SEAT_ID_MAP[self._seat_name], True
+                AUTO_SEAT_ID_MAP[self._seat_name], True
             )
         else:
             if self.current_option == FRONT_HEATER_OPTIONS[4]:
                 await self._car.remote_auto_seat_climate_request(
-                    SEAT_ID_MAP[self._seat_name], False
+                    AUTO_SEAT_ID_MAP[self._seat_name], False
                 )
 
             level: int = HEATER_OPTIONS.index(option)
