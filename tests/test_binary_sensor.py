@@ -29,6 +29,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("binary_sensor.my_model_s_online")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_online"
 
+    entry = entity_registry.async_get("binary_sensor.my_model_s_scheduled_charging")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_scheduled_charging"
+
     entry = entity_registry.async_get("binary_sensor.battery_home_battery_charging")
     assert entry.unique_id == "67890_battery_charging"
 
@@ -138,6 +141,7 @@ async def test_grid_status(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.POWER
 
+
 async def test_car_doors(hass: HomeAssistant) -> None:
     """Tests car door is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
@@ -145,11 +149,24 @@ async def test_car_doors(hass: HomeAssistant) -> None:
     state = hass.states.get("binary_sensor.my_model_s_doors")
     assert state.state == STATE_ON
 
-    assert (
-        state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.DOOR
-    )
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.DOOR
 
     assert state.attributes.get("Driver Front") == "Open"
     assert state.attributes.get("Driver Rear") == "Closed"
     assert state.attributes.get("Passenger Front") == "Closed"
     assert state.attributes.get("Passenger Rear") == "Closed"
+
+
+async def test_car_scheduled_charging(hass: HomeAssistant) -> None:
+    """Tests scheduled charging is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+
+    state = hass.states.get("binary_sensor.my_model_s_scheduled_charging")
+    assert state.state == STATE_OFF
+
+    assert (
+        state.attributes.get("Scheduled charging time")
+        == car_mock_data.VEHICLE_DATA["charge_state"][
+            "scheduled_charging_start_time_app"
+        ]
+    )
