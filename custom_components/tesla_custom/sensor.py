@@ -501,7 +501,6 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "time charge complete"
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-plus"
         self._value: Optional[datetime] = None
 
@@ -574,7 +573,6 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "arrival time"
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-sand"
         self._datetime_value: Optional[datetime] = None
         self._last_known_value: Optional[int] = None

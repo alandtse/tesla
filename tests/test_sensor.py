@@ -251,7 +251,7 @@ async def test_time_charge_complete_charging(hass: HomeAssistant) -> None:
     assert state.state == charge_complete_str
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_STATE_CLASS) is None
 
 
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
@@ -558,7 +558,7 @@ async def test_arrival_time(hass: HomeAssistant) -> None:
     assert state.state == arrival_time_str
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
-    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state.attributes.get(ATTR_STATE_CLASS) is None
     assert (
         state.attributes.get("Energy at arrival")
         == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_energy_at_arrival"]
