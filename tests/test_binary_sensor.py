@@ -225,7 +225,5 @@ async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
 
     assert (
         state.attributes.get("End off peak time")
-        == car_mock_data.VEHICLE_DATA["charge_state"][
-            "scheduled_departure_time_minutes"
-        ]
+        == car_mock_data.VEHICLE_DATA["charge_state"]["off_peak_hours_end_time"]
     )
