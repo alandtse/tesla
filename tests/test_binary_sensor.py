@@ -185,7 +185,7 @@ async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
     assert (
         state.attributes.get("Departure time")
         == car_mock_data.VEHICLE_DATA["charge_state"][
-            "scheduled_charging_start_time_app"
+            "scheduled_departure_time_minutes"
         ]
     )
 
