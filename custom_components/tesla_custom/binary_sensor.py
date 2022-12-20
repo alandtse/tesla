@@ -337,12 +337,3 @@ class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
     def is_on(self):
         """Return True if user present enebaled."""
         return self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
-
-    @property
-    def extra_state_attributes(self):
-        """Return device state attributes."""
-        user_id = self._car._vehicle_data.get("vehicle_state", {}).get("user_id")
-
-        return {
-            "user_id": user_id,
-        }
