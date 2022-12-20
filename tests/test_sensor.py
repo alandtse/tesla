@@ -387,6 +387,18 @@ async def test_range_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
+    assert (
+        state.attributes.get("est_battery_range_miles")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+    )
+    est_range_km = DistanceConverter.convert(
+        car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
+        LENGTH_MILES,
+        LENGTH_KILOMETERS,
+    )
+
+    assert state.attributes.get("est_battery_range_km") == est_range_km
+
 
 async def test_solar_power_value(hass: HomeAssistant) -> None:
     """Tests solar_power is getting the correct value."""
