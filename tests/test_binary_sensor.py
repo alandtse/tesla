@@ -41,6 +41,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("binary_sensor.battery_home_grid_status")
     assert entry.unique_id == "67890_grid_status"
 
+    entry = entity_registry.async_get("binary_sensor.my_model_s_user_present")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_user_rpesent"
+
 
 async def test_parking_brake(hass: HomeAssistant) -> None:
     """Tests car parking brake is getting the correct value."""
@@ -227,3 +230,11 @@ async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
         state.attributes.get("End off peak time")
         == car_mock_data.VEHICLE_DATA["charge_state"]["off_peak_hours_end_time"]
     )
+
+
+async def test_car_user_present(hass: HomeAssistant) -> None:
+    """Tests user present is getting the correct value."""
+    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
+
+    state = hass.states.get("binary_sensor.my_model_s_user_present")
+    assert state.state == STATE_OFF
