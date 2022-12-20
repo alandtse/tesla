@@ -240,13 +240,3 @@ async def test_car_user_present(hass: HomeAssistant) -> None:
     assert state.state == STATE_OFF
 
     assert state.attributes.get("user_id") == str(car_mock_data.VEHICLE_DATA["user_id"])
-
-
-async def test_car_user_present_temp(hass: HomeAssistant) -> None:
-    """Tests user present is getting the correct value."""
-    await setup_platform(hass, BINARY_SENSOR_DOMAIN)
-
-    state = hass.states.get("binary_sensor.my_model_s_user_present")
-    assert state.state == STATE_OFF
-
-    assert state.attributes.get("User Id") == str(car_mock_data.VEHICLE_DATA["user_id"])
