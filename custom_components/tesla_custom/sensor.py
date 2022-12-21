@@ -1,4 +1,8 @@
 """Support for the Tesla sensors."""
+
+from datetime import datetime, timedelta
+from typing import Optional
+
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite, PowerwallSite
@@ -20,19 +24,15 @@ from homeassistant.const import (
     PRESSURE_PSI,
     SPEED_MILES_PER_HOUR,
     TEMP_CELSIUS,
-    TIME_HOURS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from homeassistant.util.unit_conversion import DistanceConverter, PressureConverter
+from homeassistant.util.unit_conversion import DistanceConverter
 from homeassistant.util import dt
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DISTANCE_UNITS_KM_HR, DOMAIN
-
-from datetime import datetime, timedelta
-from typing import Optional
 
 SOLAR_SITE_SENSORS = ["solar power", "grid power", "load power"]
 BATTERY_SITE_SENSORS = SOLAR_SITE_SENSORS + ["battery power"]
@@ -319,6 +319,21 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
 
         return round(range_value, 2)
 
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        est_battery_range = self._car._vehicle_data.get("charge_state", {}).get(
+            "est_battery_range"
+        )
+        est_battery_range_km = DistanceConverter.convert(
+            est_battery_range, LENGTH_MILES, LENGTH_KILOMETERS
+        )
+
+        return {
+            "est_battery_range_miles": est_battery_range,
+            "est_battery_range_km": est_battery_range_km,
+        }
+
 
 class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car temp sensor."""
@@ -501,7 +516,6 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "time charge complete"
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-plus"
         self._value: Optional[datetime] = None
 
@@ -574,7 +588,6 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self.type = "arrival time"
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_icon = "mdi:timer-sand"
         self._datetime_value: Optional[datetime] = None
         self._last_known_value: Optional[int] = None
@@ -588,14 +601,13 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         else:
             min_duration = round(float(self._car.active_route_minutes_to_arrival), 2)
 
+        utcnow = dt.utcnow()
         if self._last_known_value != min_duration:
             self._last_known_value = min_duration
-            self._last_update_time = dt.utcnow()
+            self._last_update_time = utcnow
 
         new_value = (
-            dt.utcnow()
-            + timedelta(minutes=min_duration)
-            - (dt.utcnow() - self._last_update_time)
+            utcnow + timedelta(minutes=min_duration) - (utcnow - self._last_update_time)
         )
         if (
             self._datetime_value is None

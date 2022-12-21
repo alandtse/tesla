@@ -76,7 +76,7 @@ VEHICLE_DATA = {
         "scheduled_charging_mode": "DepartBy",
         "scheduled_charging_pending": False,
         "scheduled_charging_start_time": None,
-        "scheduled_charging_start_time_app": 0,
+        "scheduled_charging_start_time_app": 480,
         "scheduled_departure_time": 1661515200,
         "scheduled_departure_time_minutes": 300,
         "supercharger_session_trip_planner": False,
