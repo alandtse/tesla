@@ -405,7 +405,7 @@ async def test_range_value(hass: HomeAssistant) -> None:
 
 async def test_range_attributes_not_available(hass: HomeAssistant) -> None:
     """Tests range attributes handle None correctly."""
-    del car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+    car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"] = None
 
     await setup_platform(hass, SENSOR_DOMAIN)
 
