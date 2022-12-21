@@ -34,6 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarDoors(hass, car, coordinator))
         entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
         entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
+        entities.append(TeslaCarUserPresent(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -315,3 +316,31 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
             "Off peak charging weekdays only": self._car.is_off_peak_charging_weekday_only,
             "End off peak time": self._car.off_peak_hours_end_time,
         }
+
+
+class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car user present binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize user present entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "user present"
+        self._attr_icon = "mdi:account-check"
+        self._attr_device_class = None
+
+    @property
+    def is_on(self):
+        """Return True if user present enebaled."""
+        return self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        user_id = str(self._car._vehicle_data.get("user_id"))
+
+        return {"user_id": user_id}
