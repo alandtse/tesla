@@ -325,10 +325,13 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
         est_battery_range = self._car._vehicle_data.get("charge_state", {}).get(
             "est_battery_range"
         )
-        est_battery_range_km = DistanceConverter.convert(
-            est_battery_range, LENGTH_MILES, LENGTH_KILOMETERS
-        )
-
+        if est_battery_range in not None:
+            est_battery_range_km = DistanceConverter.convert(
+                est_battery_range, LENGTH_MILES, LENGTH_KILOMETERS
+            )
+        else:
+            est_battery_range_km = None
+            
         return {
             "est_battery_range_miles": est_battery_range,
             "est_battery_range_km": est_battery_range_km,
