@@ -35,6 +35,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("button.my_model_s_remote_start")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_remote_start"
 
+    entry = entity_registry.async_get("button.my_model_s_emissions_test")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_emissions_test"
+
 
 async def test_enabled_by_default(hass: HomeAssistant) -> None:
     """Tests devices are enabled by default."""
@@ -158,3 +161,17 @@ async def test_remote_start_press(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_remote_start.assert_awaited_once()
+
+
+async def test_emissions_test_press(hass: HomeAssistant) -> None:
+    """Tests car emissions test button press."""
+    await setup_platform(hass, BUTTON_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.remote_boombox") as mock_remote_boombox:
+        assert await hass.services.async_call(
+            BUTTON_DOMAIN,
+            "press",
+            {ATTR_ENTITY_ID: "button.my_model_s_emissions test"},
+            blocking=True,
+        )
+        mock_remote_boombox.assert_awaited_once()
