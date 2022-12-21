@@ -171,7 +171,7 @@ async def test_emissions_test_press(hass: HomeAssistant) -> None:
         assert await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
-            {ATTR_ENTITY_ID: "button.my_model_s_emissions test"},
+            {ATTR_ENTITY_ID: "button.my_model_s_emissions_test"},
             blocking=True,
         )
         mock_remote_boombox.assert_awaited_once()
