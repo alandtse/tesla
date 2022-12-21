@@ -183,7 +183,7 @@ class TeslaCarEmissionsTest(TeslaCarEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.remote_boombox()
+        await self._car.remote_boombox()
 
     @property
     def available(self) -> bool:
