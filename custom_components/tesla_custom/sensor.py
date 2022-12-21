@@ -319,6 +319,21 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
 
         return round(range_value, 2)
 
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        est_battery_range = self._car._vehicle_data.get("charge_state", {}).get(
+            "est_battery_range"
+        )
+        est_battery_range_km = DistanceConverter.convert(
+            est_battery_range, LENGTH_MILES, LENGTH_KILOMETERS
+        )
+
+        return {
+            "est_battery_range_miles": est_battery_range,
+            "est_battery_range_km": est_battery_range_km,
+        }
+
 
 class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car temp sensor."""
