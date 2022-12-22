@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v3.8.1 (2022-12-21)
+### Fix
+* Handle battery range attributes NoneType ([#453](https://github.com/alandtse/tesla/issues/453)) ([`90f7d0d`](https://github.com/alandtse/tesla/commit/90f7d0ddb9140dae92c446dd7274a7e27abd4f3d))
+
+## v3.8.0 (2022-12-21)
+### Feature
+* Add user present and User ID ([#446](https://github.com/alandtse/tesla/issues/446)) ([`865c637`](https://github.com/alandtse/tesla/commit/865c6377649f1c0bf94f39d98a59e4e5d0891e31))
+* Add estimated battery range attributes ([#443](https://github.com/alandtse/tesla/issues/443)) ([`7584fdc`](https://github.com/alandtse/tesla/commit/7584fdcdc64d1c752dc34bdafd08c47ded6526df))
+* Add scheduled departure and charging ([#441](https://github.com/alandtse/tesla/issues/441)) ([`f555131`](https://github.com/alandtse/tesla/commit/f55513162e5cd03633156fa59073759ef7d7052b))
+
+### Fix
+* Remove state class from timestamp sensors ([#440](https://github.com/alandtse/tesla/issues/440)) ([`43f7169`](https://github.com/alandtse/tesla/commit/43f7169b6aa43c5fe08865e75b8172cbe231d5df))
+
 ## v3.7.1 (2022-12-18)
 ### Fix
 * Fix seat map for auto climate command ([#435](https://github.com/alandtse/tesla/issues/435)) ([`c96e5b0`](https://github.com/alandtse/tesla/commit/c96e5b0ac2794f7569846af5cf78f6f8f6545e3d))
