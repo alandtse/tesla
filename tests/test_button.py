@@ -32,6 +32,45 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("button.my_model_s_homelink")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_homelink"
 
+    entry = entity_registry.async_get("button.my_model_s_remote_start")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_remote_start"
+
+
+async def test_enabled_by_default(hass: HomeAssistant) -> None:
+    """Tests devices are enabled by default."""
+    await setup_platform(hass, BUTTON_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("button.my_model_s_horn")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("button.my_model_s_flash_lights")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("button.my_model_s_wake_up")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("button.my_model_s_force_data_update")
+    assert not entry.disabled
+
+    # Default mock data has homelink enabled
+    entry = entity_registry.async_get("button.my_model_s_homelink")
+    assert not entry.disabled
+
+    entry = entity_registry.async_get("button.my_model_s_remote_start")
+    assert not entry.disabled
+
+
+async def test_disabled_by_default(hass: HomeAssistant) -> None:
+    """Tests devices are disabled by default when appropriate."""
+    # No garages paired, it should be disabled by default.
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["homelink_device_count"] = 0
+    await setup_platform(hass, BUTTON_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("button.my_model_s_homelink")
+    assert entry.disabled
+
 
 async def test_horn_press(hass: HomeAssistant) -> None:
     """Tests car horn button press."""
@@ -91,15 +130,31 @@ async def test_force_data_update_press(hass: HomeAssistant) -> None:
         mock_force_data_update.assert_awaited_once_with(wake_if_asleep=True, force=True)
 
 
-# async def test_trigger_homelink_press(hass: HomeAssistant) -> None:
-#     """Tests car trigger homelink button press."""
-#     await setup_platform(hass, BUTTON_DOMAIN)
-#     # Need a way to enable this device before running tests (disabled by default)
-#     with patch("teslajsonpy.car.TeslaCar.trigger_homelink") as mock_trigger_homelink:
-#         assert await hass.services.async_call(
-#             BUTTON_DOMAIN,
-#             "press",
-#             {ATTR_ENTITY_ID: "button.my_model_s_trigger_homelink"},
-#             blocking=True,
-#         )
-#         mock_trigger_homelink.assert_awaited_once()
+async def test_trigger_homelink_press(hass: HomeAssistant) -> None:
+    """Tests car trigger homelink button press."""
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["homelink_device_count"] = 1
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["homelink_nearby"] = True
+    await setup_platform(hass, BUTTON_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.trigger_homelink") as mock_trigger_homelink:
+        assert await hass.services.async_call(
+            BUTTON_DOMAIN,
+            "press",
+            {ATTR_ENTITY_ID: "button.my_model_s_homelink"},
+            blocking=True,
+        )
+        mock_trigger_homelink.assert_awaited_once()
+
+
+async def test_remote_start_press(hass: HomeAssistant) -> None:
+    """Tests car remote start button press."""
+    await setup_platform(hass, BUTTON_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.remote_start") as mock_remote_start:
+        assert await hass.services.async_call(
+            BUTTON_DOMAIN,
+            "press",
+            {ATTR_ENTITY_ID: "button.my_model_s_remote_start"},
+            blocking=True,
+        )
+        mock_remote_start.assert_awaited_once()

@@ -1,5 +1,9 @@
 """Tests for the Tesla sensor device."""
 
+from datetime import datetime, timedelta, timezone
+
+from pytest import MonkeyPatch
+
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
@@ -10,17 +14,30 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_WATT_HOUR,
+    LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
     POWER_WATT,
+    PRESSURE_BAR,
+    PRESSURE_PSI,
+    SPEED_KILOMETERS_PER_HOUR,
+    SPEED_MILES_PER_HOUR,
+    STATE_UNKNOWN,
     TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util import dt
+from homeassistant.util.unit_conversion import (
+    DistanceConverter,
+    SpeedConverter,
+    PressureConverter,
+)
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data
 from .mock_data import energysite as energysite_mock_data
+
 
 ATTR_STATE_CLASS = "state_class"
 
@@ -68,6 +85,12 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
 
     entry = entity_registry.async_get("sensor.battery_home_backup_reserve")
     assert entry.unique_id == "67890_backup_reserve"
+
+    entry = entity_registry.async_get("sensor.my_model_s_arrival_time")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_arrival_time"
+
+    entry = entity_registry.async_get("sensor.my_model_s_distance_to_arrival")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_distance_to_arrival"
 
 
 async def test_battery(hass: HomeAssistant) -> None:
@@ -132,12 +155,16 @@ async def test_battery_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_battery")
     assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+        car_mock_data.VEHICLE_DATA["charge_state"]["usable_battery_level"]
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
+    assert (
+        state.attributes.get("raw_soc")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["battery_level"]
+    )
 
 
 async def test_charger_energy_value(hass: HomeAssistant) -> None:
@@ -188,7 +215,23 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_charging_rate")
-    assert state.state == str(car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"])
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_KILOMETERS_PER_HOUR:
+        assert state.state == str(
+            round(
+                SpeedConverter.convert(
+                    car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"],
+                    SPEED_MILES_PER_HOUR,
+                    SPEED_KILOMETERS_PER_HOUR,
+                ),
+                1,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_MILES_PER_HOUR
+        assert state.state == str(
+            car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"]
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.SPEED
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
@@ -197,6 +240,46 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
         state.attributes.get("time_left")
         == car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"]
     )
+
+
+async def test_time_charge_complete_charging(
+    hass: HomeAssistant, monkeypatch: MonkeyPatch
+) -> None:
+    """Tests time charge complete is the correct value."""
+    mock_now = datetime(2022, 12, 1, 2, 3, 4, 0, timezone.utc)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_now)
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    charge_complete = mock_now + timedelta(
+        hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
+    )
+    charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
+    assert state.state == charge_complete_str
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
+    assert state.attributes.get(ATTR_STATE_CLASS) is None
+
+
+async def test_time_charge_completed(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.0
+    car_mock_data.VEHICLE_DATA["charge_state"]["charging_state"] = "Complete"
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    assert state.state == STATE_UNKNOWN
+
+
+async def test_time_charge_stopped(hass: HomeAssistant) -> None:
+    """Tests time charge complete is the correct value."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.0
+    car_mock_data.VEHICLE_DATA["charge_state"]["charging_state"] = "Stopped"
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    assert state.state == STATE_UNKNOWN
 
 
 async def test_grid_power_value(hass: HomeAssistant) -> None:
@@ -242,13 +325,26 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_odometer")
-    assert state.state == str(
-        round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
-    )
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+        assert state.state == str(
+            round(
+                DistanceConverter.convert(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"],
+                    LENGTH_MILES,
+                    LENGTH_KILOMETERS,
+                ),
+                1,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.state == str(
+            round(car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1)
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
 
 
 async def test_outside_temp_value(hass: HomeAssistant) -> None:
@@ -270,13 +366,65 @@ async def test_range_value(hass: HomeAssistant) -> None:
     await setup_platform(hass, SENSOR_DOMAIN)
 
     state = hass.states.get("sensor.my_model_s_range")
-    assert state.state == str(
-        car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
-    )
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+        assert state.state == str(
+            round(
+                DistanceConverter.convert(
+                    car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"],
+                    LENGTH_MILES,
+                    LENGTH_KILOMETERS,
+                ),
+                2,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.state == str(
+            car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
+        )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+
+    est_range_miles = car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+
+    assert state.attributes.get("est_battery_range_miles") == est_range_miles
+
+    if est_range_miles is not None:
+        est_range_km = DistanceConverter.convert(
+            car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
+            LENGTH_MILES,
+            LENGTH_KILOMETERS,
+        )
+    else:
+        est_range_km = None
+
+    assert state.attributes.get("est_battery_range_km") == est_range_km
+
+
+async def test_range_attributes_not_available(hass: HomeAssistant) -> None:
+    """Tests range attributes handle None correctly."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"] = None
+
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_range")
+
+    est_range_miles = car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+
+    assert state.attributes.get("est_battery_range_miles") == est_range_miles
+
+    if est_range_miles is not None:
+        est_range_km = DistanceConverter.convert(
+            car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
+            LENGTH_MILES,
+            LENGTH_KILOMETERS,
+        )
+    else:
+        est_range_km = None
+
+    assert state.attributes.get("est_battery_range_km") == est_range_km
 
 
 async def test_solar_power_value(hass: HomeAssistant) -> None:
@@ -289,3 +437,220 @@ async def test_solar_power_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+
+
+async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
+    """Tests tpms sensors are getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
+    prec = (
+        len(state_fl.state) - state_fl.state.index(".") - 1
+        if "." in state_fl.state
+        else 0
+    )
+    assert state_fl.state == str(
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"], 2
+                ),
+                PRESSURE_BAR,
+                PRESSURE_PSI,
+            ),
+            prec,
+        ),
+    )
+
+    assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+
+    assert (
+        state_fl.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_fl"
+        ]
+    )
+
+    state_fr = hass.states.get("sensor.my_model_s_tpms_front_right")
+    prec = (
+        len(state_fr.state) - state_fr.state.index(".") - 1
+        if "." in state_fr.state
+        else 0
+    )
+    assert state_fr.state == str(
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fr"], 2
+                ),
+                PRESSURE_BAR,
+                PRESSURE_PSI,
+            ),
+            prec,
+        ),
+    )
+
+    assert state_fr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+
+    assert (
+        state_fr.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_fr"
+        ]
+    )
+
+    state_rl = hass.states.get("sensor.my_model_s_tpms_rear_left")
+    prec = (
+        len(state_rl.state) - state_rl.state.index(".") - 1
+        if "." in state_rl.state
+        else 0
+    )
+    assert state_rl.state == str(
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rl"], 2
+                ),
+                PRESSURE_BAR,
+                PRESSURE_PSI,
+            ),
+            prec,
+        ),
+    )
+
+    assert state_rl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_rl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+
+    assert (
+        state_rl.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_rl"
+        ]
+    )
+
+    state_rr = hass.states.get("sensor.my_model_s_tpms_rear_right")
+    prec = (
+        len(state_rr.state) - state_rr.state.index(".") - 1
+        if "." in state_rr.state
+        else 0
+    )
+    assert state_rr.state == str(
+        round(
+            PressureConverter.convert(
+                round(
+                    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rr"], 2
+                ),
+                PRESSURE_BAR,
+                PRESSURE_PSI,
+            ),
+            prec,
+        ),
+    )
+
+    assert state_rr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_rr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+
+    assert (
+        state_rr.attributes.get("tpms_last_seen_pressure_timestamp")
+        == car_mock_data.VEHICLE_DATA["vehicle_state"][
+            "tpms_last_seen_pressure_time_rr"
+        ]
+    )
+
+
+async def test_tpms_pressure_none(hass: HomeAssistant) -> None:
+    """Tests tpms sensor data not available."""
+
+    # Because all 4 corners share the same logic, it's enough to just test 1
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"] = None
+    car_mock_data.VEHICLE_DATA["vehicle_state"][
+        "tpms_last_seen_pressure_time_fl"
+    ] = None
+
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state_fl = hass.states.get("sensor.my_model_s_tpms_front_left")
+    assert state_fl.state == STATE_UNKNOWN
+
+    assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
+    assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+
+    assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") is None
+
+
+async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> None:
+    """Tests arrival time is getting the correct value."""
+    mock_now = datetime(2022, 12, 1, 2, 3, 4, 0, timezone.utc)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_now)
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_arrival_time")
+    arrival_time = mock_now + timedelta(
+        minutes=round(
+            float(
+                car_mock_data.VEHICLE_DATA["drive_state"][
+                    "active_route_minutes_to_arrival"
+                ]
+            ),
+            2,
+        )
+    )
+    arrival_time_str = datetime.strftime(arrival_time, "%Y-%m-%dT%H:%M:%S+00:00")
+
+    assert state.state == arrival_time_str
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
+    assert state.attributes.get(ATTR_STATE_CLASS) is None
+    assert (
+        state.attributes.get("Energy at arrival")
+        == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_energy_at_arrival"]
+    )
+    assert state.attributes.get("Minutes traffic delay") == round(
+        car_mock_data.VEHICLE_DATA["drive_state"]["active_route_traffic_minutes_delay"],
+        1,
+    )
+    assert (
+        state.attributes.get("Destination")
+        == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_destination"]
+    )
+
+
+async def test_distance_to_arrival(hass: HomeAssistant) -> None:
+    """Tests distance to arrival is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_distance_to_arrival")
+
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+        assert state.state == str(
+            round(
+                DistanceConverter.convert(
+                    car_mock_data.VEHICLE_DATA["drive_state"][
+                        "active_route_miles_to_arrival"
+                    ],
+                    LENGTH_MILES,
+                    LENGTH_KILOMETERS,
+                ),
+                2,
+            )
+        )
+    else:
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.state == str(
+            round(
+                car_mock_data.VEHICLE_DATA["drive_state"][
+                    "active_route_miles_to_arrival"
+                ],
+                2,
+            )
+        )
+
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT

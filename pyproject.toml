@@ -1,13 +1,14 @@
 [tool.poetry]
 name = "tesla"
-version = "3.0.2"
+version = "3.8.1"
 description = "A fork of the Home Assistant tesla integration using a oauth proxy to login."
 authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-teslajsonpy = "^3.0.0"
+teslajsonpy = "^3.5.1"
+
 
 [tool.poetry.dev-dependencies]
 homeassistant = ">=2022.11.0"

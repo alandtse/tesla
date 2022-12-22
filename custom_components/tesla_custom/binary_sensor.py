@@ -28,8 +28,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for car in cars.values():
         entities.append(TeslaCarParkingBrake(hass, car, coordinator))
         entities.append(TeslaCarOnline(hass, car, coordinator))
+        entities.append(TeslaCarAsleep(hass, car, coordinator))
         entities.append(TeslaCarChargerConnection(hass, car, coordinator))
         entities.append(TeslaCarCharging(hass, car, coordinator))
+        entities.append(TeslaCarDoors(hass, car, coordinator))
+        entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
+        entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
+        entities.append(TeslaCarUserPresent(hass, car, coordinator))
 
     for energysite in energysites.values():
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
@@ -140,7 +145,29 @@ class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
             "vehicle_id": str(self._car.vehicle_id),
             "vin": self._car.vin,
             "id": str(self._car.id),
+            "state": self._car.state,
         }
+
+
+class TeslaCarAsleep(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car asleep binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize car asleep entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "asleep"
+        self._attr_device_class = None
+        self._attr_icon = "mdi:sleep"
+
+    @property
+    def is_on(self):
+        """Return True if car is asleep."""
+        return self._car.state == "asleep"
 
 
 class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):
@@ -182,3 +209,138 @@ class TeslaEnergyGridStatus(TeslaEnergyEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         """Return True if grid status is active."""
         return self._energysite.grid_status == GRID_ACTIVE
+
+
+class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car door sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize car door entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "doors"
+        self._attr_device_class = BinarySensorDeviceClass.DOOR
+        self._attr_icon = "mdi:car-door"
+
+    @property
+    def is_on(self):
+        """Return True if a car door is open."""
+        return (
+            self._car.door_df
+            or self._car.door_dr
+            or self._car.door_pf
+            or self._car.door_pr
+        )
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "Driver Front": self._open_or_closed(self._car.door_df),
+            "Driver Rear": self._open_or_closed(self._car.door_dr),
+            "Passenger Front": self._open_or_closed(self._car.door_pf),
+            "Passenger Rear": self._open_or_closed(self._car.door_pr),
+        }
+
+    def _open_or_closed(self, door):
+        """Return string of 'Open' or 'Closed' when passed a door integer state."""
+        if door:
+            return "Open"
+        return "Closed"
+
+
+class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car scheduled charging binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize scheduled charging entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "scheduled charging"
+        self._attr_icon = "mdi:calendar-plus"
+        self._attr_device_class = None
+
+    @property
+    def is_on(self):
+        """Return True if scheduled charging enebaled."""
+        if self._car.scheduled_charging_mode == "StartAt":
+            return True
+        return False
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "Scheduled charging time": self._car.scheduled_charging_start_time_app,
+        }
+
+
+class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car scheduled departure binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize scheduled departure entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "scheduled departure"
+        self._attr_icon = "mdi:calendar-plus"
+        self._attr_device_class = None
+
+    @property
+    def is_on(self):
+        """Return True if scheduled departure enebaled."""
+        if self._car.scheduled_charging_mode == "DepartBy":
+            return True
+        return False
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "Departure time": self._car.scheduled_departure_time_minutes,
+            "Preconditioning enabled": self._car.is_preconditioning_enabled,
+            "Preconditioning weekdays only": self._car.is_preconditioning_weekday_only,
+            "Off peak charging enabled": self._car.is_off_peak_charging_enabled,
+            "Off peak charging weekdays only": self._car.is_off_peak_charging_weekday_only,
+            "End off peak time": self._car.off_peak_hours_end_time,
+        }
+
+
+class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla car user present binary sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize user present entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "user present"
+        self._attr_icon = "mdi:account-check"
+        self._attr_device_class = None
+
+    @property
+    def is_on(self):
+        """Return True if user present enebaled."""
+        return self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        user_id = str(self._car._vehicle_data.get("user_id"))
+
+        return {"user_id": user_id}

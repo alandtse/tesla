@@ -2,6 +2,94 @@
 
 <!--next-version-placeholder-->
 
+## v3.8.1 (2022-12-21)
+### Fix
+* Handle battery range attributes NoneType ([#453](https://github.com/alandtse/tesla/issues/453)) ([`90f7d0d`](https://github.com/alandtse/tesla/commit/90f7d0ddb9140dae92c446dd7274a7e27abd4f3d))
+
+## v3.8.0 (2022-12-21)
+### Feature
+* Add user present and User ID ([#446](https://github.com/alandtse/tesla/issues/446)) ([`865c637`](https://github.com/alandtse/tesla/commit/865c6377649f1c0bf94f39d98a59e4e5d0891e31))
+* Add estimated battery range attributes ([#443](https://github.com/alandtse/tesla/issues/443)) ([`7584fdc`](https://github.com/alandtse/tesla/commit/7584fdcdc64d1c752dc34bdafd08c47ded6526df))
+* Add scheduled departure and charging ([#441](https://github.com/alandtse/tesla/issues/441)) ([`f555131`](https://github.com/alandtse/tesla/commit/f55513162e5cd03633156fa59073759ef7d7052b))
+
+### Fix
+* Remove state class from timestamp sensors ([#440](https://github.com/alandtse/tesla/issues/440)) ([`43f7169`](https://github.com/alandtse/tesla/commit/43f7169b6aa43c5fe08865e75b8172cbe231d5df))
+
+## v3.7.1 (2022-12-18)
+### Fix
+* Fix seat map for auto climate command ([#435](https://github.com/alandtse/tesla/issues/435)) ([`c96e5b0`](https://github.com/alandtse/tesla/commit/c96e5b0ac2794f7569846af5cf78f6f8f6545e3d))
+
+### Documentation
+* Update readme with new features ([`8a518c9`](https://github.com/alandtse/tesla/commit/8a518c93b05f31f2a0c9817d624a4b13dac944fc))
+
+## v3.7.0 (2022-12-11)
+### Feature
+* Add destination location entities ([#423](https://github.com/alandtse/tesla/issues/423)) ([`a4ec318`](https://github.com/alandtse/tesla/commit/a4ec318eb44838c6a6ad0164369e98aa563aff32))
+
+## v3.6.1 (2022-12-11)
+### Fix
+* Use old pressure consts for ha < 2022.11 ([#418](https://github.com/alandtse/tesla/issues/418)) ([`ad9c41c`](https://github.com/alandtse/tesla/commit/ad9c41c71ea93db9294ff4203b61f1e6f6a4b697))
+
+## v3.6.0 (2022-12-09)
+### Feature
+* Add Auto seat heater option ([#404](https://github.com/alandtse/tesla/issues/404)) ([`7e02a42`](https://github.com/alandtse/tesla/commit/7e02a423cf59c8d70c58cc623da59389044da8b4))
+* Add valet mode switch ([#405](https://github.com/alandtse/tesla/issues/405)) ([`01116d1`](https://github.com/alandtse/tesla/commit/01116d1ff5b5ea66bba6d73ad4089a2c38f03ffe))
+
+### Fix
+* Always show charge energy for current and last session ([#414](https://github.com/alandtse/tesla/issues/414)) ([`be6c1f0`](https://github.com/alandtse/tesla/commit/be6c1f09e51cb4954a67573bed04ea4151a488b0))
+* Fix arrows for window cover ([#407](https://github.com/alandtse/tesla/issues/407)) ([`108567c`](https://github.com/alandtse/tesla/commit/108567cb1b53824665ebf2ae890efd1c4f0812e5))
+* Turn climate on when turning seat heater on ([#406](https://github.com/alandtse/tesla/issues/406)) ([`78e90e4`](https://github.com/alandtse/tesla/commit/78e90e47f12a6f7288fe2d3b55e56984c2560628))
+
+## v3.5.2 (2022-12-03)
+### Fix
+* Don't round when tpms is unavailable ([#398](https://github.com/alandtse/tesla/issues/398)) ([`f5a3b0d`](https://github.com/alandtse/tesla/commit/f5a3b0d23071893d913895659efe3a4ced00bf79))
+
+## v3.5.1 (2022-12-03)
+### Fix
+* Set default pressure to PSI ([#391](https://github.com/alandtse/tesla/issues/391)) ([`e4adef7`](https://github.com/alandtse/tesla/commit/e4adef75dbfef9e03b5f8b73b0621181acf3fab1))
+
+## v3.5.0 (2022-12-01)
+### Feature
+* Add remote start button ([#385](https://github.com/alandtse/tesla/issues/385)) ([`42b7117`](https://github.com/alandtse/tesla/commit/42b7117fe16209ccf23070b22b58e576cd2709a8))
+
+## v3.4.0 (2022-11-30)
+### Feature
+* Add tpms pressure sensors ([#376](https://github.com/alandtse/tesla/issues/376)) ([`b2cbe95`](https://github.com/alandtse/tesla/commit/b2cbe9575ab6e2c4a780ec15f9ebc57f45235fa5))
+* Add doors binary sensor ([#377](https://github.com/alandtse/tesla/issues/377)) ([`8b77e3c`](https://github.com/alandtse/tesla/commit/8b77e3c7b1aff6aa6761d8f86592b891099137d4))
+
+## v3.3.2 (2022-11-29)
+### Fix
+* Use utc time zone for charge complete sensor ([`f13c618`](https://github.com/alandtse/tesla/commit/f13c618efe2071945eb5846fc0ff3c3b645da0f8))
+
+## v3.3.1 (2022-11-27)
+### Fix
+* Change timestamp calculation ([`5f92774`](https://github.com/alandtse/tesla/commit/5f9277425df93fa9ece48e2d2d27eedd433c9abb))
+
+## v3.3.0 (2022-11-27)
+### Feature
+* Add time to full charge sensor ([#349](https://github.com/alandtse/tesla/issues/349)) ([`fbcf5fe`](https://github.com/alandtse/tesla/commit/fbcf5fe9b8345a13f9fed94dc65e9f2c93a62601))
+* Show software update statuses in version info ([#370](https://github.com/alandtse/tesla/issues/370)) ([`fac9dd1`](https://github.com/alandtse/tesla/commit/fac9dd12c1baa6e3676fb30face39514200d1606))
+
+### Fix
+* Handle unresponsive cars/systems during setup ([`4d1270b`](https://github.com/alandtse/tesla/commit/4d1270b426cef4a00b8e84644aafdaa3a47407ca))
+
+## v3.2.0 (2022-11-21)
+### Feature
+* Add binary_sensor.<car>_asleep ([#361](https://github.com/alandtse/tesla/issues/361)) ([`43deefb`](https://github.com/alandtse/tesla/commit/43deefb9a0b306c0d867413bfbc6ecb67b15fd50))
+
+### Fix
+* Persist entities when reloaded while car is asleep ([#365](https://github.com/alandtse/tesla/issues/365)) ([`f0fc6e4`](https://github.com/alandtse/tesla/commit/f0fc6e49895547a3861a3592dcde7269b05b9305))
+* Fix usable_battery_level to match app ([#362](https://github.com/alandtse/tesla/issues/362)) ([`c9e4abb`](https://github.com/alandtse/tesla/commit/c9e4abbacba8df7571943f3008eaa1df410c9b28))
+* Update car-asleep binary sensor icon ([#364](https://github.com/alandtse/tesla/issues/364)) ([`30f319c`](https://github.com/alandtse/tesla/commit/30f319c893012c154faea0d5d6c3ef88efdb7ccd))
+
+## v3.1.0 (2022-11-14)
+### Feature
+* Add window cover ([#318](https://github.com/alandtse/tesla/issues/318)) ([`bea6824`](https://github.com/alandtse/tesla/commit/bea68240d68e727e5cda803fe9df2b711ba0c6ff))
+* Add charge port latch lock ([`df7d06e`](https://github.com/alandtse/tesla/commit/df7d06ead2f7ddb499e9e254f645bd969886a86a))
+
+### Fix
+* Fix typo telsafi.com -> teslafi.com ([#314](https://github.com/alandtse/tesla/issues/314)) ([`9c1514a`](https://github.com/alandtse/tesla/commit/9c1514a051a1f953ab91cd1463e03da350680eda))
+
 ## v3.0.2 (2022-10-27)
 ### Fix
 * Add missing close_cover for frunks ([`3257775`](https://github.com/alandtse/tesla/commit/325777598d13b0e2ac3b817fb4996ab60e019b2f))

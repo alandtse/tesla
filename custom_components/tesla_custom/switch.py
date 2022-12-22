@@ -21,12 +21,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entities = []
 
     for car in cars.values():
-        if car.steering_wheel_heater:
-            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
-        if car.sentry_mode_available:
-            entities.append(TeslaCarSentryMode(hass, car, coordinator))
+        entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
+        entities.append(TeslaCarSentryMode(hass, car, coordinator))
         entities.append(TeslaCarPolling(hass, car, coordinator))
         entities.append(TeslaCarCharger(hass, car, coordinator))
+        entities.append(TeslaCarValetMode(hass, car, coordinator))
 
     async_add_entities(entities, True)
 
@@ -44,6 +43,13 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
         super().__init__(hass, car, coordinator)
         self.type = "heated steering"
         self._attr_icon = "mdi:steering"
+        # Entity is only enabled upon first install if steering wheel heater is available
+        self._enabled_by_default = self._car.steering_wheel_heater
+
+    @property
+    def available(self) -> bool:
+        """Return True if steering wheel heater is available"""
+        return super().available and self._car.steering_wheel_heater
 
     @property
     def is_on(self):
@@ -140,6 +146,13 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
         super().__init__(hass, car, coordinator)
         self.type = "sentry mode"
         self._attr_icon = "mdi:shield-car"
+        # Entity is only enabled upon first install if sentry mode is available
+        self._enabled_by_default = self._car.sentry_mode_available
+
+    @property
+    def available(self) -> bool:
+        """Return True if sentry mode switch is available"""
+        return super().available and self._car.sentry_mode_available
 
     @property
     def is_on(self):
@@ -161,3 +174,39 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
         """Send the off command."""
         await self._car.set_sentry_mode(False)
         await self.async_update_ha_state()
+
+
+class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
+    """Representation of a Tesla car valet mode switch."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize valet mode switch entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "valet mode"
+        self._attr_icon = "mdi:room-service"
+
+    @property
+    def is_on(self):
+        """Return valet mode state."""
+        return self._car.is_valet_mode
+
+    async def async_turn_on(self, **kwargs):
+        """Send the on command."""
+        if self._car._vehicle_data.get("vehicle_state", {}).get("valet_pin_needed"):
+            _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
+        else:
+            await self._car.valet_mode(True)
+            await self.async_update_ha_state()
+
+    async def async_turn_off(self, **kwargs):
+        """Send the off command."""
+        if self._car._vehicle_data.get("vehicle_state", {}).get("valet_pin_needed"):
+            _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
+        else:
+            await self._car.valet_mode(False)
+            await self.async_update_ha_state()
