@@ -301,7 +301,11 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Return True if scheduled departure enebaled."""
-        if self._car.scheduled_charging_mode == "DepartBy":
+        if (
+            self._car.scheduled_charging_mode == "DepartBy"
+            or self._car.is_preconditioning_enabled
+            or self._car.is_off_peak_charging_enabled
+        ):
             return True
         return False
 
