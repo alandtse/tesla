@@ -39,3 +39,11 @@
 #     await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
 
 #     state = hass.states.get("device_tracker.my_model_s_destination_location_tracker")
+
+# async def test_car_destination_location_unknown(hass: HomeAssistant) -> None:
+#     """Tests car destination location is getting the correct value."""
+#     car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"] = None
+
+#     await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
+
+#     state = hass.states.get("device_tracker.my_model_s_destination_location_tracker")
