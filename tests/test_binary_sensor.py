@@ -176,6 +176,10 @@ async def test_car_scheduled_charging(hass: HomeAssistant) -> None:
             "scheduled_charging_start_time_app"
         ]
     )
+    assert (
+        state.attributes.get("Scheduled charging timestamp")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["scheduled_charging_start_time"]
+    )
 
 
 async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
@@ -229,6 +233,10 @@ async def test_car_scheduled_departure(hass: HomeAssistant) -> None:
     assert (
         state.attributes.get("End off peak time")
         == car_mock_data.VEHICLE_DATA["charge_state"]["off_peak_hours_end_time"]
+    )
+    assert (
+        state.attributes.get("Departure timestamp")
+        == car_mock_data.VEHICLE_DATA["charge_state"]["scheduled_departure_time"]
     )
 
 
