@@ -261,6 +261,15 @@ async def test_time_charge_complete_charging(
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) is None
 
+    mock_timetravel = mock_now + timedelta(minutes=2)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_timetravel)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    charge_complete = mock_now + timedelta(
+        hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
+    )
+    charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
 
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
