@@ -90,11 +90,15 @@ class TeslaCarDestinationLocation(TeslaCarEntity, TrackerEntity):
     @property
     def longitude(self):
         """Return destination longitude."""
+        if self._car.active_route_miles_to_arrival is None:
+            return None
         return self._car.active_route_longitude
 
     @property
     def latitude(self):
         """Return destination latitude."""
+        if self._car.active_route_miles_to_arrival is None:
+            return None
         return self._car.active_route_latitude
 
     @property
