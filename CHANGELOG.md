@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.8.1 (2022-12-21)
+### Fix
+* Handle battery range attributes NoneType ([#453](https://github.com/alandtse/tesla/issues/453)) ([`90f7d0d`](https://github.com/alandtse/tesla/commit/90f7d0ddb9140dae92c446dd7274a7e27abd4f3d))
+
 ## v3.8.0 (2022-12-21)
 ### Feature
 * Add user present and User ID ([#446](https://github.com/alandtse/tesla/issues/446)) ([`865c637`](https://github.com/alandtse/tesla/commit/865c6377649f1c0bf94f39d98a59e4e5d0891e31))

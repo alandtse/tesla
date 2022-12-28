@@ -28,5 +28,6 @@
     }
   ],
   "iot_class": "cloud_polling",
-  "version": "3.8.0"
+  "loggers": ["teslajsonpy"],
+  "version": "3.8.1"
 }

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tesla"
-version = "3.8.0"
+version = "3.8.1"
 description = "A fork of the Home Assistant tesla integration using a oauth proxy to login."
 authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
@@ -11,7 +11,7 @@ teslajsonpy = "^3.6.0"
 
 
 [tool.poetry.dev-dependencies]
-homeassistant = ">=2021.10.0"
+homeassistant = ">=2022.11.0"
 pytest-homeassistant-custom-component = ">=0.3.1"
 bandit = ">=1.7.0"
 black = {version = ">=21.12b0", allow-prereleases = true}

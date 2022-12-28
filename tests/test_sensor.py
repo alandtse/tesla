@@ -261,6 +261,15 @@ async def test_time_charge_complete_charging(
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) is None
 
+    mock_timetravel = mock_now + timedelta(minutes=2)
+    monkeypatch.setattr(dt, "utcnow", lambda: mock_timetravel)
+
+    state = hass.states.get("sensor.my_model_s_time_charge_complete")
+    charge_complete = mock_now + timedelta(
+        hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
+    )
+    charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
 
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
@@ -387,15 +396,42 @@ async def test_range_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
-    assert (
-        state.attributes.get("est_battery_range_miles")
-        == car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
-    )
-    est_range_km = DistanceConverter.convert(
-        car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
-        LENGTH_MILES,
-        LENGTH_KILOMETERS,
-    )
+    est_range_miles = car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+
+    assert state.attributes.get("est_battery_range_miles") == est_range_miles
+
+    if est_range_miles is not None:
+        est_range_km = DistanceConverter.convert(
+            car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
+            LENGTH_MILES,
+            LENGTH_KILOMETERS,
+        )
+    else:
+        est_range_km = None
+
+    assert state.attributes.get("est_battery_range_km") == est_range_km
+
+
+async def test_range_attributes_not_available(hass: HomeAssistant) -> None:
+    """Tests range attributes handle None correctly."""
+    car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"] = None
+
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_range")
+
+    est_range_miles = car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
+
+    assert state.attributes.get("est_battery_range_miles") == est_range_miles
+
+    if est_range_miles is not None:
+        est_range_km = DistanceConverter.convert(
+            car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
+            LENGTH_MILES,
+            LENGTH_KILOMETERS,
+        )
+    else:
+        est_range_km = None
 
     assert state.attributes.get("est_battery_range_km") == est_range_km
 
