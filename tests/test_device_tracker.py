@@ -1,12 +1,16 @@
 """Tests for the Tesla device tracker."""
 
-# from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
-# from homeassistant.core import HomeAssistant
-# from homeassistant.helpers import entity_registry as er
+from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 
-# from .common import setup_platform
+from homeassistant.const import (
+    STATE_UNKNOWN,
+)
 
-# from .mock_data import car as car_mock_data
+from .common import setup_platform
+
+from .mock_data import car as car_mock_data
 
 
 # async def test_registry_entries(hass: HomeAssistant) -> None:
@@ -39,3 +43,13 @@
 #     await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
 
 #     state = hass.states.get("device_tracker.my_model_s_destination_location_tracker")
+
+
+async def test_car_destination_location_no_active_route(hass: HomeAssistant) -> None:
+    """Tests car destination location is getting the correct value when there is no active route."""
+    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"] = None
+
+    await setup_platform(hass, DEVICE_TRACKER_DOMAIN)
+
+    state = hass.states.get("device_tracker.my_model_s_destination_location_tracker")
+    assert state.state == STATE_UNKNOWN
