@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v3.9.0 (2022-12-29)
+### Feature
+* Add emission test button ([#454](https://github.com/alandtse/tesla/issues/454)) ([`8d40beb`](https://github.com/alandtse/tesla/commit/8d40beb45790e06146991488934c24e1c3f4322d))
+* Add scheduled departure and charge timestamp attributes ([#458](https://github.com/alandtse/tesla/issues/458)) ([`b979846`](https://github.com/alandtse/tesla/commit/b97984605f467776b1caa871f72f9534fd4496a8))
+* Add dynamic debug logging ([#448](https://github.com/alandtse/tesla/issues/448)) ([`d310ae5`](https://github.com/alandtse/tesla/commit/d310ae506afafd4a16e9a0bb07405b929625ebda))
+
+### Fix
+* Make destination location unknown after arrival ([#460](https://github.com/alandtse/tesla/issues/460)) ([`5781cea`](https://github.com/alandtse/tesla/commit/5781cea8515e451a4a2c8dbf0aa7e973094a7feb))
+* Account for time passing between updates ([#419](https://github.com/alandtse/tesla/issues/419)) ([`02751a2`](https://github.com/alandtse/tesla/commit/02751a203a1d0dcfb6efd570cfb5246773f03e16))
+* Replace deprecated is_metric ([#343](https://github.com/alandtse/tesla/issues/343)) ([`87005fc`](https://github.com/alandtse/tesla/commit/87005fc353102d46fcd95a20a173a007d6d41b00))
+
 ## v3.8.1 (2022-12-21)
 ### Fix
 * Handle battery range attributes NoneType ([#453](https://github.com/alandtse/tesla/issues/453)) ([`90f7d0d`](https://github.com/alandtse/tesla/commit/90f7d0ddb9140dae92c446dd7274a7e27abd4f3d))

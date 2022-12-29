@@ -1,5 +1,5 @@
 """Const file for Tesla cars."""
-VERSION = "3.8.1"
+VERSION = "3.9.0"
 CONF_EXPIRATION = "expiration"
 CONF_INCLUDE_VEHICLES = "include_vehicles"
 CONF_INCLUDE_ENERGYSITES = "include_energysites"
