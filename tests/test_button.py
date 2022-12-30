@@ -175,3 +175,13 @@ async def test_emissions_test_press(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_remote_boombox.assert_awaited_once()
+
+
+async def test_emissions_options_unavailable(hass: HomeAssistant) -> None:
+    """Tests car emissions test button disabled when option codes are null."""
+    car_mock_data.VEHICLE_DATA["option_codes"] = None
+    await setup_platform(hass, BUTTON_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("button.my_model_s_emissions_test")
+    assert entry.disabled
