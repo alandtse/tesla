@@ -2834,14 +2834,14 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "teslajsonpy"
-version = "3.7.0"
+version = "3.7.1"
 description = "A library to work with Tesla API."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "teslajsonpy-3.7.0-py3-none-any.whl", hash = "sha256:188379851ff82d356f0f9be21d26d76a7bccd18448b83027f4597ddb59913844"},
-    {file = "teslajsonpy-3.7.0.tar.gz", hash = "sha256:0188db435ddcd6878fc73532b744355aad0c1b7f0c33bf663f0aee970fcf70b9"},
+    {file = "teslajsonpy-3.7.1-py3-none-any.whl", hash = "sha256:60854dbfb6612913b5d6141685746d55afc333ed37dcef6cc8cf1fd160bef8a8"},
+    {file = "teslajsonpy-3.7.1.tar.gz", hash = "sha256:00ac95054f3a9ceb51814dd9e9aa91cf33b761081bf124bf111c2845bd311fb9"},
 ]
 
 [package.dependencies]
@@ -3185,4 +3185,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0e6da8b6ce787b1b68b9c41df095580f7f95de272a3fdc29fe89395093b4e153"
+content-hash = "4198cfe1e5d1ed16e4fd62d96472381a13c2ff000f2a48d699e06b6301f4c6b9"
