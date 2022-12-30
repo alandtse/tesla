@@ -3,10 +3,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from teslajsonpy.car import TeslaCar
-from teslajsonpy.const import RESOURCE_TYPE_SOLAR, RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import EnergySite, PowerwallSite
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -18,8 +14,8 @@ from homeassistant.const import (
     LENGTH_KILOMETERS,
     LENGTH_MILES,
     PERCENTAGE,
-    POWER_WATT,
     POWER_KILO_WATT,
+    POWER_WATT,
     PRESSURE_BAR,
     PRESSURE_PSI,
     SPEED_MILES_PER_HOUR,
@@ -27,8 +23,11 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from homeassistant.util.unit_conversion import DistanceConverter
 from homeassistant.util import dt
+from homeassistant.util.unit_conversion import DistanceConverter
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY, RESOURCE_TYPE_SOLAR
+from teslajsonpy.energy import EnergySite, PowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity

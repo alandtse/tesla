@@ -1,15 +1,14 @@
 """Support for Tesla binary sensors."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
 )
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import PowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity

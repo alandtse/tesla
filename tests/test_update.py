@@ -1,13 +1,12 @@
 """Tests for the Tesla update."""
 from unittest.mock import patch
-import pytest
 
 from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN
-
 from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+import pytest
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data

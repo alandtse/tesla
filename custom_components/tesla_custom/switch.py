@@ -1,11 +1,10 @@
 """Support for Tesla switches."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity

@@ -26,8 +26,8 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
     CONF_EXPIRATION,
-    CONF_INCLUDE_VEHICLES,
     CONF_INCLUDE_ENERGYSITES,
+    CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DATA_LISTENER,

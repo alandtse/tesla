@@ -2,8 +2,6 @@
 
 from datetime import datetime, timedelta, timezone
 
-from pytest import MonkeyPatch
-
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
@@ -30,14 +28,13 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt
 from homeassistant.util.unit_conversion import (
     DistanceConverter,
-    SpeedConverter,
     PressureConverter,
+    SpeedConverter,
 )
+from pytest import MonkeyPatch
 
 from .common import setup_platform
-from .mock_data import car as car_mock_data
-from .mock_data import energysite as energysite_mock_data
-
+from .mock_data import car as car_mock_data, energysite as energysite_mock_data
 
 ATTR_STATE_CLASS = "state_class"
 

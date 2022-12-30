@@ -1,9 +1,7 @@
 """Tests for the Tesla climate."""
 from unittest.mock import patch
 
-from homeassistant.components.climate import (
-    DOMAIN as CLIMATE_DOMAIN,
-)
+from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, STATE_OFF
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er

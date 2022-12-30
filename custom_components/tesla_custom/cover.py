@@ -1,14 +1,13 @@
 """Support for Tesla covers."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.cover import (
-    CoverEntity,
     CoverDeviceClass,
+    CoverEntity,
     CoverEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity

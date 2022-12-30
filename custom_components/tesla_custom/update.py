@@ -1,10 +1,9 @@
 """Support for Tesla update."""
 from typing import Any
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
