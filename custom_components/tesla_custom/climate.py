@@ -1,8 +1,6 @@
 """Support for Tesla climate."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     DEFAULT_MAX_TEMP,
@@ -14,6 +12,7 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
@@ -109,7 +108,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
 
     @property
     def min_temp(self):
-        """Return min temperature"""
+        """Return min temperature."""
         if self._car.min_avail_temp:
             return self._car.min_avail_temp
 

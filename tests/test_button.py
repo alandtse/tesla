@@ -1,9 +1,7 @@
 """Tests for the Tesla button."""
 from unittest.mock import patch
 
-from homeassistant.components.button import (
-    DOMAIN as BUTTON_DOMAIN,
-)
+from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er

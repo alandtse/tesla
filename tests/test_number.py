@@ -1,16 +1,14 @@
 """Tests for the Tesla number."""
 from unittest.mock import patch
 
-from teslajsonpy.const import BACKUP_RESERVE_MAX, BACKUP_RESERVE_MIN, CHARGE_CURRENT_MIN
-
 from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from teslajsonpy.const import BACKUP_RESERVE_MAX, BACKUP_RESERVE_MIN, CHARGE_CURRENT_MIN
 
 from .common import setup_platform
-from .mock_data import car as car_mock_data
-from .mock_data import energysite as energysite_mock_data
+from .mock_data import car as car_mock_data, energysite as energysite_mock_data
 
 
 async def test_registry_entries(hass: HomeAssistant) -> None:

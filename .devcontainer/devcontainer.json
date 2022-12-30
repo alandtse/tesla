@@ -1,9 +1,7 @@
 {
   "name": "Tesla Custom Component development",
   "image": "ghcr.io/ludeeus/devcontainer/integration:stable",
-  "appPort": [
-    "9123:8123"
-  ],
+  "appPort": ["9123:8123"],
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "extensions": [
     "ms-python.python",
