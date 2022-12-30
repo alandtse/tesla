@@ -102,7 +102,6 @@ async def test_status_available(hass: HomeAssistant) -> None:
     with patch(
         "teslajsonpy.car.TeslaCar.schedule_software_update"
     ) as mock_schedule_software_update:
-
         assert await hass.services.async_call(
             UPDATE_DOMAIN,
             "install",
@@ -139,7 +138,6 @@ async def test_status_scheduled(hass: HomeAssistant) -> None:
     with patch(
         "teslajsonpy.car.TeslaCar.schedule_software_update"
     ) as mock_schedule_software_update:
-
         assert await hass.services.async_call(
             UPDATE_DOMAIN,
             "install",
