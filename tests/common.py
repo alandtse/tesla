@@ -12,14 +12,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from teslajsonpy.car import TeslaCar
-from teslajsonpy.energy import SolarSite, SolarPowerwallSite
 from teslajsonpy.const import AUTH_DOMAIN
+from teslajsonpy.energy import SolarPowerwallSite, SolarSite
 
 from custom_components.tesla_custom.const import CONF_EXPIRATION, DOMAIN as TESLA_DOMIN
 
 from .const import TEST_ACCESS_TOKEN, TEST_TOKEN, TEST_USERNAME, TEST_VALID_EXPIRATION
-from .mock_data import car as car_mock_data
-from .mock_data import energysite as energysite_mock_data
+from .mock_data import car as car_mock_data, energysite as energysite_mock_data
 
 
 def setup_mock_controller(mock_controller):

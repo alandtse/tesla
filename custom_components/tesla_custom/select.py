@@ -1,13 +1,12 @@
 """Support for Tesla selects."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-from teslajsonpy.const import RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
-
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -260,12 +259,13 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
         await self.async_update_ha_state()
 
     @property
-    def current_option(self):
+    def current_option(self) -> str:
         """Return current energy export rule setting."""
         if self._energysite.export_rule == "pv_only":
             return EXPORT_RULE[0]
         if self._energysite.export_rule == "battery_ok":
             return EXPORT_RULE[1]
+        return ""
 
 
 class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
@@ -295,7 +295,7 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
         await self.async_update_ha_state()
 
     @property
-    def current_option(self):
+    def current_option(self) -> str:
         """Return current operation mode setting."""
         if self._energysite.operation_mode == "self_consumption":
             return OPERATION_MODE[0]
@@ -303,3 +303,4 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
             return OPERATION_MODE[1]
         if self._energysite.operation_mode == "backup":
             return OPERATION_MODE[2]
+        return ""

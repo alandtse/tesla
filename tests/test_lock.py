@@ -2,11 +2,7 @@
 from unittest.mock import patch
 
 from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    SERVICE_LOCK,
-    SERVICE_UNLOCK,
-)
+from homeassistant.const import ATTR_ENTITY_ID, SERVICE_LOCK, SERVICE_UNLOCK
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 

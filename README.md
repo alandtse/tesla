@@ -47,18 +47,17 @@ This integration provides the following entities for vehicles:
 - Binary sensors - charger connection, charging status, car online, parking brake, car asleep, and door status.
 - Buttons - horn, flash lights, wake up<sup>1</sup>, force data update<sup>1</sup>, trigger HomeLink, and remote start. **Note:** The HomeLink button is disabled by default as some vehicles don't have this option. Enable via configuration/entities if desired.
 - Climate - turn HVAC on/off, set target temperature, set preset modes (defrost, keep on, dog mode and camp mode).
-- Device tracker - car location<sup>1</sup>, and active route destination. 
+- Device tracker - car location<sup>1</sup>, and active route destination.
 - Cover - Charger door, frunk, trunk, and windows.
 - Locks - door lock, and charge port latch lock.
-**Note:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
+  **Note:** Set `state` to `heat_cool` or `off` to enable/disable your Tesla's climate system via a scene.
 - Selects - seat heaters and cabin overheat protection<sup>2</sup>. **Note:** Turning on a heated seat will cause the climate to turn on.
 - Sensors - battery level, charge rate, energy added, charger power, inside/outside temperature, odometer, estimated range, time charge complete, TPMS pressure, active route arrival time and distance to arrival.
 - Switches - heated steering wheel, charger, sentry mode, polling, and valet mode.<sup>1</sup>.
 - Update - software update<sup>2</sup>
 
-<sup>1</sup> *Diagnostics entities.*<br/>
-<sup>2</sup> *Configuration entities.*
-
+<sup>1</sup> _Diagnostics entities._<br/>
+<sup>2</sup> _Configuration entities._
 
 This integration provides the following entities for energy sites:
 

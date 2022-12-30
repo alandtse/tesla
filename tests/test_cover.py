@@ -2,11 +2,7 @@
 from unittest.mock import patch
 
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    SERVICE_CLOSE_COVER,
-    SERVICE_OPEN_COVER,
-)
+from homeassistant.const import ATTR_ENTITY_ID, SERVICE_CLOSE_COVER, SERVICE_OPEN_COVER
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 

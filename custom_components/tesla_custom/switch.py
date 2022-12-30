@@ -1,11 +1,10 @@
 """Support for Tesla switches."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
@@ -48,7 +47,7 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
 
     @property
     def available(self) -> bool:
-        """Return True if steering wheel heater is available"""
+        """Return True if steering wheel heater is available."""
         return super().available and self._car.steering_wheel_heater
 
     @property
@@ -151,7 +150,7 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
 
     @property
     def available(self) -> bool:
-        """Return True if sentry mode switch is available"""
+        """Return True if sentry mode switch is available."""
         return super().available and self._car.sentry_mode_available
 
     @property
@@ -197,6 +196,7 @@ class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
+        # pylint: disable=protected-access
         if self._car._vehicle_data.get("vehicle_state", {}).get("valet_pin_needed"):
             _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
         else:
@@ -205,6 +205,7 @@ class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
+        # pylint: disable=protected-access
         if self._car._vehicle_data.get("vehicle_state", {}).get("valet_pin_needed"):
             _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
         else:

@@ -1,17 +1,12 @@
 """Tests for the Tesla device tracker."""
 
 from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
+from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
-from homeassistant.const import (
-    STATE_UNKNOWN,
-)
-
 from .common import setup_platform
-
 from .mock_data import car as car_mock_data
-
 
 # async def test_registry_entries(hass: HomeAssistant) -> None:
 #     """Tests devices are registered in the entity registry."""

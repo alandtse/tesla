@@ -1,11 +1,10 @@
 """Support for Tesla buttons."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from teslajsonpy.car import TeslaCar
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
@@ -71,7 +70,7 @@ class TeslaCarFlashLights(TeslaCarEntity, ButtonEntity):
 
 
 class TeslaCarWakeUp(TeslaCarEntity, ButtonEntity):
-    """Representation of a Tesla car wake up button"""
+    """Representation of a Tesla car wake up button."""
 
     def __init__(
         self,
@@ -138,7 +137,7 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
 
     @property
     def available(self) -> bool:
-        """Return True if Homelink devices are nearby"""
+        """Return True if Homelink devices are nearby."""
         return super().available and self._car.homelink_nearby
 
     async def async_press(self):

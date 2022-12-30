@@ -1,15 +1,14 @@
 """Support for Tesla binary sensors."""
 import logging
 
-from teslajsonpy.car import TeslaCar
-from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
 )
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
+from teslajsonpy.energy import PowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -278,6 +277,7 @@ class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        # pylint: disable=protected-access
         timestamp = self._car._vehicle_data.get("charge_state", {}).get(
             "scheduled_charging_start_time"
         )
@@ -316,6 +316,7 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        # pylint: disable=protected-access
         timestamp = self._car._vehicle_data.get("charge_state", {}).get(
             "scheduled_departure_time"
         )
@@ -348,11 +349,13 @@ class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Return True if user present enebaled."""
+        # pylint: disable=protected-access
         return self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
 
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        # pylint: disable=protected-access
         user_id = str(self._car._vehicle_data.get("user_id"))
 
         return {"user_id": user_id}
