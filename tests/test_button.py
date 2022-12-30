@@ -68,10 +68,17 @@ async def test_disabled_by_default(hass: HomeAssistant) -> None:
     """Tests devices are disabled by default when appropriate."""
     # No garages paired, it should be disabled by default.
     car_mock_data.VEHICLE_DATA["vehicle_state"]["homelink_device_count"] = 0
+    # Option codes without pedestrian speaker "P3WS"
+    car_mock_data.VEHICLE_DATA[
+        "option_codes"
+    ] = "AD15,MDL3,PBSB,RENA,BT37,ID3W,RF3G,S3PB,DRLH,DV2W,W39B,APF0,COUS,BC3B,CH07,PC30,FC3P,FG31,GLFR,HL31,HM31,IL31,LTPB,MR31,FM3B,RS3H,SA3P,STCP,SC04,SU3C,T3CA,TW00,TM00,UT3P,WR00,AU3P,APH3,AF00,ZCST,MI00,CDM0"
     await setup_platform(hass, BUTTON_DOMAIN)
     entity_registry = er.async_get(hass)
 
     entry = entity_registry.async_get("button.my_model_s_homelink")
+    assert entry.disabled
+
+    entry = entity_registry.async_get("button.my_model_s_emissions_test")
     assert entry.disabled
 
 
