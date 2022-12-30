@@ -121,7 +121,6 @@ class TeslaCarEntity(TeslaBaseEntity):
 
     @property
     def assumed_state(self) -> bool:
-        # pylint: disable=protected-access
         """Return whether the data is from an online vehicle."""
         return not self._coordinator.controller.is_car_online(vin=self._car.vin) and (
             self._coordinator.controller.get_last_update_time(vin=self._car.vin)

@@ -121,7 +121,7 @@ async def async_setup(hass, base_config):
 
 async def async_setup_entry(hass, config_entry):
     """Set up Tesla as config entry."""
-    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-locals,too-many-statements
     hass.data.setdefault(DOMAIN, {})
     config = config_entry.data
     # Because users can have multiple accounts, we always

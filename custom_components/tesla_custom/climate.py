@@ -108,7 +108,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
 
     @property
     def min_temp(self):
-        """Return min temperature"""
+        """Return min temperature."""
         if self._car.min_avail_temp:
             return self._car.min_avail_temp
 

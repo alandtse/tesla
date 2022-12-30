@@ -59,8 +59,7 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
             and self._car.software_update.get("status") in INSTALLABLE_STATUSES
         ):
             return UpdateEntityFeature.INSTALL | UpdateEntityFeature.PROGRESS
-        else:
-            return UpdateEntityFeature.PROGRESS
+        return UpdateEntityFeature.PROGRESS
 
     @property
     def release_url(self) -> str:

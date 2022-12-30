@@ -112,12 +112,12 @@ def async_setup_services(hass) -> None:
     async def set_update_interval(call):
         """Handle api service request.
 
-        Arguments:
+        Arguments
             call.CONF_EMAIL {str: ""} -- email, optional
             call.ATTR_VIN {str: ""} -- vehicle VIN, optional
             call.CONF_SCAN_INTERVAL {int: 660} -- New scan interval
 
-        Returns:
+        Returns
             bool -- True if new interval is set
 
         """

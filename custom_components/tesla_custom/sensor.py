@@ -321,6 +321,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        # pylint: disable=protected-access
         est_battery_range = self._car._vehicle_data.get("charge_state", {}).get(
             "est_battery_range"
         )
@@ -409,6 +410,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
             return round(self._energysite.load_power)
         if self.type == "battery power":
             return round(self._energysite.battery_power)
+        return 0
 
 
 class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
@@ -579,6 +581,7 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        # pylint: disable=protected-access
         timestamp = self._car._vehicle_data.get("vehicle_state", {}).get(
             TPMS_SENSOR_ATTR.get(self._tpms_sensor)
         )
@@ -611,8 +614,7 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         """Return route arrival time."""
         if self._car.active_route_minutes_to_arrival is None:
             return self._datetime_value
-        else:
-            min_duration = round(float(self._car.active_route_minutes_to_arrival), 2)
+        min_duration = round(float(self._car.active_route_minutes_to_arrival), 2)
 
         utcnow = dt.utcnow()
         if self._last_known_value != min_duration:
