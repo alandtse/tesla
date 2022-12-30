@@ -179,7 +179,10 @@ class TeslaCarEmissionsTest(TeslaCarEntity, ButtonEntity):
         self.type = "emissions test"
         self._attr_icon = "mdi:weather-windy"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._enabled_by_default = self._car.pedestrian_speaker
+        if self._car.pedestrian_speaker is not None:
+            self._enabled_by_default = self._car.pedestrian_speaker
+        else:
+            self._enabled_by_default = False
 
     async def async_press(self) -> None:
         """Handle the button press."""
