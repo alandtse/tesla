@@ -22,6 +22,10 @@ repos:
       - id: debug-statements
       - id: check-toml
       - id: check-json
+        exclude: >
+          (?x)^(
+            .vscode/settings.json
+          )$
       # This one is slow and doesn't check for much
       # - detect-private-key
       # This is very slow, so I recommend disabling it.
@@ -82,3 +86,14 @@ repos:
 #        language: system
 #        pass_filenames: false
 #        always_run: true
+ci:
+  autofix_commit_msg: |
+    style: auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "build: pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
