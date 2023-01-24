@@ -32,7 +32,7 @@ To use the component, you will need an application to generate a Tesla refresh t
 5. Download _all_ the files from the `custom_components/tesla_custom/` directory (folder) in this repository.
 6. Place the files you downloaded in the new directory (folder) you created.
 7. Restart Home Assistant.
-8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Tesla Custom Integration".
+8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Settings" -> "Devices & Services" then click "+" and search for "Tesla Custom Integration".
 
 Note: This integration will wake up your vehicle(s) during installation.
 

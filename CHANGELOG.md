@@ -3,8 +3,10 @@
 <!--next-version-placeholder-->
 
 ## v3.9.1 (2022-12-30)
+
 ### Fix
-* Handle None option_codes ([`47bb178`](https://github.com/alandtse/tesla/commit/47bb178ae779b281ad83fca5bccd2b84ea40e08f))
+
+- Handle None option_codes ([`47bb178`](https://github.com/alandtse/tesla/commit/47bb178ae779b281ad83fca5bccd2b84ea40e08f))
 
 ## v3.9.0 (2022-12-29)
 
