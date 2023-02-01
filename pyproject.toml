@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tesla"
-version = "3.9.1"
+version = "3.9.2"
 description = "A fork of the Home Assistant tesla integration using a oauth proxy to login."
 authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
