@@ -264,7 +264,7 @@ async def async_setup_entry(hass, config_entry):
 
     await coordinator.async_config_entry_first_refresh()
 
-    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
     return True
 
