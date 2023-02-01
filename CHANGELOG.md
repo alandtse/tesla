@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v3.9.2 (2023-01-31)
+### Fix
+* Bump teslajsonpy to fix charge current ([#484](https://github.com/alandtse/tesla/issues/484)) ([`fa4bb7e`](https://github.com/alandtse/tesla/commit/fa4bb7ed25f72d316dcc50b70342401b5bf92a5b))
+* Switch to async_forward_entry_setups ([`3d62c3c`](https://github.com/alandtse/tesla/commit/3d62c3cfbd27978e60e62f7a0a37a5ed671fbdb8))
+
+### Documentation
+* Updated readme installation instructions ([#495](https://github.com/alandtse/tesla/issues/495)) ([`8d966c4`](https://github.com/alandtse/tesla/commit/8d966c49cb7d4f8d65d0d4ad6e1e486175fed61e))
+
 ## v3.9.1 (2022-12-30)
 
 ### Fix
