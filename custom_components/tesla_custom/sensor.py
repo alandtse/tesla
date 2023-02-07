@@ -549,6 +549,18 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
             return self._value
         return None
 
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        # pylint: disable=protected-access
+        minutes_to_full_charge = self._car._vehicle_data.get("charge_state", {}).get(
+            "minutes_to_full_charge"
+        )
+
+        return {
+            "minutes_to_full_charge": minutes_to_full_charge,
+        }
+
 
 class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car TPMS Pressure sensor."""
