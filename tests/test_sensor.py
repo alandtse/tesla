@@ -32,6 +32,9 @@ from homeassistant.util.unit_conversion import (
     SpeedConverter,
 )
 from pytest import MonkeyPatch
+import pytest
+
+pytestmark = pytest.mark.asyncio
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data, energysite as energysite_mock_data
