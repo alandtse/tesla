@@ -267,6 +267,11 @@ async def test_time_charge_complete_charging(
     )
     charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
 
+    minutes_to_full_charge = car_mock_data.VEHICLE_DATA["charge_state"][
+        "minutes_to_full_charge"
+    ]
+    assert state.attributes.get("minutes_to_full_charge") == minutes_to_full_charge
+
 
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
     """Tests time charge complete is the correct value."""
