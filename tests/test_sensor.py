@@ -31,8 +31,8 @@ from homeassistant.util.unit_conversion import (
     PressureConverter,
     SpeedConverter,
 )
-from pytest import MonkeyPatch
 import pytest
+from pytest import MonkeyPatch
 
 pytestmark = pytest.mark.asyncio
 
