@@ -31,7 +31,10 @@ from homeassistant.util.unit_conversion import (
     PressureConverter,
     SpeedConverter,
 )
+import pytest
 from pytest import MonkeyPatch
+
+pytestmark = pytest.mark.asyncio
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data, energysite as energysite_mock_data
@@ -266,6 +269,11 @@ async def test_time_charge_complete_charging(
         hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
     charge_complete_str = datetime.strftime(charge_complete, "%Y-%m-%dT%H:%M:%S+00:00")
+
+    minutes_to_full_charge = car_mock_data.VEHICLE_DATA["charge_state"][
+        "minutes_to_full_charge"
+    ]
+    assert state.attributes.get("minutes_to_full_charge") == minutes_to_full_charge
 
 
 async def test_time_charge_completed(hass: HomeAssistant) -> None:
