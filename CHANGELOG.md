@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.10.0 (2023-02-22)
+### Feature
+* Add min_to_full_charge attribute ([#505](https://github.com/alandtse/tesla/issues/505)) ([`316ad90`](https://github.com/alandtse/tesla/commit/316ad90ce9cca78f5d7be6f0ce77432446639aef))
+
 ## v3.9.2 (2023-01-31)
 ### Fix
 * Bump teslajsonpy to fix charge current ([#484](https://github.com/alandtse/tesla/issues/484)) ([`fa4bb7e`](https://github.com/alandtse/tesla/commit/fa4bb7ed25f72d316dcc50b70342401b5bf92a5b))
