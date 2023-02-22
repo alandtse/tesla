@@ -42,7 +42,7 @@ repos:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.40.0
+    rev: v2.42.0
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -66,7 +66,7 @@ repos:
       - id: pyupgrade
         args: [--py38-plus]
   - repo: https://github.com/PyCQA/prospector
-    rev: v1.8.4
+    rev: v1.9.0
     hooks:
       - id: prospector
         exclude: ^(tests)/.+\.py$
