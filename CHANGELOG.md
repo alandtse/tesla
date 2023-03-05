@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.10.2 (2023-03-05)
+### Fix
+* Bump teslajsonpy to 3.7.4 ([`967ce66`](https://github.com/alandtse/tesla/commit/967ce66394de661aeed1b27b8d611d55ea7f238a))
+
 ## v3.10.1 (2023-03-05)
 ### Fix
 * Bump teslajsonpy to 3.7.3 ([`da8afd7`](https://github.com/alandtse/tesla/commit/da8afd7587165c07d0bdad2c2568a33d3128ee8e))
