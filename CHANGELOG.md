@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.10.1 (2023-03-05)
+### Fix
+* Bump teslajsonpy to 3.7.3 ([`da8afd7`](https://github.com/alandtse/tesla/commit/da8afd7587165c07d0bdad2c2568a33d3128ee8e))
+
 ## v3.10.0 (2023-02-22)
 ### Feature
 * Add min_to_full_charge attribute ([#505](https://github.com/alandtse/tesla/issues/505)) ([`316ad90`](https://github.com/alandtse/tesla/commit/316ad90ce9cca78f5d7be6f0ce77432446639aef))
