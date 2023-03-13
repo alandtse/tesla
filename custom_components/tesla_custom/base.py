@@ -149,7 +149,9 @@ class TeslaEnergyEntity(TeslaBaseEntity):
     def unique_id(self) -> str:
         """Return unique id for energy site device."""
         if not self._memorized_unique_id:
-            self._memorized_unique_id = slugify(f"{self._energysite.energysite_id} {self.type}")
+            self._memorized_unique_id = slugify(
+                f"{self._energysite.energysite_id} {self.type}"
+            )
         return self._memorized_unique_id
 
     @property
