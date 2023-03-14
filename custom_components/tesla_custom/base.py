@@ -27,6 +27,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         self._enabled_by_default: bool = True
         self.hass = hass
         self.type = None
+        self._memorized_unique_id = None
 
     def refresh(self) -> None:
         """Refresh the device data.
@@ -106,7 +107,9 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def unique_id(self) -> str:
         """Return unique id for car entity."""
-        return slugify(f"{self._car.vin} {self.type}")
+        if not self._memorized_unique_id:
+            self._memorized_unique_id = slugify(f"{self._car.vin} {self.type}")
+        return self._memorized_unique_id
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -145,7 +148,11 @@ class TeslaEnergyEntity(TeslaBaseEntity):
     @property
     def unique_id(self) -> str:
         """Return unique id for energy site device."""
-        return slugify(f"{self._energysite.energysite_id} {self.type}")
+        if not self._memorized_unique_id:
+            self._memorized_unique_id = slugify(
+                f"{self._energysite.energysite_id} {self.type}"
+            )
+        return self._memorized_unique_id
 
     @property
     def sw_version(self) -> bool:
