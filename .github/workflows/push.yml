@@ -32,6 +32,14 @@ jobs:
       - run: python3 -m pip install black
       - run: black .
 
+  todo:
+    runs-on: "ubuntu-latest"
+    name: Setup TODO issues
+    steps:
+      - uses: "actions/checkout@v3"
+      - name: "TODO to Issue"
+        uses: "alstr/todo-to-issue-action@v4"
+
   tests:
     runs-on: "ubuntu-latest"
     name: Run tests
