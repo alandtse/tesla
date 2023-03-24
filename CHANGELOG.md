@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.10.4 (2023-03-24)
+### Fix
+* Fix sharing of addresses and media ([#545](https://github.com/alandtse/tesla/issues/545)) ([`0cc8319`](https://github.com/alandtse/tesla/commit/0cc8319db47cbe0427cf71347e710da53e01fa59))
+
 ## v3.10.3 (2023-03-14)
 ### Fix
 * Memoize unique id ([#534](https://github.com/alandtse/tesla/issues/534)) ([`05f1689`](https://github.com/alandtse/tesla/commit/05f16899774afb80870ee34f83127ee462904db8))
