@@ -200,7 +200,9 @@ async def async_setup_entry(hass, config_entry):
         # https://docs.python.org/3/library/asyncio-task.html#creating-tasks
 
         if hasattr(hass, "async_create_background_task"):
-            hass.async_create_background_task(_async_close_client())
+            hass.async_create_background_task(
+                _async_close_client(), "tesla_close_client"
+            )
         else:
             asyncio.create_task(_async_close_client())
 
