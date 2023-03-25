@@ -39,6 +39,7 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
+from .util import SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,7 +127,9 @@ async def async_setup_entry(hass, config_entry):
     config = config_entry.data
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
-    async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
+    async_client = httpx.AsyncClient(
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+    )
     email = config_entry.title
 
     if not hass.data[DOMAIN]:
