@@ -380,7 +380,9 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from API endpoint."""
-        if self.update_vehicles and self.controller.is_token_refreshed():
+        if self.controller.is_token_refreshed():
+            # It doesn't matter which coordinator calls this, as long as there
+            # are no awaits in the below code, it will be called only once.
             result = self.controller.get_tokens()
             refresh_token = result["refresh_token"]
             access_token = result["access_token"]
