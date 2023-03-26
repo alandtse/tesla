@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBackupReserve(hass, energysite, coordinator))
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):

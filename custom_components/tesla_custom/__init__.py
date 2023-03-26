@@ -297,12 +297,9 @@ async def async_setup_entry(hass, config_entry):
     }
     _LOGGER.debug("Connected to the Tesla API")
 
-    await asyncio.gather(
-        *(
-            coordinator.async_config_entry_first_refresh()
-            for coordinator in coordinators.values()
-        )
-    )
+    # We do not do a first refresh as we already know the API is working
+    # from above. Each platform will schedule a refresh via update_before_add
+    # for the sites/vehicles they are interested in.
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 

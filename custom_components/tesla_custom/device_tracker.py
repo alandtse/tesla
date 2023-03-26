@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarLocation(hass, car, coordinator))
         entities.append(TeslaCarDestinationLocation(hass, car, coordinator))
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarLocation(TeslaCarEntity, TrackerEntity):

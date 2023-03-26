@@ -53,9 +53,10 @@ TPMS_SENSOR_ATTR = {
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
-    coordinators = hass.data[DOMAIN][config_entry.entry_id]["coordinators"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
-    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
+    energysites = entry_data["energysites"]
     entities = []
 
     for vin, car in cars.items():
@@ -100,7 +101,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                     TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
                 )
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarBattery(TeslaCarEntity, SensorEntity):

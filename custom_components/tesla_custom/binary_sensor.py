@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             entities.append(TeslaEnergyBatteryCharging(hass, energysite, coordinator))
             entities.append(TeslaEnergyGridStatus(hass, energysite, coordinator))
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):

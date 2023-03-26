@@ -24,7 +24,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         )
         for vin, car in cars.items()
     ]
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 INSTALLABLE_STATUSES = ["available", "scheduled"]

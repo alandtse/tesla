@@ -46,7 +46,7 @@ async def async_setup_entry(
         )
         for vin, car in cars.items()
     ]
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarClimate(TeslaCarEntity, ClimateEntity):

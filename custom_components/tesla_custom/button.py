@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarRemoteStart(hass, car, coordinator))
         entities.append(TeslaCarEmissionsTest(hass, car, coordinator))
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarHorn(TeslaCarEntity, ButtonEntity):

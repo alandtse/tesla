@@ -97,7 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
             entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
 
-    async_add_entities(entities)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
