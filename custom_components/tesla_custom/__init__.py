@@ -252,11 +252,13 @@ async def async_setup_entry(hass, config_entry):
 
         return False
 
+    reload_lock = asyncio.Lock()
     _partial_coordinator = partial(
         TeslaDataUpdateCoordinator,
         hass,
         config_entry=config_entry,
         controller=controller,
+        reload_lock=reload_lock,
         energy_site_ids=set(),
         vins=set(),
         update_vehicles=False,
@@ -336,6 +338,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         *,
         config_entry,
         controller: TeslaAPI,
+        reload_lock: asyncio.Lock,
         vins: set[str],
         energy_site_ids: set[str],
         update_vehicles: bool,
@@ -343,6 +346,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
+        self.reload_lock = reload_lock
         self.vins = vins
         self.energy_site_ids = energy_site_ids
         self.update_vehicles = update_vehicles
@@ -381,6 +385,13 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                     update_vehicles=self.update_vehicles,
                 )
         except IncompleteCredentials:
-            await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+            if self.reload_lock.locked():
+                # Any of the coordinators can trigger a reload, but we only
+                # want to do it once. If the lock is already locked, we know
+                # another coordinator is already reloading.
+                _LOGGER.debug("Config entry is already being reloaded")
+                return
+            async with self.reload_lock:
+                await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
