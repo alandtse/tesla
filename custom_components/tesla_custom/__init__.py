@@ -40,6 +40,7 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
+from .util import SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -127,7 +128,9 @@ async def async_setup_entry(hass, config_entry):
     config = config_entry.data
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
-    async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
+    async_client = httpx.AsyncClient(
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+    )
     email = config_entry.title
 
     if not hass.data[DOMAIN]:
@@ -194,7 +197,18 @@ async def async_setup_entry(hass, config_entry):
 
     @callback
     def _async_create_close_task():
-        asyncio.create_task(_async_close_client())
+        # Background tasks are tracked in HA to prevent them from
+        # being garbage collected in the middle of the task since
+        # asyncio only holds a weak reference to them.
+        #
+        # https://docs.python.org/3/library/asyncio-task.html#creating-tasks
+
+        if hasattr(hass, "async_create_background_task"):
+            hass.async_create_background_task(
+                _async_close_client(), "tesla_close_client"
+            )
+        else:
+            asyncio.create_task(_async_close_client())
 
     config_entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_CLOSE, _async_close_client)
