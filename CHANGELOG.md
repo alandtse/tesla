@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v3.11.0 (2023-03-26)
+### Feature
+* Split coordinator to avoid updating disabled cars and energy sites ([#552](https://github.com/alandtse/tesla/issues/552)) ([`41dfbcc`](https://github.com/alandtse/tesla/commit/41dfbccd07c1bf9b4300c8add77e9ae91c2a4820))
+
+### Fix
+* Use Home Assistant ssl context to avoid I/O ([#550](https://github.com/alandtse/tesla/issues/550)) ([`7386d43`](https://github.com/alandtse/tesla/commit/7386d430da675dd35c5d0bd131ca402fa92be4b2))
+* Use async_create_background_task to close the httpx client ([#551](https://github.com/alandtse/tesla/issues/551)) ([`de0d838`](https://github.com/alandtse/tesla/commit/de0d838c5d8fc098906fc2ab9427d820b2a4e4ed))
+
 ## v3.10.4 (2023-03-24)
 ### Fix
 * Fix sharing of addresses and media ([#545](https://github.com/alandtse/tesla/issues/545)) ([`0cc8319`](https://github.com/alandtse/tesla/commit/0cc8319db47cbe0427cf71347e710da53e01fa59))
