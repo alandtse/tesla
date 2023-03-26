@@ -257,7 +257,7 @@ async def async_setup_entry(hass, config_entry):
             config_entry=config_entry,
             controller=controller,
             energy_site_ids=set(),
-            vehicle_ids=set(),
+            vins=set(),
             update_vehicles=True,
         )
     }
@@ -267,7 +267,7 @@ async def async_setup_entry(hass, config_entry):
             config_entry=config_entry,
             controller=controller,
             energy_site_ids={energy_site_id},
-            vehicle_ids=set(),
+            vins=set(),
             update_vehicles=False,
         )
         for energy_site_id in energysites
@@ -278,7 +278,7 @@ async def async_setup_entry(hass, config_entry):
             config_entry=config_entry,
             controller=controller,
             energy_site_ids=set(),
-            vehicle_ids={vin},
+            vins={vin},
             update_vehicles=False,
         )
         for vin in cars
