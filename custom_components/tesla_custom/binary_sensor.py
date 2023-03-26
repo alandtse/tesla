@@ -19,12 +19,14 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
-    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
+    energysites = entry_data["energysites"]
     entities = []
 
-    for car in cars.values():
+    for vin, car in cars.items():
+        coordinator = coordinators[vin]
         entities.append(TeslaCarParkingBrake(hass, car, coordinator))
         entities.append(TeslaCarOnline(hass, car, coordinator))
         entities.append(TeslaCarAsleep(hass, car, coordinator))
@@ -35,12 +37,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
         entities.append(TeslaCarUserPresent(hass, car, coordinator))
 
-    for energysite in energysites.values():
+    for energy_site_id, energysite in energysites.items():
+        coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBatteryCharging(hass, energysite, coordinator))
             entities.append(TeslaEnergyGridStatus(hass, energysite, coordinator))
 
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):

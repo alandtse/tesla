@@ -1,6 +1,7 @@
 """Support for Tesla cars."""
 import asyncio
 from datetime import timedelta
+from functools import partial
 from http import HTTPStatus
 import logging
 
@@ -39,6 +40,7 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
+from .util import SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,7 +128,9 @@ async def async_setup_entry(hass, config_entry):
     config = config_entry.data
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
-    async_client = httpx.AsyncClient(headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60)
+    async_client = httpx.AsyncClient(
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+    )
     email = config_entry.title
 
     if not hass.data[DOMAIN]:
@@ -193,7 +197,18 @@ async def async_setup_entry(hass, config_entry):
 
     @callback
     def _async_create_close_task():
-        asyncio.create_task(_async_close_client())
+        # Background tasks are tracked in HA to prevent them from
+        # being garbage collected in the middle of the task since
+        # asyncio only holds a weak reference to them.
+        #
+        # https://docs.python.org/3/library/asyncio-task.html#creating-tasks
+
+        if hasattr(hass, "async_create_background_task"):
+            hass.async_create_background_task(
+                _async_close_client(), "tesla_close_client"
+            )
+        else:
+            asyncio.create_task(_async_close_client())
 
     config_entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_CLOSE, _async_close_client)
@@ -201,9 +216,6 @@ async def async_setup_entry(hass, config_entry):
     config_entry.async_on_unload(_async_create_close_task)
 
     _async_save_tokens(hass, config_entry, access_token, refresh_token, expiration)
-    coordinator = TeslaDataUpdateCoordinator(
-        hass, config_entry=config_entry, controller=controller
-    )
 
     try:
         if config_entry.data.get("initial_setup"):
@@ -254,15 +266,38 @@ async def async_setup_entry(hass, config_entry):
 
         return False
 
+    reload_lock = asyncio.Lock()
+    _partial_coordinator = partial(
+        TeslaDataUpdateCoordinator,
+        hass,
+        config_entry=config_entry,
+        controller=controller,
+        reload_lock=reload_lock,
+        energy_site_ids=set(),
+        vins=set(),
+        update_vehicles=False,
+    )
+    coordinators = {
+        "update_vehicles": _partial_coordinator(update_vehicles=True),
+        **{
+            energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+            for energy_site_id in energysites
+        },
+        **{vin: _partial_coordinator(vins={vin}) for vin in cars},
+    }
+
     hass.data[DOMAIN][config_entry.entry_id] = {
-        "coordinator": coordinator,
+        "controller": controller,
+        "coordinators": coordinators,
         "cars": cars,
         "energysites": energysites,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")
 
-    await coordinator.async_config_entry_first_refresh()
+    # We do not do a first refresh as we already know the API is working
+    # from above. Each platform will schedule a refresh via update_before_add
+    # for the sites/vehicles they are interested in.
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
@@ -274,11 +309,11 @@ async def async_unload_entry(hass, config_entry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
-    await hass.data[DOMAIN].get(config_entry.entry_id)[
-        "coordinator"
-    ].controller.disconnect()
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    controller: TeslaAPI = entry_data["controller"]
+    await controller.disconnect()
 
-    for listener in hass.data[DOMAIN][config_entry.entry_id][DATA_LISTENER]:
+    for listener in entry_data[DATA_LISTENER]:
         listener()
     username = config_entry.title
 
@@ -296,7 +331,8 @@ async def async_unload_entry(hass, config_entry) -> bool:
 
 async def update_listener(hass, config_entry):
     """Update when config_entry options update."""
-    controller = hass.data[DOMAIN][config_entry.entry_id]["coordinator"].controller
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    controller: TeslaAPI = entry_data["controller"]
     old_update_interval = controller.update_interval
     controller.update_interval = config_entry.options.get(
         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
@@ -312,10 +348,24 @@ async def update_listener(hass, config_entry):
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Tesla data."""
 
-    def __init__(self, hass, *, config_entry, controller: TeslaAPI):
+    def __init__(
+        self,
+        hass,
+        *,
+        config_entry,
+        controller: TeslaAPI,
+        reload_lock: asyncio.Lock,
+        vins: set[str],
+        energy_site_ids: set[str],
+        update_vehicles: bool,
+    ):
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
+        self.reload_lock = reload_lock
+        self.vins = vins
+        self.energy_site_ids = energy_site_ids
+        self.update_vehicles = update_vehicles
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
 
@@ -329,6 +379,8 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from API endpoint."""
         if self.controller.is_token_refreshed():
+            # It doesn't matter which coordinator calls this, as long as there
+            # are no awaits in the below code, it will be called only once.
             result = self.controller.get_tokens()
             refresh_token = result["refresh_token"]
             access_token = result["access_token"]
@@ -343,8 +395,19 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             # handled by the data update coordinator.
             async with async_timeout.timeout(30):
                 _LOGGER.debug("Running controller.update()")
-                return await self.controller.update()
+                return await self.controller.update(
+                    vins=self.vins,
+                    energy_site_ids=self.energy_site_ids,
+                    update_vehicles=self.update_vehicles,
+                )
         except IncompleteCredentials:
-            await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+            if self.reload_lock.locked():
+                # Any of the coordinators can trigger a reload, but we only
+                # want to do it once. If the lock is already locked, we know
+                # another coordinator is already reloading.
+                _LOGGER.debug("Config entry is already being reloaded")
+                return
+            async with self.reload_lock:
+                await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
