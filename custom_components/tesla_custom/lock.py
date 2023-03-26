@@ -14,15 +14,16 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla locks by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    coordinators = hass.data[DOMAIN][config_entry.entry_id]["coordinators"]
     cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
     entities = []
 
-    for car in cars.values():
+    for vin, car in cars.items():
+        coordinator = coordinators[vin]
         entities.append(TeslaCarDoors(hass, car, coordinator))
         entities.append(TeslaCarChargePortLatch(hass, car, coordinator))
 
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class TeslaCarDoors(TeslaCarEntity, LockEntity):

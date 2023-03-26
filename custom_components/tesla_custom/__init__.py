@@ -201,9 +201,6 @@ async def async_setup_entry(hass, config_entry):
     config_entry.async_on_unload(_async_create_close_task)
 
     _async_save_tokens(hass, config_entry, access_token, refresh_token, expiration)
-    coordinator = TeslaDataUpdateCoordinator(
-        hass, config_entry=config_entry, controller=controller
-    )
 
     try:
         if config_entry.data.get("initial_setup"):
@@ -254,15 +251,58 @@ async def async_setup_entry(hass, config_entry):
 
         return False
 
+    _base_coordinators = {
+        "update_vehicles": TeslaDataUpdateCoordinator(
+            hass,
+            config_entry=config_entry,
+            controller=controller,
+            energy_site_ids=set(),
+            vehicle_ids=set(),
+            update_vehicles=True,
+        )
+    }
+    _energy_coordinators = {
+        energy_site_id: TeslaDataUpdateCoordinator(
+            hass,
+            config_entry=config_entry,
+            controller=controller,
+            energy_site_ids={energy_site_id},
+            vehicle_ids=set(),
+            update_vehicles=False,
+        )
+        for energy_site_id in energysites
+    }
+    _vehicle_coordinators = {
+        vin: TeslaDataUpdateCoordinator(
+            hass,
+            config_entry=config_entry,
+            controller=controller,
+            energy_site_ids=set(),
+            vehicle_ids={vin},
+            update_vehicles=False,
+        )
+        for vin in cars
+    }
+    coordinators = {
+        **_base_coordinators,
+        **_energy_coordinators,
+        **_vehicle_coordinators,
+    }
+
     hass.data[DOMAIN][config_entry.entry_id] = {
-        "coordinator": coordinator,
+        "coordinators": coordinators,
         "cars": cars,
         "energysites": energysites,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")
 
-    await coordinator.async_config_entry_first_refresh()
+    await asyncio.gather(
+        *(
+            coordinator.async_config_entry_first_refresh()
+            for coordinator in coordinators.values()
+        )
+    )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
@@ -312,10 +352,22 @@ async def update_listener(hass, config_entry):
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Tesla data."""
 
-    def __init__(self, hass, *, config_entry, controller: TeslaAPI):
+    def __init__(
+        self,
+        hass,
+        *,
+        config_entry,
+        controller: TeslaAPI,
+        vins: set[str],
+        energy_site_ids: set[str],
+        update_vehicles: bool,
+    ):
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
+        self.vins = vins
+        self.energy_site_ids = energy_site_ids
+        self.update_vehicles = update_vehicles
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
 
@@ -328,7 +380,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from API endpoint."""
-        if self.controller.is_token_refreshed():
+        if self.update_vehicles and self.controller.is_token_refreshed():
             result = self.controller.get_tokens()
             refresh_token = result["refresh_token"]
             access_token = result["access_token"]
@@ -343,7 +395,11 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             # handled by the data update coordinator.
             async with async_timeout.timeout(30):
                 _LOGGER.debug("Running controller.update()")
-                return await self.controller.update()
+                return await self.controller.update(
+                    vins=self.vins,
+                    energy_site_ids=self.energy_site_ids,
+                    update_vehicles=self.update_vehicles,
+                )
         except IncompleteCredentials:
             await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
