@@ -1,6 +1,7 @@
 """Support for Tesla cars."""
 import asyncio
 from datetime import timedelta
+from functools import partial
 from http import HTTPStatus
 import logging
 
@@ -251,42 +252,22 @@ async def async_setup_entry(hass, config_entry):
 
         return False
 
-    _base_coordinators = {
-        "update_vehicles": TeslaDataUpdateCoordinator(
-            hass,
-            config_entry=config_entry,
-            controller=controller,
-            energy_site_ids=set(),
-            vins=set(),
-            update_vehicles=True,
-        )
-    }
-    _energy_coordinators = {
-        energy_site_id: TeslaDataUpdateCoordinator(
-            hass,
-            config_entry=config_entry,
-            controller=controller,
-            energy_site_ids={energy_site_id},
-            vins=set(),
-            update_vehicles=False,
-        )
-        for energy_site_id in energysites
-    }
-    _vehicle_coordinators = {
-        vin: TeslaDataUpdateCoordinator(
-            hass,
-            config_entry=config_entry,
-            controller=controller,
-            energy_site_ids=set(),
-            vins={vin},
-            update_vehicles=False,
-        )
-        for vin in cars
-    }
+    _partial_coordinator = partial(
+        TeslaDataUpdateCoordinator,
+        hass,
+        config_entry=config_entry,
+        controller=controller,
+        energy_site_ids=set(),
+        vins=set(),
+        update_vehicles=False,
+    )
     coordinators = {
-        **_base_coordinators,
-        **_energy_coordinators,
-        **_vehicle_coordinators,
+        "update_vehicles": _partial_coordinator(update_vehicles=True)
+        ** {
+            energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+            for energy_site_id in energysites
+        },
+        **{vin: _partial_coordinator(vins={vin}) for vin in cars},
     }
 
     hass.data[DOMAIN][config_entry.entry_id] = {
