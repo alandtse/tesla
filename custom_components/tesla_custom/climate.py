@@ -34,18 +34,19 @@ async def async_setup_entry(
     hass: HomeAssistant, config_entry, async_add_entities
 ) -> None:
     """Set up the Tesla climate by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
 
     entities = [
         TeslaCarClimate(
             hass,
             car,
-            coordinator,
+            coordinators[vin],
         )
-        for car in cars.values()
+        for vin, car in cars.items()
     ]
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarClimate(TeslaCarEntity, ClimateEntity):

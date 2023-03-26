@@ -15,18 +15,20 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla switches by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
     entities = []
 
-    for car in cars.values():
+    for vin, car in cars.items():
+        coordinator = coordinators[vin]
         entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
         entities.append(TeslaCarSentryMode(hass, car, coordinator))
         entities.append(TeslaCarPolling(hass, car, coordinator))
         entities.append(TeslaCarCharger(hass, car, coordinator))
         entities.append(TeslaCarValetMode(hass, car, coordinator))
 
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):

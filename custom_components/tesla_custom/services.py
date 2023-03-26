@@ -95,7 +95,8 @@ def async_setup_services(hass) -> None:
                 and entry.title != email
             ):
                 continue
-            controller = hass.data[DOMAIN].get(entry.entry_id)["coordinator"].controller
+            entry_data = hass.data[DOMAIN][entry.entry_id]
+            controller = entry_data["controller"]
         if controller is None:
             raise ValueError(f"No Tesla controllers found for email {email}")
         command = call.data.get(ATTR_COMMAND)
@@ -134,7 +135,8 @@ def async_setup_services(hass) -> None:
                 and entry.title != email
             ):
                 continue
-            controller = hass.data[DOMAIN].get(entry.entry_id)["coordinator"].controller
+            entry_data = hass.data[DOMAIN][entry.entry_id]
+            controller = entry_data["controller"]
         if controller is None:
             raise ValueError(f"No Tesla controllers found for email {email}")
 

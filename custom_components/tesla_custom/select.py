@@ -69,12 +69,14 @@ AUTO_SEAT_ID_MAP = {
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla selects by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
-    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
+    energysites = entry_data["energysites"]
     entities = []
 
-    for car in cars.values():
+    for vin, car in cars.items():
+        coordinator = coordinators[vin]
         entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
@@ -87,14 +89,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                 continue
             entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
 
-    for energysite in energysites.values():
+    for energy_site_id, energysite in energysites.items():
+        coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
         if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
             entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
             entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
 
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):

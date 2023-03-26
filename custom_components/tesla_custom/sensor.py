@@ -53,12 +53,14 @@ TPMS_SENSOR_ATTR = {
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    cars = hass.data[DOMAIN][config_entry.entry_id]["cars"]
-    energysites = hass.data[DOMAIN][config_entry.entry_id]["energysites"]
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    coordinators = entry_data["coordinators"]
+    cars = entry_data["cars"]
+    energysites = entry_data["energysites"]
     entities = []
 
-    for car in cars.values():
+    for vin, car in cars.items():
+        coordinator = coordinators[vin]
         entities.append(TeslaCarBattery(hass, car, coordinator))
         entities.append(TeslaCarChargerRate(hass, car, coordinator))
         entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
@@ -75,7 +77,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarArrivalTime(hass, car, coordinator))
         entities.append(TeslaCarDistanceToArrival(hass, car, coordinator))
 
-    for energysite in energysites.values():
+    for energy_site_id, energysite in energysites.items():
+        coordinator = coordinators[energy_site_id]
         if (
             energysite.resource_type == RESOURCE_TYPE_SOLAR
             and energysite.has_load_meter
@@ -98,7 +101,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                     TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
                 )
 
-    async_add_entities(entities, True)
+    async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarBattery(TeslaCarEntity, SensorEntity):
