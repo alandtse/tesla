@@ -287,6 +287,7 @@ async def async_setup_entry(hass, config_entry):
     }
 
     hass.data[DOMAIN][config_entry.entry_id] = {
+        "controller": controller,
         "coordinators": coordinators,
         "cars": cars,
         "energysites": energysites,
@@ -308,11 +309,11 @@ async def async_unload_entry(hass, config_entry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
-    await hass.data[DOMAIN].get(config_entry.entry_id)[
-        "coordinator"
-    ].controller.disconnect()
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    controller: TeslaAPI = entry_data["controller"]
+    await controller.disconnect()
 
-    for listener in hass.data[DOMAIN][config_entry.entry_id][DATA_LISTENER]:
+    for listener in entry_data[DATA_LISTENER]:
         listener()
     username = config_entry.title
 
@@ -330,7 +331,8 @@ async def async_unload_entry(hass, config_entry) -> bool:
 
 async def update_listener(hass, config_entry):
     """Update when config_entry options update."""
-    controller = hass.data[DOMAIN][config_entry.entry_id]["coordinator"].controller
+    entry_data = hass.data[DOMAIN][config_entry.entry_id]
+    controller: TeslaAPI = entry_data["controller"]
     old_update_interval = controller.update_interval
     controller.update_interval = config_entry.options.get(
         CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
