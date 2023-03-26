@@ -262,8 +262,8 @@ async def async_setup_entry(hass, config_entry):
         update_vehicles=False,
     )
     coordinators = {
-        "update_vehicles": _partial_coordinator(update_vehicles=True)
-        ** {
+        "update_vehicles": _partial_coordinator(update_vehicles=True),
+        **{
             energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
             for energy_site_id in energysites
         },
