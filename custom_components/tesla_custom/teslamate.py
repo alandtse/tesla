@@ -8,14 +8,12 @@ import asyncio
 import logging
 from typing import TYPE_CHECKING
 
+from homeassistant.components.mqtt import mqtt_config_entry_enabled
 from homeassistant.components.mqtt.models import ReceiveMessage
 from homeassistant.components.mqtt.subscription import (
     async_prepare_subscribe_topics,
     async_subscribe_topics,
     async_unsubscribe_topics,
-)
-from homeassistant.components.mqtt import (
-    mqtt_config_entry_enabled,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
