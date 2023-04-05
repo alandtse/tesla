@@ -14,6 +14,9 @@ from homeassistant.components.mqtt.subscription import (
     async_subscribe_topics,
     async_unsubscribe_topics,
 )
+from homeassistant.components.mqtt import (
+    mqtt_config_entry_enabled,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from teslajsonpy.car import TeslaCar
@@ -57,6 +60,7 @@ class TeslaMate:
         self.cars = cars
         self.hass = hass
         self.coordinators = coordinators
+        self._enabled = False
 
         self.watchers = []
 
@@ -67,8 +71,22 @@ class TeslaMate:
 
     async def unload(self):
         """Unload any MQTT watchers."""
-        self._sub_state = async_unsubscribe_topics(self.hass, self._sub_state)
+        self._enabled = False
+
+        if not mqtt_config_entry_enabled(self.hass):
+            logger.warning(
+                "Cannot unsub from TeslaMate as MQTT has not been configured."
+            )
+            return None
+        else:
+            await self._unsub_mqtt()
+
         return True
+
+    async def _unsub_mqtt(self):
+        """Unsub from MQTT topics."""
+        logger.info("Un-subbing from MQTT Topics.")
+        self._sub_state = async_unsubscribe_topics(self.hass, self._sub_state)
 
     async def set_car_id(self, vin, teslamate_id):
         """Set the TeslaMate Car ID."""
@@ -100,16 +118,33 @@ class TeslaMate:
         if enable is False:
             return await self.unload()
 
+        self._enabled = True
+        return await self.watch_cars()
+
+    async def watch_cars(self):
+        """Start listening to MQTT for updates."""
+
+        if self._enabled is False:
+            logger.info("Can't watch cars. teslaMate is not enabled.")
+            return None
+
+        if not mqtt_config_entry_enabled(self.hass):
+            logger.warning("Cannot enable TeslaMate as MQTT has not been configured.")
+            return None
+
+        logger.info("Setting up MQTT subs for Teslamate")
+
+        # We'll unsub from all topics before we create new ones.
+        await self._unsub_mqtt()
+
         for vin in self.cars:
             car = self.cars[vin]
             teslamate_id = await self.get_car_id(vin=vin)
 
             if teslamate_id is not None:
-                await self.watch_car(car=car, teslamate_id=teslamate_id)
+                await self._watch_car(car=car, teslamate_id=teslamate_id)
 
-        return True
-
-    async def watch_car(self, car: TeslaCar, teslamate_id: str):
+    async def _watch_car(self, car: TeslaCar, teslamate_id: str):
         """Set up MQTT watchers for a car."""
 
         topics = {}
@@ -119,7 +154,8 @@ class TeslaMate:
                 self.async_handle_new_data(car, msg), self.hass.loop
             ).result()
 
-        topics["car_data"] = {
+        sub_id = f"teslamate_{car.vin}"
+        topics[sub_id] = {
             "topic": f"teslamate/cars/{teslamate_id}/#",
             "msg_callback": msg_recieved,
             "qos": 0,
