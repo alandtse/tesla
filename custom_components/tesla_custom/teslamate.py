@@ -49,12 +49,18 @@ MAP_VEHICLE_STATE = {
 
 
 class TeslaMate:
+    """TeslaMate Connector.
+
+    Manages connnections to MQTT topics exposed by TeslaMate.
+    """
+
     def __init__(
         self,
         hass: HomeAssistant,
         coordinators: list["TeslaDataUpdateCoordinator"],
         cars: dict[str, TeslaCar],
     ):
+        """Init Class."""
         self.cars = cars
         self.hass = hass
         self.coordinators = coordinators
@@ -71,13 +77,12 @@ class TeslaMate:
         """Unload any MQTT watchers."""
         self._enabled = False
 
-        if not mqtt_config_entry_enabled(self.hass):
+        if mqtt_config_entry_enabled(self.hass):
+            await self._unsub_mqtt()
+        else:
             logger.warning(
                 "Cannot unsub from TeslaMate as MQTT has not been configured."
             )
-            return None
-        else:
-            await self._unsub_mqtt()
 
         return True
 
@@ -192,6 +197,7 @@ class TeslaMate:
     @staticmethod
     def update_drive_state(car, attr, value):
         """Update Drive State Safely."""
+        # pylint: disable=protected-access
 
         if "drive_state" not in car._vehicle_data:
             car._vehicle_data["drive_state"] = {}
@@ -202,6 +208,7 @@ class TeslaMate:
     @staticmethod
     def update_vehicle_state(car, attr, value):
         """Update Vehicle State Safely."""
+        # pylint: disable=protected-access
 
         if "vehicle_state" not in car._vehicle_data:
             car._vehicle_data["vehicle_state"] = {}
@@ -212,6 +219,7 @@ class TeslaMate:
     @staticmethod
     def update_climate_state(car, attr, value):
         """Update Climate State Safely."""
+        # pylint: disable=protected-access
 
         if "climate_state" not in car._vehicle_data:
             car._vehicle_data["climate_state"] = {}
