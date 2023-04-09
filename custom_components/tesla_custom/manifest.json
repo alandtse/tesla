@@ -1,6 +1,7 @@
 {
   "domain": "tesla_custom",
   "name": "Tesla Custom Integration",
+  "after_dependencies": ["mqtt"],
   "codeowners": ["@alandtse"],
   "config_flow": true,
   "dependencies": ["http"],

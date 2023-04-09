@@ -17,11 +17,13 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from custom_components.tesla_custom.const import (
     ATTR_POLLING_POLICY_CONNECTED,
+    CONF_ENABLE_TESLAMATE,
     CONF_EXPIRATION,
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
@@ -241,6 +243,7 @@ async def test_option_flow(hass):
             CONF_SCAN_INTERVAL: 350,
             CONF_WAKE_ON_START: True,
             CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
+            CONF_ENABLE_TESLAMATE: True,
         },
     )
     assert result["type"] == "create_entry"
@@ -248,6 +251,7 @@ async def test_option_flow(hass):
         CONF_SCAN_INTERVAL: 350,
         CONF_WAKE_ON_START: True,
         CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
+        CONF_ENABLE_TESLAMATE: True,
     }
 
 
@@ -269,6 +273,7 @@ async def test_option_flow_defaults(hass):
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
         CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
+        CONF_ENABLE_TESLAMATE: DEFAULT_ENABLE_TESLAMATE,
     }
 
 
@@ -290,4 +295,5 @@ async def test_option_flow_input_floor(hass):
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
         CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
+        CONF_ENABLE_TESLAMATE: DEFAULT_ENABLE_TESLAMATE,
     }
