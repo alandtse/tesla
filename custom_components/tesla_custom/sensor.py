@@ -66,6 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
         entities.append(TeslaCarChargerPower(hass, car, coordinator))
         entities.append(TeslaCarOdometer(hass, car, coordinator))
+        entities.append(TeslaCarShiftState(hass, car, coordinator))
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
@@ -289,6 +290,48 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
             return None
 
         return round(odometer_value, 2)
+
+
+class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car Shift State sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize odometer entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "shift state"
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_icon = "mdi:car-shift-pattern"
+
+    @property
+    def native_value(self) -> float:
+        """Return the shift state."""
+        value = self._car.shift_state
+
+        # When car is parked and off, Tesla API reports shift_state None
+        if value is None or value == "":
+            return "P"
+
+        return value
+
+    @property
+    def options(self) -> float:
+        """Return the values for the ENUM."""
+        values = ["P", "D", "R", "N"]
+
+        return values
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+
+        return {
+            "raw_state": self._car.shift_state,
+        }
 
 
 class TeslaCarRange(TeslaCarEntity, SensorEntity):
