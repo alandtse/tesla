@@ -23,7 +23,7 @@ class TeslaBaseEntity(CoordinatorEntity):
     ) -> None:
         """Initialise the Tesla device."""
         super().__init__(coordinator)
-        self._coordinator = coordinator
+        self._coordinator: TeslaDataUpdateCoordinator = coordinator
         self._enabled_by_default: bool = True
         self.hass = hass
         self.type = None
