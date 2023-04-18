@@ -15,17 +15,35 @@ from homeassistant.components.mqtt.subscription import (
     async_subscribe_topics,
     async_unsubscribe_topics,
 )
+from homeassistant.const import UnitOfLength
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
+from homeassistant.util.unit_conversion import DistanceConverter
 from teslajsonpy.car import TeslaCar
 
 from .const import TESLAMATE_STORAGE_KEY, TESLAMATE_STORAGE_VERSION
-from .util import km_to_miles
 
 if TYPE_CHECKING:
     from . import TeslaDataUpdateCoordinator
 
 logger = logging.getLogger(__name__)
+
+
+def cast_odometer(odometer: float) -> float:
+    """Convert KM to Miles.
+
+    The Tesla API natively returns the Odometer in Miles.
+    TeslaMate returns the Odometer in KMs.
+    We need to convert to Miles so the Odometer sensor calculates
+    properly.
+    """
+    odometer_km = float(odometer)
+    odometer_miles = DistanceConverter.convert(
+        odometer_km, UnitOfLength.KILOMETERS, UnitOfLength.MILES
+    )
+
+    return odometer_miles
+
 
 MAP_DRIVE_STATE = {
     "latitude": ("latitude", float),
@@ -48,7 +66,7 @@ MAP_VEHICLE_STATE = {
     "tpms_pressure_rr": ("tpms_pressure_rr", float),
     "locked": ("locked", bool),
     "sentry_mode": ("sentry_mode", bool),
-    "odometer": ("odometer", km_to_miles),
+    "odometer": ("odometer", cast_odometer),
 }
 
 MAP_CHARGE_STATE = {
