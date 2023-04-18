@@ -22,6 +22,7 @@ from homeassistant.const import (
     TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util import dt
 from homeassistant.util.unit_conversion import DistanceConverter
@@ -77,6 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             )
         entities.append(TeslaCarArrivalTime(hass, car, coordinator))
         entities.append(TeslaCarDistanceToArrival(hass, car, coordinator))
+        entities.append(TeslaCarDataUpdateTime(hass, car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
@@ -727,3 +729,29 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
         if self._car.active_route_miles_to_arrival is None:
             return None
         return round(self._car.active_route_miles_to_arrival, 2)
+
+
+class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
+    """Representation of the TeslajsonPy Last Data Update time."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize Last Data Update entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "data last update time"
+        self._attr_device_class = SensorDeviceClass.TIMESTAMP
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:timer"
+
+    @property
+    def native_value(self) -> float:
+        """Return the last data update time."""
+        last_time = self._coordinator.controller.get_last_update_time(vin=self._car.vin)
+
+        utc_tz = dt.get_time_zone("UTC")
+        date_obj = datetime.fromtimestamp(last_time, utc_tz)
+        return date_obj
