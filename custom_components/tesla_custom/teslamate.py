@@ -20,6 +20,7 @@ from homeassistant.helpers.storage import Store
 from teslajsonpy.car import TeslaCar
 
 from .const import TESLAMATE_STORAGE_KEY, TESLAMATE_STORAGE_VERSION
+from .util import km_to_miles
 
 if TYPE_CHECKING:
     from . import TeslaDataUpdateCoordinator
@@ -45,6 +46,20 @@ MAP_VEHICLE_STATE = {
     "tpms_pressure_fr": ("tpms_pressure_fr", float),
     "tpms_pressure_rl": ("tpms_pressure_rl", float),
     "tpms_pressure_rr": ("tpms_pressure_rr", float),
+    "locked": ("locked", bool),
+    "sentry_mode": ("sentry_mode", bool),
+    "odometer": ("odometer", km_to_miles),
+}
+
+MAP_CHARGE_STATE = {
+    "battery_level": ("battery_level", float),
+    "usable_battery_level": ("usable_battery_level", float),
+    "charge_energy_added": ("charge_energy_added", float),
+    "charger_actual_current": ("charger_actual_current", int),
+    "charger_power": ("charger_power", int),
+    "charger_voltage": ("charger_voltage", int),
+    "time_to_full_charge": ("time_to_full_charge", float),
+    "charge_limit_soc": ("charge_limit_soc", int),
 }
 
 
@@ -158,8 +173,10 @@ class TeslaMate:
             ).result()
 
         sub_id = f"teslamate_{car.vin}"
+        mqtt_topic = f"teslamate/cars/{teslamate_id}/#"
+
         topics[sub_id] = {
-            "topic": f"teslamate/cars/{teslamate_id}/#",
+            "topic": mqtt_topic,
             "msg_callback": msg_recieved,
             "qos": 0,
         }
@@ -169,6 +186,8 @@ class TeslaMate:
         )
 
         await async_subscribe_topics(self.hass, self._sub_state)
+
+        logger.info("Subscribed to topic: %s", mqtt_topic)
 
     async def async_handle_new_data(self, car: TeslaCar, msg: ReceiveMessage):
         """Update Car Data from MQTT msg."""
@@ -192,6 +211,12 @@ class TeslaMate:
             logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_CLIMATE_STATE[mqtt_attr]
             self.update_climate_state(car, attr, cast(msg.payload))
+            coordinator.async_update_listeners()
+
+        elif mqtt_attr in MAP_CHARGE_STATE:
+            logger.info("Setting %s from MQTT", mqtt_attr)
+            attr, cast = MAP_CHARGE_STATE[mqtt_attr]
+            self.update_charge_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
     @staticmethod
@@ -226,3 +251,14 @@ class TeslaMate:
 
         climate_state = car._vehicle_data["climate_state"]
         climate_state[attr] = value
+
+    @staticmethod
+    def update_charge_state(car, attr, value):
+        """Update Charge State Safely."""
+        # pylint: disable=protected-access
+
+        if "charge_state" not in car._vehicle_data:
+            car._vehicle_data["charge_state"] = {}
+
+        charge_state = car._vehicle_data["charge_state"]
+        charge_state[attr] = value
