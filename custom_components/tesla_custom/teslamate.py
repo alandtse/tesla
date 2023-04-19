@@ -15,10 +15,10 @@ from homeassistant.components.mqtt.subscription import (
     async_subscribe_topics,
     async_unsubscribe_topics,
 )
-from homeassistant.const import UnitOfLength
+from homeassistant.const import UnitOfLength, UnitOfSpeed
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
-from homeassistant.util.unit_conversion import DistanceConverter
+from homeassistant.util.unit_conversion import DistanceConverter, SpeedConverter
 from teslajsonpy.car import TeslaCar
 
 from .const import TESLAMATE_STORAGE_KEY, TESLAMATE_STORAGE_VERSION
@@ -45,11 +45,27 @@ def cast_odometer(odometer: float) -> float:
     return odometer_miles
 
 
+def cast_speed(speed: int) -> int:
+    """Convert KM to Miles.
+
+    The Tesla API natively returns the Speed in Miles M/H.
+    TeslaMate returns the Speed in km/h.
+    We need to convert to Miles so the speed calculates
+    properly.
+    """
+    speed_km = int(speed)
+    speed_miles = SpeedConverter.convert(
+        speed_km, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.MILES_PER_HOUR
+    )
+
+    return int(speed_miles)
+
+
 MAP_DRIVE_STATE = {
     "latitude": ("latitude", float),
     "longitude": ("longitude", float),
     "shift_state": ("shift_state", str),
-    "speed": ("speed", int),
+    "speed": ("speed", cast_speed),
     "heading": ("heading", int),
 }
 
