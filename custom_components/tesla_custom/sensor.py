@@ -686,7 +686,7 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         )
         if (
             self._datetime_value is None
-            or (new_value - self._datetime_value).total_seconds() >= 60
+            or abs((new_value - self._datetime_value).total_seconds()) >= 60
         ):
             self._datetime_value = new_value
         return self._datetime_value
