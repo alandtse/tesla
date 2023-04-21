@@ -260,7 +260,7 @@ async def test_time_charge_complete_charging(
 
     assert state.state == charge_complete_str
 
-    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] -= 0.1
+    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.15
     earlier_charge_complete = mock_now + timedelta(
         hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
     )
@@ -617,7 +617,7 @@ async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> No
 
     assert state.state == arrival_time_str
 
-    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_minutes_to_arrival"] -= 2
+    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_minutes_to_arrival"] = 32.16
     earlier_arrival_time = mock_now + timedelta(
         minutes=round(
             float(
