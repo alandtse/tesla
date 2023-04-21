@@ -15,8 +15,10 @@ from homeassistant.components.mqtt.subscription import (
     async_subscribe_topics,
     async_unsubscribe_topics,
 )
+from homeassistant.const import UnitOfLength, UnitOfSpeed
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
+from homeassistant.util.unit_conversion import DistanceConverter, SpeedConverter
 from teslajsonpy.car import TeslaCar
 
 from .const import TESLAMATE_STORAGE_KEY, TESLAMATE_STORAGE_VERSION
@@ -26,11 +28,44 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
+def cast_odometer(odometer: float) -> float:
+    """Convert KM to Miles.
+
+    The Tesla API natively returns the Odometer in Miles.
+    TeslaMate returns the Odometer in KMs.
+    We need to convert to Miles so the Odometer sensor calculates
+    properly.
+    """
+    odometer_km = float(odometer)
+    odometer_miles = DistanceConverter.convert(
+        odometer_km, UnitOfLength.KILOMETERS, UnitOfLength.MILES
+    )
+
+    return odometer_miles
+
+
+def cast_speed(speed: int) -> int:
+    """Convert KM to Miles.
+
+    The Tesla API natively returns the Speed in Miles M/H.
+    TeslaMate returns the Speed in km/h.
+    We need to convert to Miles so the speed calculates
+    properly.
+    """
+    speed_km = int(speed)
+    speed_miles = SpeedConverter.convert(
+        speed_km, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.MILES_PER_HOUR
+    )
+
+    return int(speed_miles)
+
+
 MAP_DRIVE_STATE = {
     "latitude": ("latitude", float),
     "longitude": ("longitude", float),
     "shift_state": ("shift_state", str),
-    "speed": ("speed", int),
+    "speed": ("speed", cast_speed),
     "heading": ("heading", int),
 }
 
@@ -45,6 +80,20 @@ MAP_VEHICLE_STATE = {
     "tpms_pressure_fr": ("tpms_pressure_fr", float),
     "tpms_pressure_rl": ("tpms_pressure_rl", float),
     "tpms_pressure_rr": ("tpms_pressure_rr", float),
+    "locked": ("locked", bool),
+    "sentry_mode": ("sentry_mode", bool),
+    "odometer": ("odometer", cast_odometer),
+}
+
+MAP_CHARGE_STATE = {
+    "battery_level": ("battery_level", float),
+    "usable_battery_level": ("usable_battery_level", float),
+    "charge_energy_added": ("charge_energy_added", float),
+    "charger_actual_current": ("charger_actual_current", int),
+    "charger_power": ("charger_power", int),
+    "charger_voltage": ("charger_voltage", int),
+    "time_to_full_charge": ("time_to_full_charge", float),
+    "charge_limit_soc": ("charge_limit_soc", int),
 }
 
 
@@ -158,8 +207,10 @@ class TeslaMate:
             ).result()
 
         sub_id = f"teslamate_{car.vin}"
+        mqtt_topic = f"teslamate/cars/{teslamate_id}/#"
+
         topics[sub_id] = {
-            "topic": f"teslamate/cars/{teslamate_id}/#",
+            "topic": mqtt_topic,
             "msg_callback": msg_recieved,
             "qos": 0,
         }
@@ -169,6 +220,8 @@ class TeslaMate:
         )
 
         await async_subscribe_topics(self.hass, self._sub_state)
+
+        logger.info("Subscribed to topic: %s", mqtt_topic)
 
     async def async_handle_new_data(self, car: TeslaCar, msg: ReceiveMessage):
         """Update Car Data from MQTT msg."""
@@ -192,6 +245,12 @@ class TeslaMate:
             logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_CLIMATE_STATE[mqtt_attr]
             self.update_climate_state(car, attr, cast(msg.payload))
+            coordinator.async_update_listeners()
+
+        elif mqtt_attr in MAP_CHARGE_STATE:
+            logger.info("Setting %s from MQTT", mqtt_attr)
+            attr, cast = MAP_CHARGE_STATE[mqtt_attr]
+            self.update_charge_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
     @staticmethod
@@ -226,3 +285,14 @@ class TeslaMate:
 
         climate_state = car._vehicle_data["climate_state"]
         climate_state[attr] = value
+
+    @staticmethod
+    def update_charge_state(car, attr, value):
+        """Update Charge State Safely."""
+        # pylint: disable=protected-access
+
+        if "charge_state" not in car._vehicle_data:
+            car._vehicle_data["charge_state"] = {}
+
+        charge_state = car._vehicle_data["charge_state"]
+        charge_state[attr] = value
