@@ -26,12 +26,14 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
+    CONF_ENABLE_TESLAMATE,
     CONF_EXPIRATION,
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
     DATA_LISTENER,
+    DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
@@ -40,6 +42,7 @@ from .const import (
     PLATFORMS,
 )
 from .services import async_setup_services, async_unload_services
+from .teslamate import TeslaMate
 from .util import SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
@@ -286,11 +289,20 @@ async def async_setup_entry(hass, config_entry):
         **{vin: _partial_coordinator(vins={vin}) for vin in cars},
     }
 
+    teslamate = TeslaMate(hass=hass, cars=cars, coordinators=coordinators)
+
+    enable_teslamate = config_entry.options.get(
+        CONF_ENABLE_TESLAMATE, DEFAULT_ENABLE_TESLAMATE
+    )
+
+    await teslamate.enable(enable_teslamate)
+
     hass.data[DOMAIN][config_entry.entry_id] = {
         "controller": controller,
         "coordinators": coordinators,
         "cars": cars,
         "energysites": energysites,
+        "teslamate": teslamate,
         DATA_LISTENER: [config_entry.add_update_listener(update_listener)],
     }
     _LOGGER.debug("Connected to the Tesla API")
@@ -316,6 +328,8 @@ async def async_unload_entry(hass, config_entry) -> bool:
     for listener in entry_data[DATA_LISTENER]:
         listener()
     username = config_entry.title
+
+    await entry_data["teslamate"].unload()
 
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
@@ -343,6 +357,12 @@ async def update_listener(hass, config_entry):
             old_update_interval,
             controller.update_interval,
         )
+
+    enable_teslamate = config_entry.options.get(
+        CONF_ENABLE_TESLAMATE, DEFAULT_ENABLE_TESLAMATE
+    )
+
+    await entry_data["teslamate"].enable(enable_teslamate)
 
 
 class TeslaDataUpdateCoordinator(DataUpdateCoordinator):

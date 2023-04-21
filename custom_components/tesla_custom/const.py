@@ -5,11 +5,13 @@ CONF_INCLUDE_VEHICLES = "include_vehicles"
 CONF_INCLUDE_ENERGYSITES = "include_energysites"
 CONF_POLLING_POLICY = "polling_policy"
 CONF_WAKE_ON_START = "enable_wake_on_start"
+CONF_ENABLE_TESLAMATE = "enable_teslamate"
 DOMAIN = "tesla_custom"
 ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
 DEFAULT_WAKE_ON_START = False
+DEFAULT_ENABLE_TESLAMATE = False
 ERROR_URL_NOT_DETECTED = "url_not_detected"
 MIN_SCAN_INTERVAL = 10
 
@@ -25,6 +27,7 @@ PLATFORMS = [
     "select",
     "update",
     "number",
+    "text",
 ]
 
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"
@@ -42,3 +45,6 @@ DEFAULT_POLLING_POLICY = ATTR_POLLING_POLICY_NORMAL
 DISTANCE_UNITS_KM_HR = "km/hr"
 SERVICE_API = "api"
 SERVICE_SCAN_INTERVAL = "polling_interval"
+
+TESLAMATE_STORAGE_VERSION = 1
+TESLAMATE_STORAGE_KEY = f"{DOMAIN}_teslamate"

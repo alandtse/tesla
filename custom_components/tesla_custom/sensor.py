@@ -22,6 +22,7 @@ from homeassistant.const import (
     TEMP_CELSIUS,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util import dt
 from homeassistant.util.unit_conversion import DistanceConverter
@@ -66,6 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
         entities.append(TeslaCarChargerPower(hass, car, coordinator))
         entities.append(TeslaCarOdometer(hass, car, coordinator))
+        entities.append(TeslaCarShiftState(hass, car, coordinator))
         entities.append(TeslaCarRange(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator))
         entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
@@ -76,6 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             )
         entities.append(TeslaCarArrivalTime(hass, car, coordinator))
         entities.append(TeslaCarDistanceToArrival(hass, car, coordinator))
+        entities.append(TeslaCarDataUpdateTime(hass, car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
@@ -289,6 +292,48 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
             return None
 
         return round(odometer_value, 2)
+
+
+class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car Shift State sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize odometer entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "shift state"
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_icon = "mdi:car-shift-pattern"
+
+    @property
+    def native_value(self) -> float:
+        """Return the shift state."""
+        value = self._car.shift_state
+
+        # When car is parked and off, Tesla API reports shift_state None
+        if value is None or value == "":
+            return "P"
+
+        return value
+
+    @property
+    def options(self) -> float:
+        """Return the values for the ENUM."""
+        values = ["P", "D", "R", "N"]
+
+        return values
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+
+        return {
+            "raw_state": self._car.shift_state,
+        }
 
 
 class TeslaCarRange(TeslaCarEntity, SensorEntity):
@@ -684,3 +729,29 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
         if self._car.active_route_miles_to_arrival is None:
             return None
         return round(self._car.active_route_miles_to_arrival, 2)
+
+
+class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
+    """Representation of the TeslajsonPy Last Data Update time."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize Last Data Update entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "data last update time"
+        self._attr_device_class = SensorDeviceClass.TIMESTAMP
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:timer"
+
+    @property
+    def native_value(self) -> float:
+        """Return the last data update time."""
+        last_time = self._coordinator.controller.get_last_update_time(vin=self._car.vin)
+
+        utc_tz = dt.get_time_zone("UTC")
+        date_obj = datetime.fromtimestamp(last_time, utc_tz)
+        return date_obj

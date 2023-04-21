@@ -23,11 +23,13 @@ from .const import (
     ATTR_POLLING_POLICY_ALWAYS,
     ATTR_POLLING_POLICY_CONNECTED,
     ATTR_POLLING_POLICY_NORMAL,
+    CONF_ENABLE_TESLAMATE,
     CONF_EXPIRATION,
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
@@ -162,6 +164,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         ATTR_POLLING_POLICY_ALWAYS,
                     ]
                 ),
+                vol.Optional(
+                    CONF_ENABLE_TESLAMATE,
+                    default=self.config_entry.options.get(
+                        CONF_ENABLE_TESLAMATE, DEFAULT_ENABLE_TESLAMATE
+                    ),
+                ): bool,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
