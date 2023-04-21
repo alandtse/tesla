@@ -11,7 +11,7 @@ teslajsonpy = "^3.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
-homeassistant = ">=2022.11.0"
+homeassistant = ">=2023.1.0"
 pytest-homeassistant-custom-component = ">=0.13.1"
 bandit = ">=1.7.0"
 black = {version = ">=21.12b0", allow-prereleases = true}
