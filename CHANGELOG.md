@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v3.12.0 (2023-04-21)
+### Feature
+* Add more updates to TeslaMate ([#572](https://github.com/alandtse/tesla/issues/572)) ([`970759c`](https://github.com/alandtse/tesla/commit/970759c2219d3d7c24b3de66f80c8c888e1e56ee))
+* Add Shift State Sensor ([#569](https://github.com/alandtse/tesla/issues/569)) ([`72ac435`](https://github.com/alandtse/tesla/commit/72ac43541a96c988a103f7935118d8049a050504))
+* Add Car Data Update Time Sensor ([#568](https://github.com/alandtse/tesla/issues/568)) ([`437212b`](https://github.com/alandtse/tesla/commit/437212bb9deb3de391b6114b8fd10eac00e9b8ed))
+* Allow syncing with TeslaMate via MQTT ([#564](https://github.com/alandtse/tesla/issues/564)) ([`36713fb`](https://github.com/alandtse/tesla/commit/36713fb8ad88f3182a56acab17a40a0575fb741f))
+
 ## v3.11.0 (2023-03-26)
 ### Feature
 * Split coordinator to avoid updating disabled cars and energy sites ([#552](https://github.com/alandtse/tesla/issues/552)) ([`41dfbcc`](https://github.com/alandtse/tesla/commit/41dfbccd07c1bf9b4300c8add77e9ae91c2a4820))
