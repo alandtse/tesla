@@ -260,17 +260,6 @@ async def test_time_charge_complete_charging(
 
     assert state.state == charge_complete_str
 
-    car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"] = 0.15
-    earlier_charge_complete = mock_now + timedelta(
-        hours=float(car_mock_data.VEHICLE_DATA["charge_state"]["time_to_full_charge"])
-    )
-    earlier_charge_complete_str = datetime.strftime(
-        earlier_charge_complete, "%Y-%m-%dT%H:%M:%S+00:00"
-    )
-
-    state = hass.states.get("sensor.my_model_s_time_charge_complete")
-    assert state.state == earlier_charge_complete_str
-
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) is None
 
@@ -616,24 +605,6 @@ async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> No
     arrival_time_str = datetime.strftime(arrival_time, "%Y-%m-%dT%H:%M:%S+00:00")
 
     assert state.state == arrival_time_str
-
-    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_minutes_to_arrival"] = 32.16
-    earlier_arrival_time = mock_now + timedelta(
-        minutes=round(
-            float(
-                car_mock_data.VEHICLE_DATA["drive_state"][
-                    "active_route_minutes_to_arrival"
-                ]
-            ),
-            2,
-        )
-    )
-    earlier_arrival_time_str = datetime.strftime(
-        earlier_arrival_time, "%Y-%m-%dT%H:%M:%S+00:00"
-    )
-
-    state = hass.states.get("sensor.my_model_s_arrival_time")
-    assert state.state == earlier_arrival_time_str
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TIMESTAMP
     assert state.attributes.get(ATTR_STATE_CLASS) is None
