@@ -114,6 +114,7 @@ class TeslaMate:
         self.hass = hass
         self.coordinators = coordinators
         self._enabled = False
+        self._data: dict = None
 
         self.watchers = []
 
@@ -137,35 +138,48 @@ class TeslaMate:
 
     async def _unsub_mqtt(self):
         """Unsub from MQTT topics."""
-        logger.info("Un-subbing from MQTT Topics.")
+        logger.info("Un-subbing from all MQTT Topics.")
         self._sub_state = async_unsubscribe_topics(self.hass, self._sub_state)
+        logger.info("Un-subbed from all MQTT Topics.")
+
+    async def async_load(self) -> None:
+        """Load config."""
+        if self._data is None:
+            if stored := await self._store.async_load():
+                self._data = stored
+
+        # If still None, initialise it.
+        if self._data is None:
+            self._data = {}
+
+    async def _async_save(self) -> None:
+        """Save config."""
+        await self._store.async_save(self._data)
 
     async def set_car_id(self, vin, teslamate_id):
         """Set the TeslaMate Car ID."""
-        logger.debug("Setting car ID. TeslaVin: %s TeslamateID: %s", vin, teslamate_id)
-        if (data := await self._store.async_load()) is None:
-            data = {}
+        logger.debug("Setting car ID. VIN:%s TeslamateID: %s", vin, teslamate_id)
+        await self.async_load()
 
-        if "car_map" not in data:
-            data["car_map"] = {}
+        if "car_map" not in self._data:
+            self._data["car_map"] = {}
 
-        data["car_map"][vin] = teslamate_id
+        self._data["car_map"][vin] = teslamate_id
 
-        await self._store.async_save(data)
+        await self._async_save()
         logger.debug("Successfully set car ID. Latest Car data")
-        logger.debug(data)
+        logger.debug(self._data)
 
     async def get_car_id(self, vin) -> str | None:
         """Get the TeslaMate Car ID."""
-        if (data := await self._store.async_load()) is None:
-            data = {}
+        await self.async_load()
 
-        if "car_map" not in data:
-            data["car_map"] = {}
+        if "car_map" not in self._data:
+            self._data["car_map"] = {}
 
-        result = data["car_map"].get(vin)
+        result = self._data["car_map"].get(vin)
 
-        logger.debug("Got car ID. TeslaVin: %s TeslamateID: %s", vin, result)
+        logger.debug("Got car ID. VIN:%s TeslamateID: %s", vin, result)
 
         return result
 
