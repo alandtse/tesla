@@ -142,6 +142,7 @@ class TeslaMate:
 
     async def set_car_id(self, vin, teslamate_id):
         """Set the TeslaMate Car ID."""
+        logger.debug("Setting car ID. TeslaVin: %s TeslamateID: %s", vin, teslamate_id)
         if (data := await self._store.async_load()) is None:
             data = {}
 
@@ -151,6 +152,8 @@ class TeslaMate:
         data["car_map"][vin] = teslamate_id
 
         await self._store.async_save(data)
+        logger.debug("Successfully set car ID. Latest Car data")
+        logger.debug(data)
 
     async def get_car_id(self, vin) -> str | None:
         """Get the TeslaMate Car ID."""
@@ -161,6 +164,8 @@ class TeslaMate:
             data["car_map"] = {}
 
         result = data["car_map"].get(vin)
+
+        logger.debug("Got car ID. TeslaVin: %s TeslamateID: %s", vin, result)
 
         return result
 
@@ -196,8 +201,13 @@ class TeslaMate:
             if teslamate_id is not None:
                 await self._watch_car(car=car, teslamate_id=teslamate_id)
 
+        logger.debug("Completed watch_cars")
+
     async def _watch_car(self, car: TeslaCar, teslamate_id: str):
         """Set up MQTT watchers for a car."""
+        logger.debug(
+            "Setting up MQTT Sub for VIN:%s TelsaMateID:%s", car.vin, teslamate_id
+        )
 
         topics = {}
 
@@ -208,6 +218,7 @@ class TeslaMate:
 
         sub_id = f"teslamate_{car.vin}"
         mqtt_topic = f"teslamate/cars/{teslamate_id}/#"
+        logger.debug("MQTT Topic: %s", mqtt_topic)
 
         topics[sub_id] = {
             "topic": mqtt_topic,
@@ -218,7 +229,6 @@ class TeslaMate:
         self._sub_state = async_prepare_subscribe_topics(
             self.hass, self._sub_state, topics
         )
-
         await async_subscribe_topics(self.hass, self._sub_state)
 
         logger.info("Subscribed to topic: %s", mqtt_topic)
@@ -227,36 +237,41 @@ class TeslaMate:
         """Update Car Data from MQTT msg."""
 
         mqtt_attr = msg.topic.split("/")[-1]
+        teslamate_id = await self.get_car_id(car.vin)
         coordinator = self.coordinators[car.vin]
+        logger.debug("MQTT Topic Recieved: %s", msg.topic)
+        logger.info(
+            "Got %s from MQTT for VIN:%s | TeslsMateID:%s",
+            mqtt_attr,
+            car.vin,
+            teslamate_id,
+        )
 
         if mqtt_attr in MAP_DRIVE_STATE:
-            logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_DRIVE_STATE[mqtt_attr]
             self.update_drive_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
         elif mqtt_attr in MAP_VEHICLE_STATE:
-            logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_VEHICLE_STATE[mqtt_attr]
             self.update_vehicle_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
         elif mqtt_attr in MAP_CLIMATE_STATE:
-            logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_CLIMATE_STATE[mqtt_attr]
             self.update_climate_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
         elif mqtt_attr in MAP_CHARGE_STATE:
-            logger.info("Setting %s from MQTT", mqtt_attr)
             attr, cast = MAP_CHARGE_STATE[mqtt_attr]
             self.update_charge_state(car, attr, cast(msg.payload))
             coordinator.async_update_listeners()
 
     @staticmethod
-    def update_drive_state(car, attr, value):
+    def update_drive_state(car: TeslaCar, attr, value):
         """Update Drive State Safely."""
         # pylint: disable=protected-access
+        logger.debug("Updating drive_state for VIN:%s", car.vin)
 
         if "drive_state" not in car._vehicle_data:
             car._vehicle_data["drive_state"] = {}
@@ -268,6 +283,7 @@ class TeslaMate:
     def update_vehicle_state(car, attr, value):
         """Update Vehicle State Safely."""
         # pylint: disable=protected-access
+        logger.debug("Updating vehicle_state for VIN:%s", car.vin)
 
         if "vehicle_state" not in car._vehicle_data:
             car._vehicle_data["vehicle_state"] = {}
@@ -279,6 +295,7 @@ class TeslaMate:
     def update_climate_state(car, attr, value):
         """Update Climate State Safely."""
         # pylint: disable=protected-access
+        logger.debug("Updating climate_state for VIN:%s", car.vin)
 
         if "climate_state" not in car._vehicle_data:
             car._vehicle_data["climate_state"] = {}
@@ -290,6 +307,7 @@ class TeslaMate:
     def update_charge_state(car, attr, value):
         """Update Charge State Safely."""
         # pylint: disable=protected-access
+        logger.debug("Updating charge_state for VIN:%s", car.vin)
 
         if "charge_state" not in car._vehicle_data:
             car._vehicle_data["charge_state"] = {}
