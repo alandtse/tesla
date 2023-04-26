@@ -183,6 +183,29 @@ class TeslaMate:
 
         return result
 
+    async def get_car_from_id(self, teslamate_id: str) -> TeslaCar | None:
+        """Get the TeslaCar from the TeslaMateID."""
+        logger.debug("Getting TeslaCar for teslaMateID:%s", teslamate_id)
+
+        await self.async_load()
+
+        if "car_map" not in self._data:
+            return None
+
+        found_vin = None
+
+        for vin in self._data["car_map"]:
+            if self._data["car_map"][vin] == teslamate_id:
+                found_vin = vin
+                break
+
+        if found_vin is None:
+            return None
+
+        car = self.cars.get(found_vin)
+
+        return car
+
     async def enable(self, enable=True):
         """Start Listening to MQTT topics."""
 
@@ -208,29 +231,40 @@ class TeslaMate:
         # We'll unsub from all topics before we create new ones.
         await self._unsub_mqtt()
 
+        topics = {}
+
         for vin in self.cars:
             car = self.cars[vin]
             teslamate_id = await self.get_car_id(vin=vin)
 
             if teslamate_id is not None:
-                await self._watch_car(car=car, teslamate_id=teslamate_id)
+                await self._get_car_topic(
+                    car=car, teslamate_id=teslamate_id, topics=topics
+                )
+
+        self._sub_state = async_prepare_subscribe_topics(
+            self.hass, self._sub_state, topics
+        )
+        await async_subscribe_topics(self.hass, self._sub_state)
+        logger.debug("Subscribed to MQTT Topics")
 
         logger.debug("Completed watch_cars")
 
-    async def _watch_car(self, car: TeslaCar, teslamate_id: str):
-        """Set up MQTT watchers for a car."""
+    async def _get_car_topic(self, car: TeslaCar, teslamate_id: str, topics: dict):
+        """Create Topics for MQTT Sub.
+
+        Mutates topics dict.
+        """
         logger.debug(
             "Setting up MQTT Sub for VIN:%s TelsaMateID:%s", car.vin, teslamate_id
         )
 
-        topics = {}
-
         def msg_recieved(msg: ReceiveMessage):
             return asyncio.run_coroutine_threadsafe(
-                self.async_handle_new_data(car, msg), self.hass.loop
+                self.async_handle_new_data(msg), self.hass.loop
             ).result()
 
-        sub_id = f"teslamate_{car.vin}"
+        sub_id = f"teslamate_{teslamate_id}"
         mqtt_topic = f"teslamate/cars/{teslamate_id}/#"
         logger.debug("MQTT Topic: %s", mqtt_topic)
 
@@ -240,20 +274,22 @@ class TeslaMate:
             "qos": 0,
         }
 
-        self._sub_state = async_prepare_subscribe_topics(
-            self.hass, self._sub_state, topics
-        )
-        await async_subscribe_topics(self.hass, self._sub_state)
+        logger.info("Created mqtt Topic for: %s", mqtt_topic)
 
-        logger.info("Subscribed to topic: %s", mqtt_topic)
-
-    async def async_handle_new_data(self, car: TeslaCar, msg: ReceiveMessage):
+    async def async_handle_new_data(self, msg: ReceiveMessage):
         """Update Car Data from MQTT msg."""
+        logger.debug("MQTT Topic Recieved: %s", msg.topic)
 
         mqtt_attr = msg.topic.split("/")[-1]
-        teslamate_id = await self.get_car_id(car.vin)
+        teslamate_id = msg.topic.split("/")[2]
+        car = await self.get_car_from_id(teslamate_id)
+
+        if car is None:
+            logger.debug("TeslaMate_id %s not found in config", teslamate_id)
+            return
+
         coordinator = self.coordinators[car.vin]
-        logger.debug("MQTT Topic Recieved: %s", msg.topic)
+
         logger.info(
             "Got %s from MQTT for VIN:%s | TeslsMateID:%s",
             mqtt_attr,
