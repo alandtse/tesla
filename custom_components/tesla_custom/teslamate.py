@@ -189,13 +189,11 @@ class TeslaMate:
 
         await self.async_load()
 
-        if "car_map" not in self._data:
-            return None
-
         found_vin = None
 
-        for vin in self._data["car_map"]:
-            if self._data["car_map"][vin] == teslamate_id:
+        car_map = self._data.get("car_map", {})
+        for vin, tm_id in car_map.items():
+            if tm_id == teslamate_id:
                 found_vin = vin
                 break
 
@@ -218,21 +216,22 @@ class TeslaMate:
     async def watch_cars(self):
         """Start listening to MQTT for updates."""
 
+        # Do nothing if TeslaMate or MQTT is not enabled
         if self._enabled is False:
-            logger.info("Can't watch cars. teslaMate is not enabled.")
+            logger.info("Can't watch cars. TeslaMate is not enabled.")
             return None
-
         if not mqtt_config_entry_enabled(self.hass):
             logger.warning("Cannot enable TeslaMate as MQTT has not been configured.")
             return None
 
-        logger.info("Setting up MQTT subs for Teslamate")
+        logger.info("Setting up MQTT subs for TeslaMate")
 
-        # We'll unsub from all topics before we create new ones.
+        # Unsubscribe from all topics before creating new ones
         await self._unsub_mqtt()
 
         topics = {}
 
+        # Generate topics for each car
         for vin in self.cars:
             car = self.cars[vin]
             teslamate_id = await self.get_car_id(vin=vin)
@@ -242,6 +241,7 @@ class TeslaMate:
                     car=car, teslamate_id=teslamate_id, topics=topics
                 )
 
+        # Subscribe to all topics
         self._sub_state = async_prepare_subscribe_topics(
             self.hass, self._sub_state, topics
         )
@@ -251,10 +251,7 @@ class TeslaMate:
         logger.debug("Completed watch_cars")
 
     async def _get_car_topic(self, car: TeslaCar, teslamate_id: str, topics: dict):
-        """Create Topics for MQTT Sub.
-
-        Mutates topics dict.
-        """
+        """Create topics for MQTT subscription and add them to the topics dictionary."""
         logger.debug(
             "Setting up MQTT Sub for VIN:%s TelsaMateID:%s", car.vin, teslamate_id
         )
