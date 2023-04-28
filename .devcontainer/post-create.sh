@@ -32,4 +32,4 @@ poetry config virtualenvs.create false
 poetry install --no-interaction
 
 # Keep this inline with any requirements that are in manifest.json
-pip install git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==2.2.0
+pip install git+https://github.com/zabuldon/teslajsonpy.git@dev#teslajsonpy==3.8.1
