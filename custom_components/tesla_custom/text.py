@@ -48,6 +48,9 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
 
     async def async_set_value(self, value: str) -> None:
         """Update charge limit."""
+        if value.strip() == "":
+            value = None
+
         await self.teslsmate.set_car_id(self._car.vin, value)
         await self.teslsmate.watch_cars()
         await self.async_update_ha_state()
