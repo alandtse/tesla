@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v3.12.1 (2023-04-28)
+### Fix
+* Fix multiple cars for TeslaMate ([#582](https://github.com/alandtse/tesla/issues/582)) ([`9e9b949`](https://github.com/alandtse/tesla/commit/9e9b949709acdfc79517b4b0d9c245134ed42825))
+* Bump teslajsonpy to fix climate_state error ([#580](https://github.com/alandtse/tesla/issues/580)) ([`e638177`](https://github.com/alandtse/tesla/commit/e638177a8e3eac52563e6cfd99633e4a75dd62a2))
+
 ## v3.12.0 (2023-04-21)
 ### Feature
 * Add more updates to TeslaMate ([#572](https://github.com/alandtse/tesla/issues/572)) ([`970759c`](https://github.com/alandtse/tesla/commit/970759c2219d3d7c24b3de66f80c8c888e1e56ee))
