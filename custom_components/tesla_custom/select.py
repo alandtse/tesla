@@ -11,6 +11,7 @@ from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
+from .util import safeget
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -197,6 +198,18 @@ class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
     def current_option(self):
         """Return current cabin overheat protection setting."""
         return self._car.cabin_overheat_protection
+
+    @property
+    def extra_state_attributes(self):
+        """Return extra climate attributes."""
+        # pylint: disable=protected-access
+        return {
+            "cabin_overheat_protection_actively_cooling": safeget(
+                self._car._vehicle_data,
+                "climate_state",
+                "cabin_overheat_protection_actively_cooling",
+            ),
+        }
 
 
 class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):

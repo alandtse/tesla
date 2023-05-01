@@ -9,3 +9,15 @@ except ImportError:
     from homeassistant.util.ssl import client_context
 
     SSL_CONTEXT = client_context()
+
+
+def safeget(dct, *keys, default=None):
+    """Get a recursuive object from a dict."""
+    for key in keys:
+        try:
+            dct = dct[key]
+        except KeyError:
+            return default
+        except TypeError:
+            return default
+    return dct
