@@ -591,7 +591,10 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
                 + timedelta(hours=charge_hours)
                 - (dt.utcnow() - self._last_update_time)
             )
-            if self._value is None or (new_value - self._value).total_seconds() >= 60:
+            if (
+                self._value is None
+                or abs((new_value - self._value).total_seconds()) >= 60
+            ):
                 self._value = new_value
         if self._car.charging_state in ["Charging", "Complete"]:
             return self._value
@@ -686,7 +689,7 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
         )
         if (
             self._datetime_value is None
-            or (new_value - self._datetime_value).total_seconds() >= 60
+            or abs((new_value - self._datetime_value).total_seconds()) >= 60
         ):
             self._datetime_value = new_value
         return self._datetime_value
