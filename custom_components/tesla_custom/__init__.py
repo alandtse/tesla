@@ -17,6 +17,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
@@ -386,6 +387,8 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         self.vins = vins
         self.energy_site_ids = energy_site_ids
         self.update_vehicles = update_vehicles
+        self._debounce_task = None
+        self._last_update_time = None
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
 
@@ -431,3 +434,60 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+    def async_update_listeners_debounced(self, delay_since_last=0.1, max_delay=1.0):
+        """
+        Debounced version of async_update_listeners.
+
+        This function cancels the previous task (if any) and creates a new one.
+
+        Parameters
+        ----------
+        delay_since_last : float
+            Minimum delay in seconds since the last received message before calling async_update_listeners.
+        max_delay : float
+            Maximum delay in seconds before calling async_update_listeners,
+            regardless of when the last message was received.
+
+        """
+        # If there's an existing debounce task, cancel it
+        if self._debounce_task:
+            self._debounce_task()
+            _LOGGER.debug("Previous debounce task cancelled")
+
+        # Schedule the call to _debounced, pass max_delay using partial
+        self._debounce_task = async_call_later(
+            self.hass, delay_since_last, partial(self._debounced, max_delay)
+        )
+        _LOGGER.debug("New debounce task scheduled")
+
+    async def _debounced(self, max_delay, *args):
+        """
+        Debounce method that waits a certain delay since the last update.
+
+        This method ensures that async_update_listeners is called at least every max_delay seconds.
+
+        Parameters
+        ----------
+        max_delay : float
+            Maximum delay in seconds before calling async_update_listeners.
+
+        """
+        # Get the current time
+        now = self.hass.loop.time()
+
+        # If it's been at least max_delay since the last update (or there was no previous update),
+        # call async_update_listeners and update the last update time
+        if not self._last_update_time or now - self._last_update_time >= max_delay:
+            self._last_update_time = now
+            self.async_update_listeners()
+            _LOGGER.debug("Listeners updated")
+        else:
+            # If it hasn't been max_delay since the last update,
+            # schedule the call to _debounced again after the remaining time
+            self._debounce_task = async_call_later(
+                self.hass,
+                max_delay - (now - self._last_update_time),
+                partial(self._debounced, max_delay),
+            )
+            _LOGGER.debug("Max delay not reached, scheduling another debounce task")
