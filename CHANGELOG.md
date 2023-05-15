@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v3.12.2 (2023-05-06)
+### Fix
+* Update arrival with earlier charge complete and arrival times ([#575](https://github.com/alandtse/tesla/issues/575)) ([`92da756`](https://github.com/alandtse/tesla/commit/92da7566d8ef21378cf143de84865e6ca3938c4c))
+
 ## v3.12.1 (2023-04-28)
 ### Fix
 * Fix multiple cars for TeslaMate ([#582](https://github.com/alandtse/tesla/issues/582)) ([`9e9b949`](https://github.com/alandtse/tesla/commit/9e9b949709acdfc79517b4b0d9c245134ed42825))
