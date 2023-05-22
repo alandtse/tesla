@@ -60,6 +60,9 @@ deps/deps.jl
 # User settings
 /.vscode/settings.json
 
+# Home Assistant configuration
+config/*
+!config/configuration.yaml
 
 # Keep these config files
 !/.gitignore
@@ -75,5 +78,5 @@ deps/deps.jl
 !.npmignore
 !/.scrutinizer.yml
 !/.prospector.yml
-!/.devcontainer
+!/.devcontainer.json
 !/.vscode
