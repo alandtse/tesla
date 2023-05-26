@@ -12,8 +12,6 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
-import httpx
 from teslajsonpy import Controller as TeslaAPI, TeslaException
 from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials
@@ -36,7 +34,7 @@ from .const import (
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
-from .util import SSL_CONTEXT
+from .util import get_async_client
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -182,9 +180,7 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
     """
 
     config = {}
-    async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
-    )
+    async_client = get_async_client()
 
     try:
         controller = TeslaAPI(
