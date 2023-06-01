@@ -296,11 +296,13 @@ async def async_setup_entry(hass, config_entry):
         # to keep the vehicles up to date.
         @callback
         def _async_update_vehicles():
-            """Update vehicles coordinator."""
-            # Schedule all the car coordinators listeners to update
-            # since the vehicles coordinator has updated.
-            for coordinator in car_coordinators.values():
-                coordinator.async_update_listeners_debounced()
+            """Update vehicles coordinator.
+
+            This listener is called when the update_vehicles_coordinator
+            is updated. Since each car coordinator is also polling we don't
+            need to do anything here, but we need to have this listener
+            to ensure the update_vehicles_coordinator is updated regularly.
+            """
 
         update_vehicles_coordinator.async_add_listener(_async_update_vehicles)
 
