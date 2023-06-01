@@ -281,14 +281,30 @@ async def async_setup_entry(hass, config_entry):
         vins=set(),
         update_vehicles=False,
     )
-    coordinators = {
-        "update_vehicles": _partial_coordinator(update_vehicles=True),
-        **{
-            energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
-            for energy_site_id in energysites
-        },
-        **{vin: _partial_coordinator(vins={vin}) for vin in cars},
+    energy_coordinators = {
+        energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+        for energy_site_id in energysites
     }
+    car_coordinators = {vin: _partial_coordinator(vins={vin}) for vin in cars}
+    coordinators = {**energy_coordinators, **car_coordinators}
+
+    if car_coordinators:
+        update_vehicles_coordinator = _partial_coordinator(update_vehicles=True)
+        coordinators["update_vehicles"] = update_vehicles_coordinator
+
+        # If we have cars, we want to update the vehicles coordinator
+        # to keep the vehicles up to date.
+        @callback
+        def _async_update_vehicles():
+            """Update vehicles coordinator.
+
+            This listener is called when the update_vehicles_coordinator
+            is updated. Since each car coordinator is also polling we don't
+            need to do anything here, but we need to have this listener
+            to ensure the update_vehicles_coordinator is updated regularly.
+            """
+
+        update_vehicles_coordinator.async_add_listener(_async_update_vehicles)
 
     teslamate = TeslaMate(hass=hass, cars=cars, coordinators=coordinators)
 
