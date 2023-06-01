@@ -286,14 +286,11 @@ async def async_setup_entry(hass, config_entry):
         for energy_site_id in energysites
     }
     car_coordinators = {vin: _partial_coordinator(vins={vin}) for vin in cars}
-    coordinators = {
-        "update_vehicles": _partial_coordinator(update_vehicles=True),
-        **energy_coordinators,
-        **car_coordinators,
-    }
+    coordinators = {**energy_coordinators, **car_coordinators}
 
     if car_coordinators:
-        update_vehicles_coordinator = coordinators["update_vehicles"]
+        update_vehicles_coordinator = _partial_coordinator(update_vehicles=True)
+        coordinators["update_vehicles"] = update_vehicles_coordinator
 
         # If we have cars, we want to update the vehicles coordinator
         # to keep the vehicles up to date.
