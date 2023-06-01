@@ -290,6 +290,21 @@ async def async_setup_entry(hass, config_entry):
         **{vin: _partial_coordinator(vins={vin}) for vin in cars},
     }
 
+    update_vehicles_coordinator = coordinators["update_vehicles"]
+
+    if cars:
+        # If we have cars, we want to update the vehicles coordinator
+        # to keep the vehicles up to date.
+        @callback
+        def _async_update_vehicles():
+            """Update vehicles coordinator.
+
+            The coordinator will not update if there is not at least one
+            listener, so we need to add a dummy listener.
+            """
+
+        update_vehicles_coordinator.async_add_listener(_async_update_vehicles)
+
     teslamate = TeslaMate(hass=hass, cars=cars, coordinators=coordinators)
 
     enable_teslamate = config_entry.options.get(
