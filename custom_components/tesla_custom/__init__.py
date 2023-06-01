@@ -281,27 +281,29 @@ async def async_setup_entry(hass, config_entry):
         vins=set(),
         update_vehicles=False,
     )
+    energy_coordinators = {
+        energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+        for energy_site_id in energysites
+    }
+    car_coordinators = {vin: _partial_coordinator(vins={vin}) for vin in cars}
     coordinators = {
         "update_vehicles": _partial_coordinator(update_vehicles=True),
-        **{
-            energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
-            for energy_site_id in energysites
-        },
-        **{vin: _partial_coordinator(vins={vin}) for vin in cars},
+        **energy_coordinators,
+        **car_coordinators,
     }
 
-    update_vehicles_coordinator = coordinators["update_vehicles"]
+    if car_coordinators:
+        update_vehicles_coordinator = coordinators["update_vehicles"]
 
-    if cars:
         # If we have cars, we want to update the vehicles coordinator
         # to keep the vehicles up to date.
         @callback
         def _async_update_vehicles():
-            """Update vehicles coordinator.
-
-            The coordinator will not update if there is not at least one
-            listener, so we need to add a dummy listener.
-            """
+            """Update vehicles coordinator."""
+            # Schedule all the car coordinators to update
+            # since the vehicles coordinator has updated.
+            for coordinator in car_coordinators.values():
+                coordinator.async_update_listeners_debounced()
 
         update_vehicles_coordinator.async_add_listener(_async_update_vehicles)
 
