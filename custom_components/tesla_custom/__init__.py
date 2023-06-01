@@ -300,7 +300,7 @@ async def async_setup_entry(hass, config_entry):
         @callback
         def _async_update_vehicles():
             """Update vehicles coordinator."""
-            # Schedule all the car coordinators to update
+            # Schedule all the car coordinators listeners to update
             # since the vehicles coordinator has updated.
             for coordinator in car_coordinators.values():
                 coordinator.async_update_listeners_debounced()
