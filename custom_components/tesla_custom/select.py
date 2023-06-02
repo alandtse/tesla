@@ -191,7 +191,7 @@ class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
         await self._car.set_cabin_overheat_protection(option)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def current_option(self):
@@ -220,7 +220,7 @@ class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
         else:
             await self._energysite.set_grid_charging(False)
 
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def current_option(self):
@@ -259,7 +259,7 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
         if option == EXPORT_RULE[1]:
             await self._energysite.set_export_rule("battery_ok")
 
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def current_option(self) -> str:
@@ -295,7 +295,7 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
         if option == OPERATION_MODE[2]:
             await self._energysite.set_operation_mode("backup")
 
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def current_option(self) -> str:
