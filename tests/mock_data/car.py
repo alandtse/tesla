@@ -116,6 +116,8 @@ VEHICLE_DATA = {
         "timestamp": 1661641175268,
         "wiper_blade_heater": False,
         "steering_wheel_heater": True,
+        "auto_steering_wheel_heat": True,
+        "steering_wheel_heat_level": 1,
     },
     "drive_state": {
         "active_route_destination": "Saved destination name",
