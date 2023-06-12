@@ -36,9 +36,6 @@ async def test_enabled_by_default(hass: HomeAssistant) -> None:
     await setup_platform(hass, SWITCH_DOMAIN)
     entity_registry = er.async_get(hass)
 
-    entry = entity_registry.async_get("switch.my_model_s_heated_steering")
-    assert not entry.disabled
-
     entry = entity_registry.async_get("switch.my_model_s_polling")
     assert not entry.disabled
 
@@ -54,7 +51,6 @@ async def test_enabled_by_default(hass: HomeAssistant) -> None:
 
 async def test_disabled_by_default(hass: HomeAssistant) -> None:
     """Tests devices are disabled by default when appropriate."""
-    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heater"] = None
     car_mock_data.VEHICLE_DATA["vehicle_state"]["sentry_mode_available"] = False
     await setup_platform(hass, SWITCH_DOMAIN)
     entity_registry = er.async_get(hass)
@@ -68,25 +64,30 @@ async def test_disabled_by_default(hass: HomeAssistant) -> None:
 
 async def test_heated_steering(hass: HomeAssistant) -> None:
     """Tests car heated steering switch."""
-    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heater"] = False
-    await setup_platform(hass, SWITCH_DOMAIN)
+    entity_id = "switch.my_model_s_heated_steering"
 
+    # We need to enable the switch for Testing.
     with patch(
+        "custom_components.tesla_custom.switch.TeslaCarHeatedSteeringWheel.entity_registry_enabled_default",
+        return_value=True,
+    ), patch(
         "teslajsonpy.car.TeslaCar.set_heated_steering_wheel"
     ) as mock_seat_heated_steering_wheel:
+        await setup_platform(hass, SWITCH_DOMAIN)
+
         # Test switch on
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
-            {ATTR_ENTITY_ID: "switch.my_model_s_heated_steering"},
+            {ATTR_ENTITY_ID: entity_id},
             blocking=True,
         )
         mock_seat_heated_steering_wheel.assert_awaited_once_with(True)
         # Test switch off
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
-            {ATTR_ENTITY_ID: "switch.my_model_s_heated_steering"},
+            {ATTR_ENTITY_ID: entity_id},
             blocking=True,
         )
         mock_seat_heated_steering_wheel.assert_awaited_with(False)

@@ -254,6 +254,8 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
 
 async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
     """Tests car heated seat select."""
+    entity_id = "select.my_model_s_heated_steering_wheel"
+
     await setup_platform(hass, SELECT_DOMAIN)
 
     with patch(
@@ -264,7 +266,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "Off",
             },
             blocking=True,
@@ -275,7 +277,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "Low",
             },
             blocking=True,
@@ -286,7 +288,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "High",
             },
             blocking=True,
@@ -301,7 +303,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "Auto",
             },
             blocking=True,
@@ -315,7 +317,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "Low",
             },
             blocking=True,
@@ -328,7 +330,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
-                ATTR_ENTITY_ID: "select.my_model_s_heated_steering_wheel",
+                ATTR_ENTITY_ID: entity_id,
                 "option": "Low",
             },
             blocking=True,
