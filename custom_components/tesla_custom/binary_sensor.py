@@ -255,6 +255,7 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
             return "Open"
         return "Closed"
 
+
 class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla window door sensor."""
 
@@ -295,7 +296,6 @@ class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
         if window:
             return "Open"
         return "Closed"
-
 
 
 class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
