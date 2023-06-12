@@ -17,6 +17,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
@@ -280,14 +281,30 @@ async def async_setup_entry(hass, config_entry):
         vins=set(),
         update_vehicles=False,
     )
-    coordinators = {
-        "update_vehicles": _partial_coordinator(update_vehicles=True),
-        **{
-            energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
-            for energy_site_id in energysites
-        },
-        **{vin: _partial_coordinator(vins={vin}) for vin in cars},
+    energy_coordinators = {
+        energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+        for energy_site_id in energysites
     }
+    car_coordinators = {vin: _partial_coordinator(vins={vin}) for vin in cars}
+    coordinators = {**energy_coordinators, **car_coordinators}
+
+    if car_coordinators:
+        update_vehicles_coordinator = _partial_coordinator(update_vehicles=True)
+        coordinators["update_vehicles"] = update_vehicles_coordinator
+
+        # If we have cars, we want to update the vehicles coordinator
+        # to keep the vehicles up to date.
+        @callback
+        def _async_update_vehicles():
+            """Update vehicles coordinator.
+
+            This listener is called when the update_vehicles_coordinator
+            is updated. Since each car coordinator is also polling we don't
+            need to do anything here, but we need to have this listener
+            to ensure the update_vehicles_coordinator is updated regularly.
+            """
+
+        update_vehicles_coordinator.async_add_listener(_async_update_vehicles)
 
     teslamate = TeslaMate(hass=hass, cars=cars, coordinators=coordinators)
 
@@ -386,6 +403,8 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         self.vins = vins
         self.energy_site_ids = energy_site_ids
         self.update_vehicles = update_vehicles
+        self._debounce_task = None
+        self._last_update_time = None
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
 
@@ -431,3 +450,60 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+    def async_update_listeners_debounced(self, delay_since_last=0.1, max_delay=1.0):
+        """
+        Debounced version of async_update_listeners.
+
+        This function cancels the previous task (if any) and creates a new one.
+
+        Parameters
+        ----------
+        delay_since_last : float
+            Minimum delay in seconds since the last received message before calling async_update_listeners.
+        max_delay : float
+            Maximum delay in seconds before calling async_update_listeners,
+            regardless of when the last message was received.
+
+        """
+        # If there's an existing debounce task, cancel it
+        if self._debounce_task:
+            self._debounce_task()
+            _LOGGER.debug("Previous debounce task cancelled")
+
+        # Schedule the call to _debounced, pass max_delay using partial
+        self._debounce_task = async_call_later(
+            self.hass, delay_since_last, partial(self._debounced, max_delay)
+        )
+        _LOGGER.debug("New debounce task scheduled")
+
+    async def _debounced(self, max_delay, *args):
+        """
+        Debounce method that waits a certain delay since the last update.
+
+        This method ensures that async_update_listeners is called at least every max_delay seconds.
+
+        Parameters
+        ----------
+        max_delay : float
+            Maximum delay in seconds before calling async_update_listeners.
+
+        """
+        # Get the current time
+        now = self.hass.loop.time()
+
+        # If it's been at least max_delay since the last update (or there was no previous update),
+        # call async_update_listeners and update the last update time
+        if not self._last_update_time or now - self._last_update_time >= max_delay:
+            self._last_update_time = now
+            self.async_update_listeners()
+            _LOGGER.debug("Listeners updated")
+        else:
+            # If it hasn't been max_delay since the last update,
+            # schedule the call to _debounced again after the remaining time
+            self._debounce_task = async_call_later(
+                self.hass,
+                max_delay - (now - self._last_update_time),
+                partial(self._debounced, max_delay),
+            )
+            _LOGGER.debug("Max delay not reached, scheduling another debounce task")

@@ -44,13 +44,13 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
         """Send lock command."""
         _LOGGER.debug("Locking: %s", self.name)
         await self._car.lock()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
         _LOGGER.debug("Unlocking: %s", self.name)
         await self._car.unlock()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def is_locked(self):
@@ -77,13 +77,13 @@ class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
         """Send open command."""
         _LOGGER.debug("Opening: %s", self.name)
         await self._car.charge_port_door_open()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
         _LOGGER.debug("Unlocking: %s", self.name)
         await self._car.charge_port_door_open()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_lock(self, **kwargs):
         """Log lock command not possible."""

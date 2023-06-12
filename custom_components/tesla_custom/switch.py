@@ -60,12 +60,12 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         await self._car.set_heated_steering_wheel(True)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         await self._car.set_heated_steering_wheel(False)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
 
 class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
@@ -95,13 +95,13 @@ class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
         """Send the on command."""
         _LOGGER.debug("Enable polling: %s %s", self.name, self._car.vin)
         self._coordinator.controller.set_updates(vin=self._car.vin, value=True)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         _LOGGER.debug("Disable polling: %s %s", self.name, self._car.vin)
         self._coordinator.controller.set_updates(vin=self._car.vin, value=False)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
 
 class TeslaCarCharger(TeslaCarEntity, SwitchEntity):
@@ -126,12 +126,12 @@ class TeslaCarCharger(TeslaCarEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         await self._car.start_charge()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         await self._car.stop_charge()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
 
 class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
@@ -169,12 +169,12 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         await self._car.set_sentry_mode(True)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         await self._car.set_sentry_mode(False)
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
 
 class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
@@ -203,7 +203,7 @@ class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
             _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
         else:
             await self._car.valet_mode(True)
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
@@ -212,4 +212,4 @@ class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
             _LOGGER.debug("Pin required for valet mode, set pin in vehicle or app.")
         else:
             await self._car.valet_mode(False)
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
