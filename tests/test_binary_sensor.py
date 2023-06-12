@@ -162,6 +162,7 @@ async def test_car_doors(hass: HomeAssistant) -> None:
     assert state.attributes.get("Passenger Front") == "Closed"
     assert state.attributes.get("Passenger Rear") == "Closed"
 
+
 async def test_car_windows(hass: HomeAssistant) -> None:
     """Tests car window is getting the correct value."""
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
@@ -175,6 +176,7 @@ async def test_car_windows(hass: HomeAssistant) -> None:
     assert state.attributes.get("Driver Rear") == "Closed"
     assert state.attributes.get("Passenger Front") == "Closed"
     assert state.attributes.get("Passenger Rear") == "Closed"
+
 
 async def test_car_scheduled_charging(hass: HomeAssistant) -> None:
     """Tests scheduled charging is getting the correct value."""
