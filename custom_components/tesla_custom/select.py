@@ -45,6 +45,15 @@ FRONT_HEATER_OPTIONS = [
     "Auto",
 ]
 
+STEERING_HEATER_OPTIONS = [
+    "Off",
+    "Low",
+    "High",
+    "Auto",
+]
+
+STEERING_HEATER_OPTIONS_MAP = {"Off": 0, "Low": 1, "High": 3}
+
 OPERATION_MODE = [
     "Self-Powered",
     "Time-Based Control",
@@ -78,6 +87,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for vin, car in cars.items():
         coordinator = coordinators[vin]
         entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
+        entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
@@ -170,6 +180,71 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
         if self._is_auto_available:
             return FRONT_HEATER_OPTIONS
         return HEATER_OPTIONS
+
+
+class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
+    """Representation of a Tesla car heated steering wheel select."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ):
+        """Initialize heated seat entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "heated steering wheel"
+        self._attr_icon = "mdi:steering"
+        self._enabled_by_default = self._car.steering_wheel_heater
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+
+        if option == STEERING_HEATER_OPTIONS[3]:
+            _LOGGER.debug("Setting Heated Steering to Auto")
+            await self._car.remote_auto_steering_wheel_heat_climate_request(True)
+        else:
+            level: int = STEERING_HEATER_OPTIONS_MAP[option]
+
+            await self._car.remote_auto_steering_wheel_heat_climate_request(False)
+
+            if not self._car.is_climate_on and level > 0:
+                await self._car.set_hvac_mode("on")
+
+            _LOGGER.debug("Setting Heated Steering to %s", level)
+            await self._car.set_heated_steering_wheel_level(level)
+
+        await self.update_controller(force=True)
+
+    @property
+    def current_option(self):
+        """Return current heated steering setting."""
+        if self._car.is_auto_steering_wheel_heat is True:
+            current_str = "Auto"
+        else:
+            current_value = self._car.get_heated_steering_wheel_level()
+            current_str = next(
+                (
+                    key
+                    for key, val in STEERING_HEATER_OPTIONS_MAP.items()
+                    if val == current_value
+                ),
+                None,
+            )
+
+        options_idx = STEERING_HEATER_OPTIONS.index(current_str)
+
+        return STEERING_HEATER_OPTIONS[options_idx]
+
+    @property
+    def options(self):
+        """Return heated seat options."""
+        return STEERING_HEATER_OPTIONS
+
+    @property
+    def available(self) -> bool:
+        """Return True if steering wheel heater is available."""
+        return super().available and self._car.steering_wheel_heater
 
 
 class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
