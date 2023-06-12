@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarCharging(hass, car, coordinator))
         entities.append(TeslaCarDoors(hass, car, coordinator))
         entities.append(TeslaCarWindows(hass, car, coordinator))
-        
+
         entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
         entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
         entities.append(TeslaCarUserPresent(hass, car, coordinator))
