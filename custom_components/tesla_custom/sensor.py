@@ -509,7 +509,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
         """Initialize battery remaining entity."""
         super().__init__(hass, energysite, coordinator)
         self.type = "battery remaining"
-        self._attr_device_class = SensorDeviceClass.BATTERY
+        self._attr_device_class = SensorDeviceClass.ENERGY_STORAGE
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
 
