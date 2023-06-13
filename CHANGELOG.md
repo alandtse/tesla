@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v3.13.0 (2023-06-13)
+
+### Feature
+
+* Add heated steering wheel select ([#628](https://github.com/alandtse/tesla/issues/628)) ([`96cbad6`](https://github.com/alandtse/tesla/commit/96cbad6ccd6058a550397796ccdba97c286db152))
+
+### Fix
+
+* Use async_write vs async_update ([#626](https://github.com/alandtse/tesla/issues/626)) ([`78b0641`](https://github.com/alandtse/tesla/commit/78b0641587940ee40a6a6a4414e3fba43c83631b))
+
 ## v3.12.3 (2023-06-01)
 ### Fix
 
