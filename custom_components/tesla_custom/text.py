@@ -53,7 +53,7 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
 
         await self.teslsmate.set_car_id(self._car.vin, value)
         await self.teslsmate.watch_cars()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_update(self) -> None:
         """Update the entity."""

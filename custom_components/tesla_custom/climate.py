@@ -128,7 +128,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             temp = round(temperature, 1)
 
             await self._car.set_temperature(temp)
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""

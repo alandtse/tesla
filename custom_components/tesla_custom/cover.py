@@ -55,13 +55,13 @@ class TeslaCarChargerDoor(TeslaCarEntity, CoverEntity):
         """Send close cover command."""
         _LOGGER.debug("Closing cover: %s", self.name)
         await self._car.charge_port_door_close()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
         await self._car.charge_port_door_open()
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     @property
     def is_closed(self):
@@ -86,14 +86,14 @@ class TeslaCarFrunk(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Closing cover: %s", self.name)
         if self.is_closed is False:
             await self._car.toggle_frunk()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
         if self.is_closed is True:
             await self._car.toggle_frunk()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     @property
     def is_closed(self):
@@ -130,14 +130,14 @@ class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Closing cover: %s", self.name)
         if self.is_closed is False:
             await self._car.toggle_trunk()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
         if self.is_closed is True:
             await self._car.toggle_trunk()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     @property
     def is_closed(self):
@@ -176,14 +176,14 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Closing cover: %s", self.name)
         if self.is_closed is False:
             await self._car.close_windows()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command."""
         _LOGGER.debug("Opening cover: %s", self.name)
         if self.is_closed is True:
             await self._car.vent_windows()
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     @property
     def is_closed(self):

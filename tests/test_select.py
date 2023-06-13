@@ -250,3 +250,89 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_set_operation_mode.assert_awaited_with("backup")
+
+
+async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
+    """Tests car heated seat select."""
+    entity_id = "select.my_model_s_heated_steering_wheel"
+
+    await setup_platform(hass, SELECT_DOMAIN)
+
+    with patch(
+        "teslajsonpy.car.TeslaCar.set_heated_steering_wheel_level"
+    ) as mock_set_heated_steering_wheel_level:
+        # Test selecting "Off"
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "Off",
+            },
+            blocking=True,
+        )
+        mock_set_heated_steering_wheel_level.assert_awaited_once_with(0)
+        # Test selecting "Low"
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "Low",
+            },
+            blocking=True,
+        )
+        mock_set_heated_steering_wheel_level.assert_awaited_with(1)
+        # Test selecting "High"
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "High",
+            },
+            blocking=True,
+        )
+        mock_set_heated_steering_wheel_level.assert_awaited_with(3)
+
+    with patch(
+        "teslajsonpy.car.TeslaCar.remote_auto_steering_wheel_heat_climate_request"
+    ) as mock_remote_auto_steering_wheel_heat_climate_request:
+        # Test selecting "Auto"
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "Auto",
+            },
+            blocking=True,
+        )
+        mock_remote_auto_steering_wheel_heat_climate_request.assert_awaited_once_with(
+            True
+        )
+        # Test from "Auto" selection
+        car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "Low",
+            },
+            blocking=True,
+        )
+        mock_remote_auto_steering_wheel_heat_climate_request.assert_awaited_with(False)
+
+    with patch("teslajsonpy.car.TeslaCar.set_hvac_mode") as mock_set_hvac_mode:
+        # Test climate_on check
+        assert await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: entity_id,
+                "option": "Low",
+            },
+            blocking=True,
+        )
+        mock_set_hvac_mode.assert_awaited_once_with("on")
