@@ -4,7 +4,7 @@
   "after_dependencies": ["mqtt"],
   "codeowners": ["@alandtse"],
   "config_flow": true,
-  "dependencies": ["homeassistant","http"],
+  "dependencies": ["homeassistant", "http"],
   "dhcp": [
     {
       "hostname": "tesla_*",
