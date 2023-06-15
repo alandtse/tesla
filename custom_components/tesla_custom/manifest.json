@@ -4,7 +4,7 @@
   "after_dependencies": ["mqtt"],
   "codeowners": ["@alandtse"],
   "config_flow": true,
-  "dependencies": ["homeassistant", "http"],
+  "dependencies": ["http"],
   "dhcp": [
     {
       "hostname": "tesla_*",
@@ -23,6 +23,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "loggers": ["teslajsonpy"],
-  "requirements": ["teslajsonpy==3.9.0"],
+  "requirements": ["teslajsonpy==3.9.0", "homeassistant>=2023.4.0"],
   "version": "3.13.0"
 }
