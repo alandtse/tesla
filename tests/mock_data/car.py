@@ -197,7 +197,7 @@ VEHICLE_DATA = {
         "dashcam_state": "<invalid>",
         "df": 1,
         "dr": 0,
-        "fd_window": 1,
+        "fd_window": 0,
         "feature_bitmask": "5,0",
         "fp_window": 0,
         "ft": 0,
