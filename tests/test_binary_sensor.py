@@ -168,11 +168,11 @@ async def test_car_windows(hass: HomeAssistant) -> None:
     await setup_platform(hass, BINARY_SENSOR_DOMAIN)
 
     state = hass.states.get("binary_sensor.my_model_s_windows")
-    assert state.state == STATE_ON
+    assert state.state == STATE_OFF
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == BinarySensorDeviceClass.WINDOW
 
-    assert state.attributes.get("Driver Front") == "Open"
+    assert state.attributes.get("Driver Front") == "Closed"
     assert state.attributes.get("Driver Rear") == "Closed"
     assert state.attributes.get("Passenger Front") == "Closed"
     assert state.attributes.get("Passenger Rear") == "Closed"
