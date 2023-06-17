@@ -751,10 +751,13 @@ class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
         self._attr_icon = "mdi:timer"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> datetime:
         """Return the last data update time."""
         last_time = self._coordinator.controller.get_last_update_time(vin=self._car.vin)
 
         utc_tz = dt.get_time_zone("UTC")
-        date_obj = datetime.fromtimestamp(last_time, utc_tz)
+        if not isinstance(last_time, datetime):
+            date_obj = datetime.fromtimestamp(last_time, utc_tz)
+        else:
+            date_obj = last_time.replace(tzinfo=utc_tz)
         return date_obj
