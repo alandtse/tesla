@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v3.14.0 (2023-06-17)
+
+### Feature
+
+* Add car windows binary_sensors ([#629](https://github.com/alandtse/tesla/issues/629)) ([`fdefa52`](https://github.com/alandtse/tesla/commit/fdefa52ff9a520848a50900b3b3d0c44d079e643))
+
+### Fix
+
+* Update battery remaining sensor to ENERGY_STORAGE ([#632](https://github.com/alandtse/tesla/issues/632)) ([`ff960f0`](https://github.com/alandtse/tesla/commit/ff960f0fa26f784c06f1f9da095a34b357a00509))
+* Fix variable heated steering for older cars ([#638](https://github.com/alandtse/tesla/issues/638)) ([`db1d6b8`](https://github.com/alandtse/tesla/commit/db1d6b8e71a17e3d2a2ad54109b9aa2409ba8a37))
+
 ## v3.13.0 (2023-06-13)
 
 ### Feature
