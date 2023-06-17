@@ -44,8 +44,8 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
         super().__init__(hass, car, coordinator)
         self.type = "heated steering"
         self._attr_icon = "mdi:steering"
-        # Entity is disabled for new installs, as Select has been created.
-        self._enabled_by_default = False
+        # Entity is disabled for cars with variable heated steering wheel.
+        self._enabled_by_default = car.get_heated_steering_wheel_level() is not None
 
     @property
     def available(self) -> bool:
