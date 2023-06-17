@@ -130,7 +130,7 @@ async def test_battery_remaining(hass: HomeAssistant) -> None:
         energysite_mock_data.BATTERY_SUMMARY["energy_left"]
     )
 
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY_STORAGE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_WATT_HOUR
 
