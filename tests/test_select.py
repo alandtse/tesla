@@ -33,6 +33,23 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("select.battery_home_operation_mode")
     assert entry.unique_id == "67890_operation_mode"
 
+    entry = entity_registry.async_get("select.my_model_s_heated_steering_wheel")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_heated_steering_wheel"
+
+
+async def test_skipped_entries(hass: HomeAssistant) -> None:
+    """Tests devices are skipped in the entity registry."""
+
+    del car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heat_level"]
+    await setup_platform(hass, SELECT_DOMAIN)
+    entity_registry = er.async_get(hass)
+
+    entry = entity_registry.async_get("select.my_model_s_heated_steering_wheel")
+    assert entry is None
+
+    # Add it back for further tests
+    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heat_level"] = "1"
+
 
 async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
     """Tests car heated seat select."""
@@ -253,7 +270,7 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
 
 
 async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
-    """Tests car heated seat select."""
+    """Tests car heated steering wheel select."""
     entity_id = "select.my_model_s_heated_steering_wheel"
 
     await setup_platform(hass, SELECT_DOMAIN)

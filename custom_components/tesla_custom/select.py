@@ -87,7 +87,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     for vin, car in cars.items():
         coordinator = coordinators[vin]
         entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
-        entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
+        if car.get_heated_steering_wheel_level() is not None:
+            # Only add steering wheel select if we have a variable heated steering wheel
+            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
