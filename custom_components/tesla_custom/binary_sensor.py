@@ -33,6 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerConnection(hass, car, coordinator))
         entities.append(TeslaCarCharging(hass, car, coordinator))
         entities.append(TeslaCarDoors(hass, car, coordinator))
+        entities.append(TeslaCarWindows(hass, car, coordinator))
         entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
         entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
         entities.append(TeslaCarUserPresent(hass, car, coordinator))
@@ -251,6 +252,48 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
     def _open_or_closed(self, door):
         """Return string of 'Open' or 'Closed' when passed a door integer state."""
         if door:
+            return "Open"
+        return "Closed"
+
+
+class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
+    """Representation of a Tesla window door sensor."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize car windows entity."""
+        super().__init__(hass, car, coordinator)
+        self.type = "windows"
+        self._attr_device_class = BinarySensorDeviceClass.WINDOW
+        self._attr_icon = "mdi:car-door"
+
+    @property
+    def is_on(self):
+        """Return True if a car window is open."""
+        return (
+            self._car.window_fd
+            or self._car.window_fp
+            or self._car.window_rd
+            or self._car.window_rp
+        )
+
+    @property
+    def extra_state_attributes(self):
+        """Return device state attributes."""
+        return {
+            "Driver Front": self._open_or_closed(self._car.window_fd),
+            "Driver Rear": self._open_or_closed(self._car.window_rd),
+            "Passenger Front": self._open_or_closed(self._car.window_fp),
+            "Passenger Rear": self._open_or_closed(self._car.window_rp),
+        }
+
+    def _open_or_closed(self, window):
+        """Return string of 'Open' or 'Closed' when passed a window integer state."""
+        if window:
             return "Open"
         return "Closed"
 

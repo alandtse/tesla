@@ -52,6 +52,7 @@ async def test_enabled_by_default(hass: HomeAssistant) -> None:
 async def test_disabled_by_default(hass: HomeAssistant) -> None:
     """Tests devices are disabled by default when appropriate."""
     car_mock_data.VEHICLE_DATA["vehicle_state"]["sentry_mode_available"] = False
+    del car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heat_level"]
     await setup_platform(hass, SWITCH_DOMAIN)
     entity_registry = er.async_get(hass)
 
@@ -60,6 +61,9 @@ async def test_disabled_by_default(hass: HomeAssistant) -> None:
 
     entry = entity_registry.async_get("switch.my_model_s_sentry_mode")
     assert entry.disabled
+
+    # Add it back for further tests
+    car_mock_data.VEHICLE_DATA["climate_state"]["steering_wheel_heat_level"] = "1"
 
 
 async def test_heated_steering(hass: HomeAssistant) -> None:
