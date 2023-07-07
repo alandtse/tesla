@@ -620,6 +620,10 @@ async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> No
         state.attributes.get("Destination")
         == car_mock_data.VEHICLE_DATA["drive_state"]["active_route_destination"]
     )
+    assert state.attributes.get("Minutes to arrival") == round(
+        car_mock_data.VEHICLE_DATA["drive_state"]["active_route_minutes_to_arrival"],
+        2,
+    )
 
 
 async def test_distance_to_arrival(hass: HomeAssistant) -> None:
