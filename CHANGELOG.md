@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v3.15.0 (2023-07-07)
+
+### Feature
+
+* Add minutes-to-arrival-attr ([#657](https://github.com/alandtse/tesla/issues/657)) ([`672fc04`](https://github.com/alandtse/tesla/commit/672fc046ef5213b4d7dc62bf34bccae1b6245b7b))
+
 ## v3.14.0 (2023-06-17)
 
 ### Feature
