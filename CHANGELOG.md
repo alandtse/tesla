@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v3.15.1 (2023-07-08)
+
+### Fix
+
+* Check if arrival time attribute is available ([`5936ea3`](https://github.com/alandtse/tesla/commit/5936ea39049aa3728f03b975d54d02a6387cf8e6))
+
 ## v3.15.0 (2023-07-07)
 
 ### Feature
