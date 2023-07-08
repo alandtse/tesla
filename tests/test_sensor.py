@@ -626,6 +626,14 @@ async def test_arrival_time(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> No
     )
 
 
+async def test_arrival_time_none(hass: HomeAssistant, monkeypatch: MonkeyPatch) -> None:
+    """Tests arrival time is getting the correct value."""
+    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_minutes_to_arrival"] = None
+    await setup_platform(hass, SENSOR_DOMAIN)
+    state = hass.states.get("sensor.my_model_s_arrival_time")
+    assert state.attributes.get("Minutes to arrival") == None
+
+
 async def test_distance_to_arrival(hass: HomeAssistant) -> None:
     """Tests distance to arrival is getting the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
