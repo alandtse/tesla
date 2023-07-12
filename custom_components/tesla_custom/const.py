@@ -28,6 +28,7 @@ PLATFORMS = [
     "update",
     "number",
     "text",
+    "media_player",
 ]
 
 AUTH_CALLBACK_PATH = "/auth/tesla/callback"

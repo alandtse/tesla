@@ -17,6 +17,7 @@ from teslajsonpy.car import TeslaCar
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
+from .util import safeget
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -184,3 +185,28 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
         # max_defrost changes multiple states so refresh all entities
         await self._coordinator.async_refresh()
+
+    @property
+    def extra_state_attributes(self):
+        """Return extra climate attributes."""
+        # pylint: disable=protected-access
+        return {
+            "is_auto_conditioning_on": safeget(
+                self._car._vehicle_data, "climate_state", "is_auto_conditioning_on"
+            ),
+            "is_front_defroster_on": safeget(
+                self._car._vehicle_data, "climate_state", "is_front_defroster_on"
+            ),
+            "is_rear_defroster_on": safeget(
+                self._car._vehicle_data, "climate_state", "is_rear_defroster_on"
+            ),
+            "is_preconditioning": safeget(
+                self._car._vehicle_data, "climate_state", "is_preconditioning"
+            ),
+            "side_mirror_heaters": safeget(
+                self._car._vehicle_data, "climate_state", "side_mirror_heaters"
+            ),
+            "wiper_blade_heater": safeget(
+                self._car._vehicle_data, "climate_state", "wiper_blade_heater"
+            ),
+        }
