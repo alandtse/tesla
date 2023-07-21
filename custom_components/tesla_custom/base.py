@@ -18,7 +18,7 @@ class TeslaBaseEntity(CoordinatorEntity):
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
     _enabled_by_default: bool = True
-    type: str | None = None
+    type: str
 
     def __init__(
         self, hass: HomeAssistant, coordinator: TeslaDataUpdateCoordinator
