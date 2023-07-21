@@ -480,18 +480,9 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
     type = "time charge complete"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_icon = "mdi:timer-plus"
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize time charge complete entity."""
-        super().__init__(hass, car, coordinator)
-        self._value: Optional[datetime] = None
-        self._last_known_value: Optional[int] = None
-        self._last_update_time: Optional[datetime] = None
+    _value: Optional[datetime] = None
+    _last_known_value: Optional[int] = None
+    _last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
@@ -581,18 +572,9 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
     type = "arrival time"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_icon = "mdi:timer-sand"
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize time charge complete entity."""
-        super().__init__(hass, car, coordinator)
-        self._datetime_value: Optional[datetime] = None
-        self._last_known_value: Optional[int] = None
-        self._last_update_time: Optional[datetime] = None
+    _datetime_value: Optional[datetime] = None
+    _last_known_value: Optional[int] = None
+    _last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
