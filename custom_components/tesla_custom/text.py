@@ -28,6 +28,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
     """Representation of a Tesla car charge limit number."""
 
+    type = "teslamate id"
+    _attr_icon = "mdi:ev-station"
+    _attr_mode = TextMode.TEXT
+    _enabled_by_default = False
+    _attr_entity_category = EntityCategory.CONFIG
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -37,12 +43,6 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
     ) -> None:
         """Initialize charge limit entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "teslamate id"
-        self._attr_icon = "mdi:ev-station"
-        self._attr_mode = TextMode.TEXT
-        self._enabled_by_default = False
-        self._attr_entity_category = EntityCategory.CONFIG
-
         self.teslsmate = teslamate
         self._state = None
 

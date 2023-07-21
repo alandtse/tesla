@@ -50,17 +50,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car parking brake binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize parking brake entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "parking brake"
-        self._attr_icon = "mdi:car-brake-parking"
-        self._attr_device_class = None
+    type = "parking brake"
+    _attr_icon = "mdi:car-brake-parking"
+    _attr_device_class = None
 
     @property
     def is_on(self):
@@ -72,17 +64,9 @@ class TeslaCarParkingBrake(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car charger connection binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charger connection entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charger"
-        self._attr_icon = "mdi:ev-station"
-        self._attr_device_class = BinarySensorDeviceClass.PLUG
+    type = "charger"
+    _attr_icon = "mdi:ev-station"
+    _attr_device_class = BinarySensorDeviceClass.PLUG
 
     @property
     def is_on(self):
@@ -125,16 +109,8 @@ class TeslaCarCharging(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car online binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car online entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "online"
-        self._attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
+    _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
+    type = "online"
 
     @property
     def is_on(self):
@@ -155,17 +131,9 @@ class TeslaCarOnline(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarAsleep(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car asleep binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car asleep entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "asleep"
-        self._attr_device_class = None
-        self._attr_icon = "mdi:sleep"
+    type = "asleep"
+    _attr_device_class = None
+    _attr_icon = "mdi:sleep"
 
     @property
     def is_on(self):
@@ -176,17 +144,9 @@ class TeslaCarAsleep(TeslaCarEntity, BinarySensorEntity):
 class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):
     """Representation of a Tesla energy charging binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize battery charging entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "battery charging"
-        self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
-        self._attr_icon = "mdi:battery-charging"
+    _attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
+    _attr_icon = "mdi:battery-charging"
+    type = "battery charging"
 
     @property
     def is_on(self) -> bool:
@@ -197,16 +157,8 @@ class TeslaEnergyBatteryCharging(TeslaEnergyEntity, BinarySensorEntity):
 class TeslaEnergyGridStatus(TeslaEnergyEntity, BinarySensorEntity):
     """Representation of the Tesla energy grid status binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize grid status entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "grid status"
-        self._attr_device_class = BinarySensorDeviceClass.POWER
+    type = "grid status"
+    _attr_device_class = BinarySensorDeviceClass.POWER
 
     @property
     def is_on(self) -> bool:
@@ -217,27 +169,15 @@ class TeslaEnergyGridStatus(TeslaEnergyEntity, BinarySensorEntity):
 class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car door sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car door entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "doors"
-        self._attr_device_class = BinarySensorDeviceClass.DOOR
-        self._attr_icon = "mdi:car-door"
+    type = "doors"
+    _attr_device_class = BinarySensorDeviceClass.DOOR
+    _attr_icon = "mdi:car-door"
 
     @property
     def is_on(self):
         """Return True if a car door is open."""
-        return (
-            self._car.door_df
-            or self._car.door_dr
-            or self._car.door_pf
-            or self._car.door_pr
-        )
+        car = self._car
+        return car.door_df or car.door_dr or car.door_pf or car.door_pr
 
     @property
     def extra_state_attributes(self):
@@ -259,27 +199,15 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla window door sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car windows entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "windows"
-        self._attr_device_class = BinarySensorDeviceClass.WINDOW
-        self._attr_icon = "mdi:car-door"
+    type = "windows"
+    _attr_device_class = BinarySensorDeviceClass.WINDOW
+    _attr_icon = "mdi:car-door"
 
     @property
     def is_on(self):
         """Return True if a car window is open."""
-        return (
-            self._car.window_fd
-            or self._car.window_fp
-            or self._car.window_rd
-            or self._car.window_rp
-        )
+        car = self._car
+        return car.window_fd or car.window_fp or car.window_rd or car.window_rp
 
     @property
     def extra_state_attributes(self):
@@ -301,17 +229,9 @@ class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car scheduled charging binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize scheduled charging entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "scheduled charging"
-        self._attr_icon = "mdi:calendar-plus"
-        self._attr_device_class = None
+    type = "scheduled charging"
+    _attr_icon = "mdi:calendar-plus"
+    _attr_device_class = None
 
     @property
     def is_on(self):
@@ -336,25 +256,18 @@ class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car scheduled departure binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize scheduled departure entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "scheduled departure"
-        self._attr_icon = "mdi:calendar-plus"
-        self._attr_device_class = None
+    type = "scheduled departure"
+    _attr_icon = "mdi:calendar-plus"
+    _attr_device_class = None
 
     @property
     def is_on(self):
         """Return True if scheduled departure enebaled."""
+        car = self._car
         if (
-            self._car.scheduled_charging_mode == "DepartBy"
-            or self._car.is_preconditioning_enabled
-            or self._car.is_off_peak_charging_enabled
+            car.scheduled_charging_mode == "DepartBy"
+            or car.is_preconditioning_enabled
+            or car.is_off_peak_charging_enabled
         ):
             return True
         return False
@@ -380,17 +293,9 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
     """Representation of a Tesla car user present binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize user present entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "user present"
-        self._attr_icon = "mdi:account-check"
-        self._attr_device_class = None
+    type = "user present"
+    _attr_icon = "mdi:account-check"
+    _attr_device_class = None
 
     @property
     def is_on(self):

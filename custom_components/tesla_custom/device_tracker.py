@@ -31,15 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
     """Representation of a Tesla car location device tracker."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car location entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "location tracker"
+    type = "location tracker"
 
     @property
     def source_type(self):
@@ -73,15 +65,7 @@ class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
 class TeslaCarDestinationLocation(TeslaCarEntity, TrackerEntity):
     """Representation of a Tesla car destination location device tracker."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car destination location entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "destination location tracker"
+    type = "destination location tracker"
 
     @property
     def source_type(self):

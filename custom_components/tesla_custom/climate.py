@@ -52,15 +52,7 @@ async def async_setup_entry(
 class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     """Representation of a Tesla car climate."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize climate entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "HVAC (climate) system"
+    type = "HVAC (climate) system"
 
     @property
     def supported_features(self):

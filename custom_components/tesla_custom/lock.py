@@ -30,15 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarDoors(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car door lock."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize door lock entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "doors"
+    type = "doors"
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
@@ -61,17 +53,9 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
 class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
     """Representation of a Tesla charge port latch."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charge port latch (lock) entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charge port latch"
-        self._attr_icon = "mdi:ev-plug-tesla"
-        self._attr_supported_features = LockEntityFeature.OPEN
+    type = "charge port latch"
+    _attr_icon = "mdi:ev-plug-tesla"
+    _attr_supported_features = LockEntityFeature.OPEN
 
     async def async_open(self, **kwargs):
         """Send open command."""

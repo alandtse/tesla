@@ -32,7 +32,7 @@ class TeslaBaseEntity(CoordinatorEntity):
     def refresh(self) -> None:
         """Refresh the device data.
 
-        This is called by the DataUpdateCoodinator when new data is available.
+        This is called by the DataUpdateCoordinator when new data is available.
 
         This assumes the controller has already been updated. This should be
         called by inherited classes so the overall device information is updated.
@@ -97,11 +97,12 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def vehicle_name(self) -> str:
         """Return vehicle name."""
+        display_name = self._car.display_name
+        vin = self._car.vin
         return (
-            self._car.display_name
-            if self._car.display_name is not None
-            and self._car.display_name != self._car.vin[-6:]
-            else f"Tesla Model {str(self._car.vin[3]).upper()}"
+            display_name
+            if display_name is not None and display_name != vin[-6:]
+            else f"Tesla Model {str(vin[3]).upper()}"
         )
 
     @property
@@ -125,10 +126,12 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def assumed_state(self) -> bool:
         """Return whether the data is from an online vehicle."""
-        return not self._coordinator.controller.is_car_online(vin=self._car.vin) and (
-            self._coordinator.controller.get_last_update_time(vin=self._car.vin)
-            - self._coordinator.controller.get_last_wake_up_time(vin=self._car.vin)
-            > self._coordinator.controller.update_interval
+        vin = self._car.vin
+        controller = self._coordinator.controller
+        return not controller.is_car_online(vin=vin) and (
+            controller.get_last_update_time(vin=vin)
+            - controller.get_last_wake_up_time(vin=vin)
+            > controller.update_interval
         )
 
 
