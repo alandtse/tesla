@@ -72,8 +72,6 @@ class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
         _LOGGER.debug("Locking charge port latch not possible with Tesla's API.")
 
     @property
-    def is_locked(self):
+    def is_locked(self) -> bool:
         """Return True if charge port latch is engaged."""
-        if self._car.charge_port_latch == "Engaged":
-            return True
-        return False
+        return self._car.charge_port_latch == "Engaged"

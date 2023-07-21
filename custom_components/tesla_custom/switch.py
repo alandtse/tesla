@@ -77,12 +77,13 @@ class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool | None:
         """Return True if updates available."""
-        if self._coordinator.controller.get_updates(vin=self._car.vin) is None:
+        controller = self._coordinator.controller
+        get_updates = controller.get_updates(vin=self._car.vin)
+        if get_updates is None:
             return None
-
-        return bool(self._coordinator.controller.get_updates(vin=self._car.vin))
+        return bool(get_updates)
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
@@ -146,11 +147,7 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
         """Return True if sentry mode is on."""
         sentry_mode_available = self._car.sentry_mode_available
         sentry_mode_status = self._car.sentry_mode
-
-        if sentry_mode_available is True and sentry_mode_status is True:
-            return True
-
-        return False
+        return bool(sentry_mode_available and sentry_mode_status)
 
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
