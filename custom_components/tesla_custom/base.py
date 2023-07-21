@@ -1,5 +1,5 @@
 """Support for Tesla cars and energy sites."""
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
@@ -29,6 +29,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         self.hass = hass
         self._memorized_unique_id = None
 
+    @callback
     def refresh(self) -> None:
         """Refresh the device data.
 
