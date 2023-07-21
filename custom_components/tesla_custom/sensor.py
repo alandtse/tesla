@@ -28,7 +28,7 @@ from homeassistant.util import dt
 from homeassistant.util.unit_conversion import DistanceConverter
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY, RESOURCE_TYPE_SOLAR
-from teslajsonpy.energy import EnergySite, PowerwallSite
+from teslajsonpy.energy import EnergySite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -110,19 +110,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarBattery(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car battery sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize the Sensor Entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "battery"
-        self._attr_device_class = SensorDeviceClass.BATTERY
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PERCENTAGE
-        self._attr_icon = "mdi:battery"
+    type = "battery"
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_icon = "mdi:battery"
 
     @staticmethod
     def has_battery() -> bool:
@@ -155,19 +147,11 @@ class TeslaCarBattery(TeslaCarEntity, SensorEntity):
 class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car energy added sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize energy added entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "energy added"
-        self._attr_device_class = SensorDeviceClass.ENERGY
-        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
-        self._attr_icon = "mdi:lightning-bolt"
+    type = "energy added"
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+    _attr_icon = "mdi:lightning-bolt"
 
     @property
     def native_value(self) -> float:
@@ -202,18 +186,10 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
 class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car charger power."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize energy added entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charger power"
-        self._attr_device_class = SensorDeviceClass.POWER
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = POWER_KILO_WATT
+    type = "charger power"
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = POWER_KILO_WATT
 
     @property
     def native_value(self) -> int:
@@ -234,19 +210,11 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
 class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car charging rate."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charging rate entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charging rate"
-        self._attr_device_class = SensorDeviceClass.SPEED
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = SPEED_MILES_PER_HOUR
-        self._attr_icon = "mdi:speedometer"
+    type = "charging rate"
+    _attr_device_class = SensorDeviceClass.SPEED
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = SPEED_MILES_PER_HOUR
+    _attr_icon = "mdi:speedometer"
 
     @property
     def native_value(self) -> float:
@@ -269,19 +237,11 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
 class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car odometer sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize odometer entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "odometer"
-        self._attr_device_class = SensorDeviceClass.DISTANCE
-        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
-        self._attr_native_unit_of_measurement = LENGTH_MILES
-        self._attr_icon = "mdi:counter"
+    type = "odometer"
+    _attr_device_class = SensorDeviceClass.DISTANCE
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_icon = "mdi:counter"
 
     @property
     def native_value(self) -> float:
@@ -297,17 +257,9 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
 class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car Shift State sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize odometer entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "shift state"
-        self._attr_device_class = SensorDeviceClass.ENUM
-        self._attr_icon = "mdi:car-shift-pattern"
+    type = "shift state"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_icon = "mdi:car-shift-pattern"
 
     @property
     def native_value(self) -> float:
@@ -339,19 +291,11 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
 class TeslaCarRange(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car range sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize range entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "range"
-        self._attr_device_class = SensorDeviceClass.DISTANCE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = LENGTH_MILES
-        self._attr_icon = "mdi:gauge"
+    type = "range"
+    _attr_device_class = SensorDeviceClass.DISTANCE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_icon = "mdi:gauge"
 
     @property
     def native_value(self) -> float:
@@ -389,6 +333,12 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
 class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car temp sensor."""
 
+    type = "temperature"
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = TEMP_CELSIUS
+    _attr_icon = "mdi:thermometer"
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -399,18 +349,11 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     ) -> None:
         """Initialize temp entity."""
         super().__init__(hass, car, coordinator)
-        self.type = "temperature"
         self.inside = inside
-
         if inside is True:
             self.type += " (inside)"
         else:
             self.type += " (outside)"
-
-        self._attr_device_class = SensorDeviceClass.TEMPERATURE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = TEMP_CELSIUS
-        self._attr_icon = "mdi:thermometer"
 
     @property
     def native_value(self) -> float:
@@ -424,6 +367,10 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
 class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy power sensor."""
 
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = POWER_WATT
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -434,10 +381,6 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         """Initialize power sensor."""
         super().__init__(hass, energysite, coordinator)
         self.type = sensor_type
-        self._attr_device_class = SensorDeviceClass.POWER
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = POWER_WATT
-
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
         if self.type == "grid power":
@@ -464,18 +407,10 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
 class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
     """Representation of the Tesla energy battery sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize battery sensor entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "battery"
-        self._attr_device_class = SensorDeviceClass.BATTERY
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PERCENTAGE
+    type = "battery"
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
 
     @staticmethod
     def has_battery() -> bool:
@@ -500,18 +435,10 @@ class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
 class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy battery remaining sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize battery remaining entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "battery remaining"
-        self._attr_device_class = SensorDeviceClass.ENERGY_STORAGE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
+    type = "battery remaining"
+    _attr_device_class = SensorDeviceClass.ENERGY_STORAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = ENERGY_WATT_HOUR
 
     @property
     def native_value(self) -> int:
@@ -531,18 +458,10 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
 class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy backup reserve sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize backup energy reserve entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "backup reserve"
-        self._attr_device_class = SensorDeviceClass.BATTERY
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PERCENTAGE
+    type = "backup reserve"
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
 
     @property
     def native_value(self) -> int:
@@ -558,20 +477,12 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
 class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car time charge complete."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize time charge complete entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "time charge complete"
-        self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_icon = "mdi:timer-plus"
-        self._value: Optional[datetime] = None
-        self._last_known_value: Optional[int] = None
-        self._last_update_time: Optional[datetime] = None
+    type = "time charge complete"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:timer-plus"
+    _value: Optional[datetime] = None
+    _last_known_value: Optional[int] = None
+    _last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
@@ -616,6 +527,12 @@ class TeslaCarTimeChargeComplete(TeslaCarEntity, SensorEntity):
 class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car TPMS Pressure sensor."""
 
+    _attr_device_class = SensorDeviceClass.PRESSURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PRESSURE_BAR
+    _attr_suggested_unit_of_measurement = PRESSURE_PSI
+    _attr_icon = "mdi:gauge-full"
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -627,11 +544,6 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         super().__init__(hass, car, coordinator)
         self._tpms_sensor = tpms_sensor
         self.type = tpms_sensor
-        self._attr_device_class = SensorDeviceClass.PRESSURE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = PRESSURE_BAR
-        self._attr_suggested_unit_of_measurement = PRESSURE_PSI
-        self._attr_icon = "mdi:gauge-full"
 
     @property
     def native_value(self) -> float:
@@ -657,20 +569,12 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
 class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla car route arrival time."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize time charge complete entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "arrival time"
-        self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_icon = "mdi:timer-sand"
-        self._datetime_value: Optional[datetime] = None
-        self._last_known_value: Optional[int] = None
-        self._last_update_time: Optional[datetime] = None
+    type = "arrival time"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_icon = "mdi:timer-sand"
+    _datetime_value: Optional[datetime] = None
+    _last_known_value: Optional[int] = None
+    _last_update_time: Optional[datetime] = None
 
     @property
     def native_value(self) -> Optional[datetime]:
@@ -715,19 +619,11 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
 class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     """Representation of the Tesla distance to arrival."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize distance to arrival entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "distance to arrival"
-        self._attr_device_class = SensorDeviceClass.DISTANCE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_unit_of_measurement = LENGTH_MILES
-        self._attr_icon = "mdi:map-marker-distance"
+    type = "distance to arrival"
+    _attr_device_class = SensorDeviceClass.DISTANCE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_icon = "mdi:map-marker-distance"
 
     @property
     def native_value(self) -> float:
@@ -740,18 +636,10 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
 class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
     """Representation of the TeslajsonPy Last Data Update time."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize Last Data Update entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "data last update time"
-        self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:timer"
+    type = "data last update time"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:timer"
 
     @property
     def native_value(self) -> datetime:

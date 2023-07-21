@@ -3,9 +3,7 @@ from typing import Any
 
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -41,15 +39,7 @@ PRETTY_STATUS_STRINGS = {
 class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
     """Representation of a Tesla car update."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize update entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "software update"
+    type = "software update"
 
     @property
     def supported_features(self):
