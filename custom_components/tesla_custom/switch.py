@@ -22,11 +22,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
-        entities.append(TeslaCarSentryMode(hass, car, coordinator))
-        entities.append(TeslaCarPolling(hass, car, coordinator))
-        entities.append(TeslaCarCharger(hass, car, coordinator))
-        entities.append(TeslaCarValetMode(hass, car, coordinator))
+        entities.append(TeslaCarHeatedSteeringWheel(car, coordinator))
+        entities.append(TeslaCarSentryMode(car, coordinator))
+        entities.append(TeslaCarPolling(car, coordinator))
+        entities.append(TeslaCarCharger(car, coordinator))
+        entities.append(TeslaCarValetMode(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -39,12 +39,11 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize heated steering wheel entity."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         # Entity is disabled for cars with variable heated steering wheel.
         self._enabled_by_default = car.get_heated_steering_wheel_level() is not None
 
@@ -79,7 +78,7 @@ class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
     @property
     def is_on(self) -> bool | None:
         """Return True if updates available."""
-        controller = self._coordinator.controller
+        controller = self.coordinator.controller
         get_updates = controller.get_updates(vin=self._car.vin)
         if get_updates is None:
             return None
@@ -88,13 +87,13 @@ class TeslaCarPolling(TeslaCarEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Send the on command."""
         _LOGGER.debug("Enable polling: %s %s", self.name, self._car.vin)
-        self._coordinator.controller.set_updates(vin=self._car.vin, value=True)
+        self.coordinator.controller.set_updates(vin=self._car.vin, value=True)
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send the off command."""
         _LOGGER.debug("Disable polling: %s %s", self.name, self._car.vin)
-        self._coordinator.controller.set_updates(vin=self._car.vin, value=False)
+        self.coordinator.controller.set_updates(vin=self._car.vin, value=False)
         self.async_write_ha_state()
 
 
@@ -128,12 +127,11 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize sentry mode entity."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         # Entity is only enabled upon first install if sentry mode is available
         self._enabled_by_default = self._car.sentry_mode_available
 

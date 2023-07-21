@@ -24,22 +24,22 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarParkingBrake(hass, car, coordinator))
-        entities.append(TeslaCarOnline(hass, car, coordinator))
-        entities.append(TeslaCarAsleep(hass, car, coordinator))
-        entities.append(TeslaCarChargerConnection(hass, car, coordinator))
-        entities.append(TeslaCarCharging(hass, car, coordinator))
-        entities.append(TeslaCarDoors(hass, car, coordinator))
-        entities.append(TeslaCarWindows(hass, car, coordinator))
-        entities.append(TeslaCarScheduledCharging(hass, car, coordinator))
-        entities.append(TeslaCarScheduledDeparture(hass, car, coordinator))
-        entities.append(TeslaCarUserPresent(hass, car, coordinator))
+        entities.append(TeslaCarParkingBrake(car, coordinator))
+        entities.append(TeslaCarOnline(car, coordinator))
+        entities.append(TeslaCarAsleep(car, coordinator))
+        entities.append(TeslaCarChargerConnection(car, coordinator))
+        entities.append(TeslaCarCharging(car, coordinator))
+        entities.append(TeslaCarDoors(car, coordinator))
+        entities.append(TeslaCarWindows(car, coordinator))
+        entities.append(TeslaCarScheduledCharging(car, coordinator))
+        entities.append(TeslaCarScheduledDeparture(car, coordinator))
+        entities.append(TeslaCarUserPresent(car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyBatteryCharging(hass, energysite, coordinator))
-            entities.append(TeslaEnergyGridStatus(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBatteryCharging(energysite, coordinator))
+            entities.append(TeslaEnergyGridStatus(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -180,9 +180,7 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
 
     def _open_or_closed(self, door):
         """Return string of 'Open' or 'Closed' when passed a door integer state."""
-        if door:
-            return "Open"
-        return "Closed"
+        return "Open" if door else "Closed"
 
 
 class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
@@ -201,11 +199,12 @@ class TeslaCarWindows(TeslaCarEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        car = self._car
         return {
-            "Driver Front": self._open_or_closed(self._car.window_fd),
-            "Driver Rear": self._open_or_closed(self._car.window_rd),
-            "Passenger Front": self._open_or_closed(self._car.window_fp),
-            "Passenger Rear": self._open_or_closed(self._car.window_rp),
+            "Driver Front": self._open_or_closed(car.window_fd),
+            "Driver Rear": self._open_or_closed(car.window_rd),
+            "Passenger Front": self._open_or_closed(car.window_fp),
+            "Passenger Rear": self._open_or_closed(car.window_rp),
         }
 
     def _open_or_closed(self, window):
@@ -261,16 +260,17 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     def extra_state_attributes(self):
         """Return device state attributes."""
         # pylint: disable=protected-access
-        timestamp = self._car._vehicle_data.get("charge_state", {}).get(
+        car = self._car
+        timestamp = car._vehicle_data.get("charge_state", {}).get(
             "scheduled_departure_time"
         )
         return {
-            "Departure time": self._car.scheduled_departure_time_minutes,
-            "Preconditioning enabled": self._car.is_preconditioning_enabled,
-            "Preconditioning weekdays only": self._car.is_preconditioning_weekday_only,
-            "Off peak charging enabled": self._car.is_off_peak_charging_enabled,
-            "Off peak charging weekdays only": self._car.is_off_peak_charging_weekday_only,
-            "End off peak time": self._car.off_peak_hours_end_time,
+            "Departure time": car.scheduled_departure_time_minutes,
+            "Preconditioning enabled": car.is_preconditioning_enabled,
+            "Preconditioning weekdays only": car.is_preconditioning_weekday_only,
+            "Off peak charging enabled": car.is_off_peak_charging_enabled,
+            "Off peak charging weekdays only": car.is_off_peak_charging_weekday_only,
+            "End off peak time": car.off_peak_hours_end_time,
             "Departure timestamp": timestamp,
         }
 

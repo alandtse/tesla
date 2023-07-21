@@ -36,14 +36,7 @@ async def async_setup_entry(
     coordinators = entry_data["coordinators"]
     cars = entry_data["cars"]
 
-    entities = [
-        TeslaCarClimate(
-            hass,
-            car,
-            coordinators[vin],
-        )
-        for vin, car in cars.items()
-    ]
+    entities = [TeslaCarClimate(car, coordinators[vin]) for vin, car in cars.items()]
     async_add_entities(entities, update_before_add=True)
 
 
@@ -128,7 +121,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self._car.set_hvac_mode("on")
         # set_hvac_mode changes multiple states so refresh all entities
-        await self._coordinator.async_refresh()
+        await self.coordinator.async_refresh()
 
     @property
     def preset_mode(self):
@@ -173,4 +166,4 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
         # max_defrost changes multiple states so refresh all entities
-        await self._coordinator.async_refresh()
+        await self.coordinator.async_refresh()

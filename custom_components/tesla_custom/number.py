@@ -24,13 +24,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarChargeLimit(hass, car, coordinator))
-        entities.append(TeslaCarChargingAmps(hass, car, coordinator))
+        entities.append(TeslaCarChargeLimit(car, coordinator))
+        entities.append(TeslaCarChargingAmps(car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyBackupReserve(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBackupReserve(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 

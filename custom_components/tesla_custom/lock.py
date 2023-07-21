@@ -19,8 +19,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarDoors(hass, car, coordinator))
-        entities.append(TeslaCarChargePortLatch(hass, car, coordinator))
+        entities.append(TeslaCarDoors(car, coordinator))
+        entities.append(TeslaCarChargePortLatch(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 

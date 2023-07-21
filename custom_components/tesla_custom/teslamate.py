@@ -100,7 +100,7 @@ MAP_CHARGE_STATE = {
 class TeslaMate:
     """TeslaMate Connector.
 
-    Manages connnections to MQTT topics exposed by TeslaMate.
+    Manages connections to MQTT topics exposed by TeslaMate.
     """
 
     def __init__(
@@ -108,7 +108,7 @@ class TeslaMate:
         hass: HomeAssistant,
         coordinators: list["TeslaDataUpdateCoordinator"],
         cars: dict[str, TeslaCar],
-    ):
+    ) -> None:
         """Init Class."""
         self.cars = cars
         self.hass = hass
