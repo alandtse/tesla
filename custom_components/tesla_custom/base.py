@@ -17,6 +17,8 @@ class TeslaBaseEntity(CoordinatorEntity):
 
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
+    _enabled_by_default: bool = True
+    type: str | None = None
 
     def __init__(
         self, hass: HomeAssistant, coordinator: TeslaDataUpdateCoordinator
@@ -24,9 +26,7 @@ class TeslaBaseEntity(CoordinatorEntity):
         """Initialise the Tesla device."""
         super().__init__(coordinator)
         self._coordinator: TeslaDataUpdateCoordinator = coordinator
-        self._enabled_by_default: bool = True
         self.hass = hass
-        self.type = None
         self._memorized_unique_id = None
 
     def refresh(self) -> None:
