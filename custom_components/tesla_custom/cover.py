@@ -7,9 +7,7 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
 )
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 

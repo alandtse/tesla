@@ -12,9 +12,7 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 

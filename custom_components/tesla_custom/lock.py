@@ -3,9 +3,7 @@ import logging
 
 from homeassistant.components.lock import LockEntity, LockEntityFeature
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 

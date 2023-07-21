@@ -3,16 +3,13 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.const import ELECTRIC_CURRENT_AMPERE, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import (
     BACKUP_RESERVE_MAX,
     BACKUP_RESERVE_MIN,
     CHARGE_CURRENT_MIN,
     RESOURCE_TYPE_BATTERY,
 )
-from teslajsonpy.energy import PowerwallSite
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 

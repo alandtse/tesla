@@ -28,7 +28,7 @@ from homeassistant.util import dt
 from homeassistant.util.unit_conversion import DistanceConverter
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY, RESOURCE_TYPE_SOLAR
-from teslajsonpy.energy import EnergySite, PowerwallSite
+from teslajsonpy.energy import EnergySite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity

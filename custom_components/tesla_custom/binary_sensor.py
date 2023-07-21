@@ -8,7 +8,6 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.core import HomeAssistant
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity

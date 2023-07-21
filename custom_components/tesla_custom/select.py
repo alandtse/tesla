@@ -6,7 +6,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
