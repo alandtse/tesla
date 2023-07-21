@@ -6,10 +6,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import GRID_ACTIVE, RESOURCE_TYPE_BATTERY
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
@@ -87,17 +85,9 @@ class TeslaCarChargerConnection(TeslaCarEntity, BinarySensorEntity):
 class TeslaCarCharging(TeslaCarEntity, BinarySensorEntity):
     """Representation of Tesla car charging binary sensor."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charging entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charging"
-        self._attr_icon = "mdi:ev-station"
-        self._attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
+    type = "charging"
+    _attr_icon = "mdi:ev-station"
+    _attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
 
     @property
     def is_on(self):
@@ -173,7 +163,7 @@ class TeslaCarDoors(TeslaCarEntity, BinarySensorEntity):
     _attr_icon = "mdi:car-door"
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return True if a car door is open."""
         car = self._car
         return car.door_df or car.door_dr or car.door_pf or car.door_pr
@@ -233,11 +223,9 @@ class TeslaCarScheduledCharging(TeslaCarEntity, BinarySensorEntity):
     _attr_device_class = None
 
     @property
-    def is_on(self):
-        """Return True if scheduled charging enebaled."""
-        if self._car.scheduled_charging_mode == "StartAt":
-            return True
-        return False
+    def is_on(self) -> bool:
+        """Return True if scheduled charging enabled."""
+        return self._car.scheduled_charging_mode == "StartAt"
 
     @property
     def extra_state_attributes(self):
@@ -263,13 +251,11 @@ class TeslaCarScheduledDeparture(TeslaCarEntity, BinarySensorEntity):
     def is_on(self):
         """Return True if scheduled departure enebaled."""
         car = self._car
-        if (
+        return bool(
             car.scheduled_charging_mode == "DepartBy"
             or car.is_preconditioning_enabled
             or car.is_off_peak_charging_enabled
-        ):
-            return True
-        return False
+        )
 
     @property
     def extra_state_attributes(self):
@@ -297,10 +283,12 @@ class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
     _attr_device_class = None
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return True if user present enebaled."""
         # pylint: disable=protected-access
-        return self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
+        return bool(
+            self._car._vehicle_data.get("vehicle_state", {}).get("is_user_present")
+        )
 
     @property
     def extra_state_attributes(self):
