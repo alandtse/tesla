@@ -22,13 +22,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarHorn(hass, car, coordinator))
-        entities.append(TeslaCarFlashLights(hass, car, coordinator))
-        entities.append(TeslaCarWakeUp(hass, car, coordinator))
-        entities.append(TeslaCarForceDataUpdate(hass, car, coordinator))
-        entities.append(TeslaCarTriggerHomelink(hass, car, coordinator))
-        entities.append(TeslaCarRemoteStart(hass, car, coordinator))
-        entities.append(TeslaCarEmissionsTest(hass, car, coordinator))
+        entities.append(TeslaCarHorn(car, coordinator))
+        entities.append(TeslaCarFlashLights(car, coordinator))
+        entities.append(TeslaCarWakeUp(car, coordinator))
+        entities.append(TeslaCarForceDataUpdate(car, coordinator))
+        entities.append(TeslaCarTriggerHomelink(car, coordinator))
+        entities.append(TeslaCarRemoteStart(car, coordinator))
+        entities.append(TeslaCarEmissionsTest(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -97,12 +97,11 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise Homelink button."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         # Entity is only enabled upon first install if garages have been paired to homelink
         self._enabled_by_default = self._car.homelink_device_count
 
@@ -136,12 +135,11 @@ class TeslaCarEmissionsTest(TeslaCarEntity, ButtonEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize emissions test button."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         self._enabled_by_default = self._car.pedestrian_speaker
 
     async def async_press(self) -> None:

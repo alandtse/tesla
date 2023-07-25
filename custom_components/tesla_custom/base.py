@@ -1,9 +1,9 @@
 """Support for Tesla cars and energy sites."""
-from homeassistant.core import HomeAssistant, callback
+
+from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 from teslajsonpy.energy import EnergySite
@@ -12,22 +12,14 @@ from . import TeslaDataUpdateCoordinator
 from .const import ATTRIBUTION, DOMAIN
 
 
-class TeslaBaseEntity(CoordinatorEntity):
+class TeslaBaseEntity(CoordinatorEntity[TeslaDataUpdateCoordinator]):
     """Representation of a Tesla device."""
 
+    type: str
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
     _enabled_by_default: bool = True
-    type: str
-
-    def __init__(
-        self, hass: HomeAssistant, coordinator: TeslaDataUpdateCoordinator
-    ) -> None:
-        """Initialise the Tesla device."""
-        super().__init__(coordinator)
-        self._coordinator: TeslaDataUpdateCoordinator = coordinator
-        self.hass = hass
-        self._memorized_unique_id = None
+    _memorized_unique_id: str | None = None
 
     @callback
     def refresh(self) -> None:
@@ -60,18 +52,12 @@ class TeslaCarEntity(TeslaBaseEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla car device."""
-        super().__init__(hass, coordinator)
+        super().__init__(coordinator)
         self._car = car
-        self._unit_system = (
-            METRIC_SYSTEM
-            if self.hass.config.units is METRIC_SYSTEM
-            else US_CUSTOMARY_SYSTEM
-        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -90,10 +76,10 @@ class TeslaCarEntity(TeslaBaseEntity):
             )
             return
 
-        await self._coordinator.controller.update(
+        await self.coordinator.controller.update(
             self._car.id, wake_if_asleep=wake_if_asleep, force=force
         )
-        await self._coordinator.async_refresh()
+        await self.coordinator.async_refresh()
 
     @property
     def vehicle_name(self) -> str:
@@ -128,7 +114,7 @@ class TeslaCarEntity(TeslaBaseEntity):
     def assumed_state(self) -> bool:
         """Return whether the data is from an online vehicle."""
         vin = self._car.vin
-        controller = self._coordinator.controller
+        controller = self.coordinator.controller
         return not controller.is_car_online(vin=vin) and (
             controller.get_last_update_time(vin=vin)
             - controller.get_last_wake_up_time(vin=vin)
@@ -141,12 +127,11 @@ class TeslaEnergyEntity(TeslaBaseEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         energysite: EnergySite,
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla energy device."""
-        super().__init__(hass, coordinator)
+        super().__init__(coordinator)
         self._energysite = energysite
 
     @property

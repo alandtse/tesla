@@ -20,7 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarTeslaMateID(hass, car, coordinator, teslamate))
+        entities.append(TeslaCarTeslaMateID(car, coordinator, teslamate))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -36,14 +36,13 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         teslamate: TeslaMate,
     ) -> None:
         """Initialize charge limit entity."""
-        super().__init__(hass, car, coordinator)
-        self.teslsmate = teslamate
+        super().__init__(car, coordinator)
+        self.teslamate = teslamate
         self._state = None
 
     async def async_set_value(self, value: str) -> None:
@@ -51,14 +50,14 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
         if value.strip() == "":
             value = None
 
-        await self.teslsmate.set_car_id(self._car.vin, value)
-        await self.teslsmate.watch_cars()
+        await self.teslamate.set_car_id(self._car.vin, value)
+        await self.teslamate.watch_cars()
         self.async_write_ha_state()
 
     async def async_update(self) -> None:
         """Update the entity."""
         # Ignore manual update requests if the entity is disabled
-        self._state = await self.teslsmate.get_car_id(self._car.vin)
+        self._state = await self.teslamate.get_car_id(self._car.vin)
 
     @property
     def native_value(self) -> str:

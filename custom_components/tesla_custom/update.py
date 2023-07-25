@@ -14,14 +14,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     coordinators = entry_data["coordinators"]
     cars = entry_data["cars"]
 
-    entities = [
-        TeslaCarUpdate(
-            hass,
-            car,
-            coordinators[vin],
-        )
-        for vin, car in cars.items()
-    ]
+    entities = [TeslaCarUpdate(car, coordinators[vin]) for vin, car in cars.items()]
     async_add_entities(entities, update_before_add=True)
 
 

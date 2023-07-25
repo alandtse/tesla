@@ -62,23 +62,21 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarBattery(hass, car, coordinator))
-        entities.append(TeslaCarChargerRate(hass, car, coordinator))
-        entities.append(TeslaCarChargerEnergy(hass, car, coordinator))
-        entities.append(TeslaCarChargerPower(hass, car, coordinator))
-        entities.append(TeslaCarOdometer(hass, car, coordinator))
-        entities.append(TeslaCarShiftState(hass, car, coordinator))
-        entities.append(TeslaCarRange(hass, car, coordinator))
-        entities.append(TeslaCarTemp(hass, car, coordinator))
-        entities.append(TeslaCarTemp(hass, car, coordinator, inside=True))
-        entities.append(TeslaCarTimeChargeComplete(hass, car, coordinator))
+        entities.append(TeslaCarBattery(car, coordinator))
+        entities.append(TeslaCarChargerRate(car, coordinator))
+        entities.append(TeslaCarChargerEnergy(car, coordinator))
+        entities.append(TeslaCarChargerPower(car, coordinator))
+        entities.append(TeslaCarOdometer(car, coordinator))
+        entities.append(TeslaCarShiftState(car, coordinator))
+        entities.append(TeslaCarRange(car, coordinator))
+        entities.append(TeslaCarTemp(car, coordinator))
+        entities.append(TeslaCarTemp(car, coordinator, inside=True))
+        entities.append(TeslaCarTimeChargeComplete(car, coordinator))
         for tpms_sensor in TPMS_SENSORS:
-            entities.append(
-                TeslaCarTpmsPressureSensor(hass, car, coordinator, tpms_sensor)
-            )
-        entities.append(TeslaCarArrivalTime(hass, car, coordinator))
-        entities.append(TeslaCarDistanceToArrival(hass, car, coordinator))
-        entities.append(TeslaCarDataUpdateTime(hass, car, coordinator))
+            entities.append(TeslaCarTpmsPressureSensor(car, coordinator, tpms_sensor))
+        entities.append(TeslaCarArrivalTime(car, coordinator))
+        entities.append(TeslaCarDistanceToArrival(car, coordinator))
+        entities.append(TeslaCarDataUpdateTime(car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
@@ -88,20 +86,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         ):
             for sensor_type in SOLAR_SITE_SENSORS:
                 entities.append(
-                    TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
+                    TeslaEnergyPowerSensor(energysite, coordinator, sensor_type)
                 )
         elif energysite.resource_type == RESOURCE_TYPE_SOLAR:
             entities.append(
-                TeslaEnergyPowerSensor(hass, energysite, coordinator, "solar power")
+                TeslaEnergyPowerSensor(energysite, coordinator, "solar power")
             )
 
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyBattery(hass, energysite, coordinator))
-            entities.append(TeslaEnergyBatteryRemaining(hass, energysite, coordinator))
-            entities.append(TeslaEnergyBackupReserve(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBattery(energysite, coordinator))
+            entities.append(TeslaEnergyBatteryRemaining(energysite, coordinator))
+            entities.append(TeslaEnergyBackupReserve(energysite, coordinator))
             for sensor_type in BATTERY_SITE_SENSORS:
                 entities.append(
-                    TeslaEnergyPowerSensor(hass, energysite, coordinator, sensor_type)
+                    TeslaEnergyPowerSensor(energysite, coordinator, sensor_type)
                 )
 
     async_add_entities(entities, update_before_add=True)
@@ -199,11 +197,12 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
+        car = self._car
         return {
-            "charger_amps_request": self._car.charge_current_request,
-            "charger_amps_actual": self._car.charger_actual_current,
-            "charger_volts": self._car.charger_voltage,
-            "charger_phases": self._car.charger_phases,
+            "charger_amps_request": car.charge_current_request,
+            "charger_amps_actual": car.charger_actual_current,
+            "charger_volts": car.charger_voltage,
+            "charger_phases": car.charger_phases,
         }
 
 
@@ -300,10 +299,11 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return range."""
-        range_value = self._car.battery_range
+        car = self._car
+        range_value = car.battery_range
 
-        if self._car.gui_range_display == "Ideal":
-            range_value = self._car.ideal_battery_range
+        if car.gui_range_display == "Ideal":
+            range_value = car.ideal_battery_range
 
         if range_value is None:
             return None
@@ -341,14 +341,13 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         *,
         inside=False,
     ) -> None:
         """Initialize temp entity."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         self.inside = inside
         if inside is True:
             self.type += " (inside)"
@@ -360,7 +359,6 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
         """Return car temperature."""
         if self.inside is True:
             return self._car.inside_temp
-
         return self._car.outside_temp
 
 
@@ -373,13 +371,12 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         energysite: EnergySite,
         coordinator: TeslaDataUpdateCoordinator,
         sensor_type: str,
     ) -> None:
         """Initialize power sensor."""
-        super().__init__(hass, energysite, coordinator)
+        super().__init__(energysite, coordinator)
         self.type = sensor_type
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
@@ -535,13 +532,12 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         tpms_sensor: str,
     ) -> None:
         """Initialize TPMS Pressure sensor."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         self._tpms_sensor = tpms_sensor
         self.type = tpms_sensor
 
@@ -601,18 +597,19 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return device state attributes."""
-        if self._car.active_route_traffic_minutes_delay is None:
+        car = self._car
+        if car.active_route_traffic_minutes_delay is None:
             minutes = None
         else:
-            minutes = round(self._car.active_route_traffic_minutes_delay, 1)
+            minutes = round(car.active_route_traffic_minutes_delay, 1)
 
         return {
-            "Energy at arrival": self._car.active_route_energy_at_arrival,
+            "Energy at arrival": car.active_route_energy_at_arrival,
             "Minutes traffic delay": minutes,
-            "Destination": self._car.active_route_destination,
+            "Destination": car.active_route_destination,
             "Minutes to arrival": None
-            if self._car.active_route_minutes_to_arrival is None
-            else round(float(self._car.active_route_minutes_to_arrival), 2),
+            if car.active_route_minutes_to_arrival is None
+            else round(float(car.active_route_minutes_to_arrival), 2),
         }
 
 
@@ -644,11 +641,9 @@ class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> datetime:
         """Return the last data update time."""
-        last_time = self._coordinator.controller.get_last_update_time(vin=self._car.vin)
-
-        utc_tz = dt.get_time_zone("UTC")
+        last_time = self.coordinator.controller.get_last_update_time(vin=self._car.vin)
         if not isinstance(last_time, datetime):
-            date_obj = datetime.fromtimestamp(last_time, utc_tz)
+            date_obj = datetime.fromtimestamp(last_time, dt.UTC)
         else:
-            date_obj = last_time.replace(tzinfo=utc_tz)
+            date_obj = last_time.replace(tzinfo=dt.UTC)
         return date_obj

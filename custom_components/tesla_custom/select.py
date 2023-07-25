@@ -85,10 +85,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
+        entities.append(TeslaCarCabinOverheatProtection(car, coordinator))
         if car.get_heated_steering_wheel_level() is not None:
             # Only add steering wheel select if we have a variable heated steering wheel
-            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
+            entities.append(TeslaCarHeatedSteeringWheel(car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
@@ -98,15 +98,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                 car.third_row_seats == "None" or car.third_row_seats is None
             ):
                 continue
-            entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
+            entities.append(TeslaCarHeatedSeat(car, coordinator, seat_name))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
+            entities.append(TeslaEnergyOperationMode(energysite, coordinator))
         if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
-            entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
-            entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
+            entities.append(TeslaEnergyExportRule(energysite, coordinator))
+            entities.append(TeslaEnergyGridCharging(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -118,13 +118,12 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         seat_name: str,
     ):
         """Initialize heated seat entity."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
         if SEAT_ID_MAP[self._seat_name] < 2:
@@ -192,12 +191,11 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
 
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize heated seat entity."""
-        super().__init__(hass, car, coordinator)
+        super().__init__(car, coordinator)
         self._enabled_by_default = self._car.steering_wheel_heater
 
     async def async_select_option(self, option: str, **kwargs):
