@@ -132,7 +132,7 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
     ) -> None:
         """Initialize sentry mode entity."""
         # Entity is only enabled upon first install if sentry mode is available
-        self._enabled_by_default = self._car.sentry_mode_available
+        self._enabled_by_default = car.sentry_mode_available
         super().__init__(car, coordinator)
 
     @property

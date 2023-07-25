@@ -102,7 +102,7 @@ class TeslaCarTriggerHomelink(TeslaCarEntity, ButtonEntity):
     ) -> None:
         """Initialise Homelink button."""
         # Entity is only enabled upon first install if garages have been paired to homelink
-        self._enabled_by_default = self._car.homelink_device_count
+        self._enabled_by_default = car.homelink_device_count
         super().__init__(car, coordinator)
 
     @property
@@ -139,7 +139,7 @@ class TeslaCarEmissionsTest(TeslaCarEntity, ButtonEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize emissions test button."""
-        self._enabled_by_default = self._car.pedestrian_speaker
+        self._enabled_by_default = car.pedestrian_speaker
         super().__init__(car, coordinator)
 
     async def async_press(self) -> None:
