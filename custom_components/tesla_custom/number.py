@@ -3,16 +3,13 @@ from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.const import ELECTRIC_CURRENT_AMPERE, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
-from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import (
     BACKUP_RESERVE_MAX,
     BACKUP_RESERVE_MIN,
     CHARGE_CURRENT_MIN,
     RESOURCE_TYPE_BATTERY,
 )
-from teslajsonpy.energy import PowerwallSite
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
@@ -27,13 +24,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarChargeLimit(hass, car, coordinator))
-        entities.append(TeslaCarChargingAmps(hass, car, coordinator))
+        entities.append(TeslaCarChargeLimit(car, coordinator))
+        entities.append(TeslaCarChargingAmps(car, coordinator))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyBackupReserve(hass, energysite, coordinator))
+            entities.append(TeslaEnergyBackupReserve(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -41,18 +38,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
     """Representation of a Tesla car charge limit number."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charge limit entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charge limit"
-        self._attr_icon = "mdi:ev-station"
-        self._attr_mode = NumberMode.AUTO
-        self._attr_native_step = 1
+    type = "charge limit"
+    _attr_icon = "mdi:ev-station"
+    _attr_mode = NumberMode.AUTO
+    _attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
         """Update charge limit."""
@@ -83,18 +72,10 @@ class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
 class TeslaCarChargingAmps(TeslaCarEntity, NumberEntity):
     """Representation of a Tesla car charging amps number."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charging amps entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charging amps"
-        self._attr_icon = "mdi:ev-station"
-        self._attr_mode = NumberMode.AUTO
-        self._attr_native_step = 1
+    type = "charging amps"
+    _attr_icon = "mdi:ev-station"
+    _attr_mode = NumberMode.AUTO
+    _attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
         """Update charging amps."""
@@ -125,18 +106,10 @@ class TeslaCarChargingAmps(TeslaCarEntity, NumberEntity):
 class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
     """Representation of a Tesla energy backup reserve number."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize backup reserve entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "backup reserve"
-        self._attr_icon = "mdi:battery"
-        self._attr_mode = NumberMode.AUTO
-        self._attr_native_step = 1
+    type = "backup reserve"
+    _attr_icon = "mdi:battery"
+    _attr_mode = NumberMode.AUTO
+    _attr_native_step = 1
 
     async def async_set_native_value(self, value: int) -> None:
         """Update backup reserve percentage."""

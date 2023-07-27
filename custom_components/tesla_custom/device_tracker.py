@@ -4,9 +4,7 @@ import logging
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -22,8 +20,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarLocation(hass, car, coordinator))
-        entities.append(TeslaCarDestinationLocation(hass, car, coordinator))
+        entities.append(TeslaCarLocation(car, coordinator))
+        entities.append(TeslaCarDestinationLocation(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -31,15 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
     """Representation of a Tesla car location device tracker."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car location entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "location tracker"
+    type = "location tracker"
 
     @property
     def source_type(self):
@@ -73,15 +63,7 @@ class TeslaCarLocation(TeslaCarEntity, TrackerEntity):
 class TeslaCarDestinationLocation(TeslaCarEntity, TrackerEntity):
     """Representation of a Tesla car destination location device tracker."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize car destination location entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "destination location tracker"
+    type = "destination location tracker"
 
     @property
     def source_type(self):

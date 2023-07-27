@@ -3,9 +3,7 @@ import logging
 
 from homeassistant.components.lock import LockEntity, LockEntityFeature
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -21,8 +19,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarDoors(hass, car, coordinator))
-        entities.append(TeslaCarChargePortLatch(hass, car, coordinator))
+        entities.append(TeslaCarDoors(car, coordinator))
+        entities.append(TeslaCarChargePortLatch(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -30,15 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarDoors(TeslaCarEntity, LockEntity):
     """Representation of a Tesla car door lock."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize door lock entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "doors"
+    type = "doors"
 
     async def async_lock(self, **kwargs):
         """Send lock command."""
@@ -61,17 +51,9 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
 class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
     """Representation of a Tesla charge port latch."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize charge port latch (lock) entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "charge port latch"
-        self._attr_icon = "mdi:ev-plug-tesla"
-        self._attr_supported_features = LockEntityFeature.OPEN
+    type = "charge port latch"
+    _attr_icon = "mdi:ev-plug-tesla"
+    _attr_supported_features = LockEntityFeature.OPEN
 
     async def async_open(self, **kwargs):
         """Send open command."""
@@ -90,8 +72,6 @@ class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):
         _LOGGER.debug("Locking charge port latch not possible with Tesla's API.")
 
     @property
-    def is_locked(self):
+    def is_locked(self) -> bool:
         """Return True if charge port latch is engaged."""
-        if self._car.charge_port_latch == "Engaged":
-            return True
-        return False
+        return self._car.charge_port_latch == "Engaged"

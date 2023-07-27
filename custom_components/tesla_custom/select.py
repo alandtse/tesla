@@ -6,7 +6,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
-from teslajsonpy.energy import PowerwallSite, SolarPowerwallSite
 
 from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity, TeslaEnergyEntity
@@ -86,10 +85,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
-        entities.append(TeslaCarCabinOverheatProtection(hass, car, coordinator))
+        entities.append(TeslaCarCabinOverheatProtection(car, coordinator))
         if car.get_heated_steering_wheel_level() is not None:
             # Only add steering wheel select if we have a variable heated steering wheel
-            entities.append(TeslaCarHeatedSteeringWheel(hass, car, coordinator))
+            entities.append(TeslaCarHeatedSteeringWheel(car, coordinator))
         for seat_name in SEAT_ID_MAP:
             if "rear" in seat_name and not car.rear_seat_heaters:
                 continue
@@ -99,15 +98,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                 car.third_row_seats == "None" or car.third_row_seats is None
             ):
                 continue
-            entities.append(TeslaCarHeatedSeat(hass, car, coordinator, seat_name))
+            entities.append(TeslaCarHeatedSeat(car, coordinator, seat_name))
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            entities.append(TeslaEnergyOperationMode(hass, energysite, coordinator))
+            entities.append(TeslaEnergyOperationMode(energysite, coordinator))
         if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
-            entities.append(TeslaEnergyExportRule(hass, energysite, coordinator))
-            entities.append(TeslaEnergyGridCharging(hass, energysite, coordinator))
+            entities.append(TeslaEnergyExportRule(energysite, coordinator))
+            entities.append(TeslaEnergyGridCharging(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -115,22 +114,22 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car heated seat select."""
 
+    _attr_icon = "mdi:car-seat-heater"
+
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
         seat_name: str,
     ):
         """Initialize heated seat entity."""
-        super().__init__(hass, car, coordinator)
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
-        self._attr_icon = "mdi:car-seat-heater"
         if SEAT_ID_MAP[self._seat_name] < 2:
             self._is_auto_available = True
         else:
             self._is_auto_available = False
+        super().__init__(car, coordinator)
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -187,17 +186,17 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
 class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car heated steering wheel select."""
 
+    type = "heated steering wheel"
+    _attr_icon = "mdi:steering"
+
     def __init__(
         self,
-        hass: HomeAssistant,
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize heated seat entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "heated steering wheel"
-        self._attr_icon = "mdi:steering"
-        self._enabled_by_default = self._car.steering_wheel_heater
+        self._enabled_by_default = car.steering_wheel_heater
+        super().__init__(car, coordinator)
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -252,18 +251,10 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
 class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car cabin overheat protection select."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ):
-        """Initialize cabin overheat protection entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "cabin overheat protection"
-        self._attr_options = CABIN_OPTIONS
-        self._attr_entity_category = EntityCategory.CONFIG
-        self._attr_icon = "mdi:sun-thermometer"
+    type = "cabin overheat protection"
+    _attr_options = CABIN_OPTIONS
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_icon = "mdi:sun-thermometer"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -279,16 +270,8 @@ class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
 class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site grid charging select."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: SolarPowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ):
-        """Initialize grid charging entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "grid charging"
-        self._attr_options = GRID_CHARGING
+    type = "grid charging"
+    _attr_options = GRID_CHARGING
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -317,17 +300,9 @@ class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
 class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site energy export rule select."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: SolarPowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ):
-        """Initialize energy export rule entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "energy exports"
-        self._attr_options = EXPORT_RULE
-        self._attr_icon = "mdi:home-export-outline"
+    type = "energy exports"
+    _attr_options = EXPORT_RULE
+    _attr_icon = "mdi:home-export-outline"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -351,17 +326,9 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
 class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site operation mode select."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        energysite: PowerwallSite,
-        coordinator: TeslaDataUpdateCoordinator,
-    ):
-        """Initialize operation mode entity."""
-        super().__init__(hass, energysite, coordinator)
-        self.type = "operation mode"
-        self._attr_options = OPERATION_MODE
-        self._attr_icon = "mdi:home-battery"
+    type = "operation mode"
+    _attr_options = OPERATION_MODE
+    _attr_icon = "mdi:home-battery"
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""

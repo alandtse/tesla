@@ -12,9 +12,7 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
-from teslajsonpy.car import TeslaCar
 
-from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -38,29 +36,14 @@ async def async_setup_entry(
     coordinators = entry_data["coordinators"]
     cars = entry_data["cars"]
 
-    entities = [
-        TeslaCarClimate(
-            hass,
-            car,
-            coordinators[vin],
-        )
-        for vin, car in cars.items()
-    ]
+    entities = [TeslaCarClimate(car, coordinators[vin]) for vin, car in cars.items()]
     async_add_entities(entities, update_before_add=True)
 
 
 class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     """Representation of a Tesla car climate."""
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        car: TeslaCar,
-        coordinator: TeslaDataUpdateCoordinator,
-    ) -> None:
-        """Initialize climate entity."""
-        super().__init__(hass, car, coordinator)
-        self.type = "HVAC (climate) system"
+    type = "HVAC (climate) system"
 
     @property
     def supported_features(self):
@@ -138,7 +121,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         elif hvac_mode == HVAC_MODE_HEAT_COOL:
             await self._car.set_hvac_mode("on")
         # set_hvac_mode changes multiple states so refresh all entities
-        await self._coordinator.async_refresh()
+        await self.coordinator.async_refresh()
 
     @property
     def preset_mode(self):
@@ -183,4 +166,4 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         else:
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
         # max_defrost changes multiple states so refresh all entities
-        await self._coordinator.async_refresh()
+        await self.coordinator.async_refresh()
