@@ -34,5 +34,25 @@
         }
       }
     }
+  },
+  "services": {
+    "api": {
+      "name": "Run API Command",
+      "description": "Run an API command using controller.api",
+      "fields": {
+        "email": "Email address",
+        "command": "Command",
+        "parameters": "Parameters"
+      }
+    },
+    "polling_interval": {
+      "name": "Set Polling Interval",
+      "description": "Set the polling interval for the Tesla API",
+      "fields": {
+        "scan_interval": "Interval (seconds)",
+        "email": "Email address",
+        "vin": "Vehicle VIN"
+      }
+    }
   }
 }
