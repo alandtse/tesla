@@ -123,13 +123,13 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
         seat_name: str,
     ):
         """Initialize heated seat entity."""
-        super().__init__(car, coordinator)
         self._seat_name = seat_name
         self.type = f"heated seat {seat_name}"
         if SEAT_ID_MAP[self._seat_name] < 2:
             self._is_auto_available = True
         else:
             self._is_auto_available = False
+        super().__init__(car, coordinator)
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
@@ -195,8 +195,8 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ):
         """Initialize heated seat entity."""
+        self._enabled_by_default = car.steering_wheel_heater
         super().__init__(car, coordinator)
-        self._enabled_by_default = self._car.steering_wheel_heater
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""

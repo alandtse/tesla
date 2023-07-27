@@ -43,9 +43,9 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SwitchEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize heated steering wheel entity."""
-        super().__init__(car, coordinator)
         # Entity is disabled for cars with variable heated steering wheel.
         self._enabled_by_default = car.get_heated_steering_wheel_level() is not None
+        super().__init__(car, coordinator)
 
     @property
     def available(self) -> bool:
@@ -131,9 +131,9 @@ class TeslaCarSentryMode(TeslaCarEntity, SwitchEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize sentry mode entity."""
-        super().__init__(car, coordinator)
         # Entity is only enabled upon first install if sentry mode is available
-        self._enabled_by_default = self._car.sentry_mode_available
+        self._enabled_by_default = car.sentry_mode_available
+        super().__init__(car, coordinator)
 
     @property
     def available(self) -> bool:

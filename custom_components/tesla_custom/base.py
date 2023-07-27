@@ -1,6 +1,5 @@
 """Support for Tesla cars and energy sites."""
 
-from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
@@ -21,30 +20,20 @@ class TeslaBaseEntity(CoordinatorEntity[TeslaDataUpdateCoordinator]):
     _enabled_by_default: bool = True
     _memorized_unique_id: str | None = None
 
-    @callback
-    def refresh(self) -> None:
-        """Refresh the device data.
-
-        This is called by the DataUpdateCoordinator when new data is available.
-
-        This assumes the controller has already been updated. This should be
-        called by inherited classes so the overall device information is updated.
-        """
-        self.async_write_ha_state()
-
-    @property
-    def name(self) -> str:
-        """Return device name."""
-        return self.type.capitalize()
-
-    @property
-    def entity_registry_enabled_default(self) -> bool:
-        """Set entity registry to default."""
-        return self._enabled_by_default
+    def __init__(
+        self, base_unique_id: str, coordinator: TeslaDataUpdateCoordinator
+    ) -> None:
+        """Initialise the Tesla device."""
+        super().__init__(coordinator)
+        self._attr_unique_id = slugify(f"{base_unique_id} {self.type}")
+        self._attr_name = self.type.capitalize()
+        self._attr_entity_registry_enabled_default = self._enabled_by_default
 
     async def async_added_to_hass(self) -> None:
         """Register state update callback."""
-        self.async_on_remove(self.coordinator.async_add_listener(self.refresh))
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self.async_write_ha_state)
+        )
 
 
 class TeslaCarEntity(TeslaBaseEntity):
@@ -56,8 +45,22 @@ class TeslaCarEntity(TeslaBaseEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla car device."""
-        super().__init__(coordinator)
+        vin = car.vin
+        super().__init__(vin, coordinator)
         self._car = car
+        display_name = car.display_name
+        vehicle_name = (
+            display_name
+            if display_name is not None and display_name != vin[-6:]
+            else f"Tesla Model {str(vin[3]).upper()}"
+        )
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, car.id)},
+            name=vehicle_name,
+            manufacturer="Tesla",
+            model=car.car_type,
+            sw_version=car.car_version,
+        )
 
     async def update_controller(
         self, *, wake_if_asleep: bool = False, force: bool = True, blocking: bool = True
@@ -82,35 +85,6 @@ class TeslaCarEntity(TeslaBaseEntity):
         await self.coordinator.async_refresh()
 
     @property
-    def vehicle_name(self) -> str:
-        """Return vehicle name."""
-        display_name = self._car.display_name
-        vin = self._car.vin
-        return (
-            display_name
-            if display_name is not None and display_name != vin[-6:]
-            else f"Tesla Model {str(vin[3]).upper()}"
-        )
-
-    @property
-    def unique_id(self) -> str:
-        """Return unique id for car entity."""
-        if not self._memorized_unique_id:
-            self._memorized_unique_id = slugify(f"{self._car.vin} {self.type}")
-        return self._memorized_unique_id
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device info."""
-        return DeviceInfo(
-            identifiers={(DOMAIN, self._car.id)},
-            name=self.vehicle_name,
-            manufacturer="Tesla",
-            model=self._car.car_type,
-            sw_version=self._car.car_version,
-        )
-
-    @property
     def assumed_state(self) -> bool:
         """Return whether the data is from an online vehicle."""
         vin = self._car.vin
@@ -131,34 +105,18 @@ class TeslaEnergyEntity(TeslaBaseEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialise the Tesla energy device."""
-        super().__init__(coordinator)
+        energysite_id = energysite.energysite_id
+        super().__init__(energysite_id, coordinator)
         self._energysite = energysite
-
-    @property
-    def unique_id(self) -> str:
-        """Return unique id for energy site device."""
-        if not self._memorized_unique_id:
-            self._memorized_unique_id = slugify(
-                f"{self._energysite.energysite_id} {self.type}"
-            )
-        return self._memorized_unique_id
-
-    @property
-    def sw_version(self) -> bool:
-        """Return firmware version."""
-        if self._energysite.resource_type == RESOURCE_TYPE_BATTERY:
-            return self._energysite.version
-        # Non-Powerwall sites do not provide version info
-        return "Unavailable"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return device info."""
-        model = f"{self._energysite.resource_type.title()}"
-        return DeviceInfo(
-            identifiers={(DOMAIN, self._energysite.energysite_id)},
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY:
+            sw_version = energysite.version
+        else:
+            # Non-Powerwall sites do not provide version info
+            sw_version = "Unavailable"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, energysite_id)},
             manufacturer="Tesla",
-            model=model,
-            name=self._energysite.site_name,
-            sw_version=self.sw_version,
+            model=energysite.resource_type.title(),
+            name=energysite.site_name,
+            sw_version=sw_version,
         )

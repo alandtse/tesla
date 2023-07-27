@@ -41,9 +41,9 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
         teslamate: TeslaMate,
     ) -> None:
         """Initialize charge limit entity."""
-        super().__init__(car, coordinator)
         self.teslamate = teslamate
         self._state = None
+        super().__init__(car, coordinator)
 
     async def async_set_value(self, value: str) -> None:
         """Update charge limit."""

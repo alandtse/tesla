@@ -347,12 +347,12 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
         inside=False,
     ) -> None:
         """Initialize temp entity."""
-        super().__init__(car, coordinator)
         self.inside = inside
         if inside is True:
             self.type += " (inside)"
         else:
             self.type += " (outside)"
+        super().__init__(car, coordinator)
 
     @property
     def native_value(self) -> float:
@@ -376,7 +376,6 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         sensor_type: str,
     ) -> None:
         """Initialize power sensor."""
-        super().__init__(energysite, coordinator)
         self.type = sensor_type
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
@@ -386,6 +385,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
             self._attr_icon = "mdi:home-lightning-bolt"
         if self.type == "battery power":
             self._attr_icon = "mdi:home-battery"
+        super().__init__(energysite, coordinator)
 
     @property
     def native_value(self) -> float:
@@ -537,9 +537,9 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
         tpms_sensor: str,
     ) -> None:
         """Initialize TPMS Pressure sensor."""
-        super().__init__(car, coordinator)
         self._tpms_sensor = tpms_sensor
         self.type = tpms_sensor
+        super().__init__(car, coordinator)
 
     @property
     def native_value(self) -> float:
