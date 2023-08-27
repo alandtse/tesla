@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      id-token: write
 
     steps:
       - name: Checkout
