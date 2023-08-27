@@ -130,9 +130,7 @@ class TeslaMate:
         if mqtt_config_entry_enabled(self.hass):
             await self._unsub_mqtt()
         else:
-            logger.warning(
-                "Cannot unsub from TeslaMate as MQTT has not been configured."
-            )
+            logger.info("Cannot unsub from TeslaMate as MQTT has not been configured.")
 
         return True
 
@@ -287,7 +285,7 @@ class TeslaMate:
 
         coordinator = self.coordinators[car.vin]
 
-        logger.info(
+        logger.debug(
             "Got %s from MQTT for VIN:%s | TeslsMateID:%s",
             mqtt_attr,
             car.vin,
