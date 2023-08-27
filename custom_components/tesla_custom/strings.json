@@ -34,5 +34,43 @@
         }
       }
     }
+  },
+  "services": {
+    "api": {
+      "name": "Run API Command",
+      "description": "Run an API command using controller.api",
+      "fields": {
+        "email": {
+          "name": "Email address",
+          "description": "Email address (optional if only one account)"
+        },
+        "command": {
+          "name": "Command",
+          "description": "Command to run. See https://github.com/zabuldon/teslajsonpy/blob/master/teslajsonpy/endpoints.json"
+        },
+        "parameters": {
+          "name": "Parameters",
+          "description": "Parameters in a dictionary. `path_vars` replace variables in endpoints.json path. All others are passed directly to controller.api. For command parameters see https://tesla-api.timdorr.com/vehicle/commands."
+        }
+      }
+    },
+    "polling_interval": {
+      "name": "Set Polling Interval",
+      "description": "Set the polling interval for the Tesla API",
+      "fields": {
+        "scan_interval": {
+          "name": "Interval (seconds)",
+          "description": "Number of seconds between each poll.  See https://github.com/alandtse/tesla/wiki/Polling-policy more information."
+        },
+        "email": {
+          "name": "Email address",
+          "description": "Email address (optional if only one account)"
+        },
+        "vin": {
+          "name": "Vehicle VIN",
+          "description": "Vehicle VIN (if not provided then default polling interval will be updated)"
+        }
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 #  SPDX-License-Identifier: Apache-2.0
 api:
+  name: Run API Command
   # Description of the service
   description: Run an API command using controller.api. https://teslajsonpy.readthedocs.io/en/latest/teslajsonpy/teslajsonpy.html#teslajsonpy.Controller.api
   # Different fields that your service accepts
@@ -31,6 +32,7 @@ api:
         object:
 
 polling_interval:
+  name: Set Polling Interval
   description: Set polling interval for updating fresh data from an awake car
   fields:
     email:
