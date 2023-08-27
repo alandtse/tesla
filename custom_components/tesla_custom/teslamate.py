@@ -54,6 +54,7 @@ def cast_bool(val: str) -> bool:
     """Convert bool string to actual bool."""
     return val.lower() in ["true", "True"]
 
+
 def cast_trunk_open(val: str) -> int:
     """Convert bool string to trunk/frunk open/close value."""
     return 255 if cast_bool(str) else 0
