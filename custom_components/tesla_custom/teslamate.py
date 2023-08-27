@@ -44,16 +44,20 @@ def cast_odometer(odometer: float) -> float:
 
     return odometer_miles
 
+
 def cast_plugged_in(val: str) -> str:
     """Convert boolean string for plugged_in value"""
     return "Connected" if cast_bool(val) else "Disconnected"
 
+
 def cast_bool(val: str) -> bool:
     """Convert bool string to actual bool"""
-    return val.lower() in ['true', 'True']
+    return val.lower() in ["true", "True"]
+
 
 def cast_trunk_open(val: str) -> int:
     return 255 if cast_bool(str) else 0
+
 
 def cast_speed(speed: int) -> int:
     """Convert KM to Miles.
@@ -83,7 +87,7 @@ MAP_CLIMATE_STATE = {
     "is_climate_on": ("is_climate_on", cast_bool),
     "inside_temp": ("inside_temp", float),
     "outside_temp": ("outside_temp", float),
-    "is_preconditioning": ("is_preconditioning", cast_bool)
+    "is_preconditioning": ("is_preconditioning", cast_bool),
 }
 
 MAP_VEHICLE_STATE = {
@@ -96,7 +100,7 @@ MAP_VEHICLE_STATE = {
     "odometer": ("odometer", cast_odometer),
     "trunk_open": ("rt", cast_trunk_open),
     "frunk_open": ("ft", cast_trunk_open),
-    "is_user_present": ("is_user_present", cast_bool)
+    "is_user_present": ("is_user_present", cast_bool),
 }
 
 MAP_CHARGE_STATE = {
@@ -109,7 +113,7 @@ MAP_CHARGE_STATE = {
     "time_to_full_charge": ("time_to_full_charge", float),
     "charge_limit_soc": ("charge_limit_soc", int),
     "plugged_in": ("charging_state", cast_plugged_in),
-    "charge_port_door_open": ("charge_port_door_open", cast_bool)
+    "charge_port_door_open": ("charge_port_door_open", cast_bool),
 }
 
 
