@@ -57,7 +57,7 @@ def cast_bool(val: str) -> bool:
 
 def cast_trunk_open(val: str) -> int:
     """Convert bool string to trunk/frunk open/close value."""
-    return 255 if cast_bool(str) else 0
+    return 255 if cast_bool(val) else 0
 
 
 def cast_speed(speed: int) -> int:
