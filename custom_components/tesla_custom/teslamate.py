@@ -29,20 +29,18 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def cast_odometer(odometer: float) -> float:
+def cast_km_to_miles(km_to_convert: float) -> float:
     """Convert KM to Miles.
 
-    The Tesla API natively returns the Odometer in Miles.
-    TeslaMate returns the Odometer in KMs.
-    We need to convert to Miles so the Odometer sensor calculates
+    The Tesla API natively returns properties in Miles.
+    TeslaMate returns some properties in KMs.
+    We need to convert to Miles so the home assistant sensor calculates
     properly.
     """
-    odometer_km = float(odometer)
-    odometer_miles = DistanceConverter.convert(
-        odometer_km, UnitOfLength.KILOMETERS, UnitOfLength.MILES
-    )
+    km = float(km_to_convert)
+    miles = DistanceConverter.convert(km, UnitOfLength.KILOMETERS, UnitOfLength.MILES)
 
-    return odometer_miles
+    return miles
 
 
 def cast_plugged_in(val: str) -> str:
@@ -98,7 +96,7 @@ MAP_VEHICLE_STATE = {
     "tpms_pressure_rr": ("tpms_pressure_rr", float),
     "locked": ("locked", cast_bool),
     "sentry_mode": ("sentry_mode", cast_bool),
-    "odometer": ("odometer", cast_odometer),
+    "odometer": ("odometer", cast_km_to_miles),
     "trunk_open": ("rt", cast_trunk_open),
     "frunk_open": ("ft", cast_trunk_open),
     "is_user_present": ("is_user_present", cast_bool),
@@ -106,6 +104,7 @@ MAP_VEHICLE_STATE = {
 
 MAP_CHARGE_STATE = {
     "battery_level": ("battery_level", float),
+    "est_battery_range_km": ("battery_range", cast_km_to_miles),
     "usable_battery_level": ("usable_battery_level", float),
     "charge_energy_added": ("charge_energy_added", float),
     "charger_actual_current": ("charger_actual_current", int),
