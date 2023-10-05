@@ -118,6 +118,7 @@ MAP_CHARGE_STATE = {
     "charge_current_request_max": ("charge_current_request_max", int),
 }
 
+
 class TeslaMate:
     """TeslaMate Connector.
 
