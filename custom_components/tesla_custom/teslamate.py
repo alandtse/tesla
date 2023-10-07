@@ -114,6 +114,8 @@ MAP_CHARGE_STATE = {
     "charge_limit_soc": ("charge_limit_soc", int),
     "plugged_in": ("charging_state", cast_plugged_in),
     "charge_port_door_open": ("charge_port_door_open", cast_bool),
+    "charge_current_request": ("charge_current_request", int),
+    "charge_current_request_max": ("charge_current_request_max", int),
 }
 
 
