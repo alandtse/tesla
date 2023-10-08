@@ -56,12 +56,20 @@ class TeslaCarChargeLimit(TeslaCarEntity, NumberEntity):
     @property
     def native_min_value(self) -> int:
         """Return min charge limit."""
-        return self._car.charge_limit_soc_min
+        return (
+            self._car.charge_limit_soc_min
+            if self._car.charge_limit_soc_min is not None
+            else 0
+        )
 
     @property
     def native_max_value(self) -> int:
         """Return max charge limit."""
-        return self._car.charge_limit_soc_max
+        return (
+            self._car.charge_limit_soc_max
+            if self._car.charge_limit_soc_max is not None
+            else 100
+        )
 
     @property
     def native_unit_of_measurement(self) -> str:
