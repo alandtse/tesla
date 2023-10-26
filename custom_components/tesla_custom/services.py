@@ -71,7 +71,7 @@ def async_setup_services(hass) -> None:
         SERVICE_SCAN_INTERVAL,
         async_call_tesla_service,
         schema=SCAN_INTERVAL_SCHEMA,
-        supports_response=True
+        supports_response=True,
     )
 
     async def api(call):
@@ -163,7 +163,10 @@ def async_setup_services(hass) -> None:
                 vin,
             )
             controller.set_update_interval_vin(vin=vin, value=update_interval)
-        return {"result": True, "message": f"Update interval set to {update_interval} for VIN {vin}"}
+        return {
+            "result": True,
+            "message": f"Update interval set to {update_interval} for VIN {vin}",
+        }
 
 
 @callback
