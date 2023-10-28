@@ -113,7 +113,7 @@ def async_setup_services(hass) -> None:
         )
         path_vars = parameters.pop(ATTR_PATH_VARS)
         response = await controller.api(name=command, path_vars=path_vars, **parameters)
-        return {"results": response}
+        return response
 
     async def set_update_interval(call):
         """Handle api service request.
