@@ -477,6 +477,11 @@ BATTERY_DATA = {
     "default_real_mode": "self_consumption",
     "operation": "self_consumption",
     "installation_date": "2022-03-21T17:15:23+10:00",
+    "load_power": 7010,
+    "solar_power": 6638,
+    "grid_power": 2,
+    "battery_power": 370,
+    "generator_power": 0,
     "power_reading": [
         {
             "timestamp": "2022-08-18T15:10:20+10:00",
@@ -496,5 +501,6 @@ BATTERY_SUMMARY = {
     "energy_left": 13610.736842105263,
     "total_pack_energy": 14056,
     "percentage_charged": 96.8322199922116,
-    "battery_power": 400,
+    "battery_power": 370,
+    "grid_status": "Active",
 }

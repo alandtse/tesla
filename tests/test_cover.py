@@ -33,7 +33,7 @@ async def test_charger_door(hass: HomeAssistant) -> None:
     await setup_platform(hass, COVER_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.charge_port_door_open") as mock_open_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_charger_door"},
@@ -42,7 +42,7 @@ async def test_charger_door(hass: HomeAssistant) -> None:
         mock_open_cover.assert_awaited_once()
 
     with patch("teslajsonpy.car.TeslaCar.charge_port_door_close") as mock_close_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_charger_door"},
@@ -56,7 +56,7 @@ async def test_frunk(hass: HomeAssistant) -> None:
     await setup_platform(hass, COVER_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.toggle_frunk") as mock_toggle_frunk:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_frunk"},
@@ -70,7 +70,7 @@ async def test_trunk(hass: HomeAssistant) -> None:
     await setup_platform(hass, COVER_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.toggle_trunk") as mock_toggle_trunk:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_trunk"},
@@ -84,7 +84,7 @@ async def test_windows(hass: HomeAssistant) -> None:
     await setup_platform(hass, COVER_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.close_windows") as mock_close_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
@@ -93,7 +93,7 @@ async def test_windows(hass: HomeAssistant) -> None:
         mock_close_cover.assert_not_awaited()
 
     with patch("teslajsonpy.car.TeslaCar.vent_windows") as mock_open_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
@@ -107,7 +107,7 @@ async def test_windows(hass: HomeAssistant) -> None:
     car_mock_data.VEHICLE_DATA["vehicle_state"]["rp_window"] = 1
 
     with patch("teslajsonpy.car.TeslaCar.vent_windows") as mock_open_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_OPEN_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_windows"},
@@ -116,7 +116,7 @@ async def test_windows(hass: HomeAssistant) -> None:
         mock_close_cover.assert_not_awaited()
 
     with patch("teslajsonpy.car.TeslaCar.close_windows") as mock_close_cover:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             COVER_DOMAIN,
             SERVICE_CLOSE_COVER,
             {ATTR_ENTITY_ID: "cover.my_model_s_windows"},

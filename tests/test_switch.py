@@ -105,7 +105,7 @@ async def test_heated_steering(hass: HomeAssistant) -> None:
 #         "teslajsonpy.Controller.set_updates"
 #     ) as mock_controller_set_updates, patch("teslajsonpy.Controller.get_updates"):
 
-#         assert await hass.services.async_call(
+#         await hass.services.async_call(
 #             SWITCH_DOMAIN,
 #             SERVICE_TURN_ON,
 #             {ATTR_ENTITY_ID: "switch.my_model_s_polling"},
@@ -120,7 +120,7 @@ async def test_charger(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.start_charge") as mock_start_charge:
         # Test switch on
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.my_model_s_charger"},
@@ -130,7 +130,7 @@ async def test_charger(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.stop_charge") as mock_start_charge:
         # Test switch off
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
             {ATTR_ENTITY_ID: "switch.my_model_s_charger"},
@@ -146,7 +146,7 @@ async def test_sentry_mode(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.set_sentry_mode") as mock_set_sentry_mode:
         # Test switch on
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.my_model_s_sentry_mode"},
@@ -154,7 +154,7 @@ async def test_sentry_mode(hass: HomeAssistant) -> None:
         )
         mock_set_sentry_mode.assert_awaited_once_with(True)
         # Test switch off
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
             {ATTR_ENTITY_ID: "switch.my_model_s_sentry_mode"},
@@ -170,7 +170,7 @@ async def test_valet_mode(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.valet_mode") as mock_valet_mode:
         # Test switch on
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
@@ -178,7 +178,7 @@ async def test_valet_mode(hass: HomeAssistant) -> None:
         )
         mock_valet_mode.assert_awaited_once_with(True)
         # Test switch off
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
             {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
@@ -189,14 +189,14 @@ async def test_valet_mode(hass: HomeAssistant) -> None:
     with patch("teslajsonpy.car.TeslaCar.valet_mode") as mock_pin_required:
         # Test pin required
         car_mock_data.VEHICLE_DATA["vehicle_state"]["valet_pin_needed"] = True
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
             blocking=True,
         )
         mock_pin_required.assert_not_awaited()
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_OFF,
             {ATTR_ENTITY_ID: "switch.my_model_s_valet_mode"},
