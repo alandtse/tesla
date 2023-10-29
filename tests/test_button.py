@@ -78,7 +78,7 @@ async def test_horn_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.honk_horn") as mock_honk_horn:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_horn"},
@@ -92,7 +92,7 @@ async def test_flash_lights_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.flash_lights") as mock_flash_lights:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_flash_lights"},
@@ -106,7 +106,7 @@ async def test_wake_up_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.wake_up") as mock_wake_up:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_wake_up"},
@@ -122,7 +122,7 @@ async def test_force_data_update_press(hass: HomeAssistant) -> None:
     with patch(
         "custom_components.tesla_custom.base.TeslaCarEntity.update_controller"
     ) as mock_force_data_update:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_force_data_update"},
@@ -138,7 +138,7 @@ async def test_trigger_homelink_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.trigger_homelink") as mock_trigger_homelink:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_homelink"},
@@ -152,7 +152,7 @@ async def test_remote_start_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.remote_start") as mock_remote_start:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_remote_start"},
@@ -166,7 +166,7 @@ async def test_emissions_test_press(hass: HomeAssistant) -> None:
     await setup_platform(hass, BUTTON_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.remote_boombox") as mock_remote_boombox:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             BUTTON_DOMAIN,
             "press",
             {ATTR_ENTITY_ID: "button.my_model_s_emissions_test"},

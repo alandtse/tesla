@@ -26,7 +26,7 @@ To use the component, you will need an application to generate a Tesla refresh t
 ## Installation
 
 1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Tesla". After adding this `https://github.com/alandtse/tesla` as a custom repository. Skip to 7.
-2. If no HACS, use the tool of choice to open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
+2. If you do not have HACS, use the tool of choice to open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 3. If you do not have a `custom_components` directory (folder) there, you need to create it.
 4. In the `custom_components` directory (folder) create a new folder called `tesla_custom`.
 5. Download _all_ the files from the `custom_components/tesla_custom/` directory (folder) in this repository.
@@ -72,7 +72,7 @@ Tesla options are set via **Configuration** -> **Integrations** -> **Tesla** -> 
 - Seconds between polling - referred to below as the `polling_interval`.
 - Wake cars on start - Whether to wake sleeping cars on Home Assistant startup. This allows a user to choose whether cars should continue to sleep (and not update information) or to wake up the cars potentially interrupting long term hibernation and increasing vampire drain.
 - Polling policy - When do we actively poll the car to get updates, and when do we try to allow the car to sleep. See [the Wiki](https://github.com/alandtse/tesla/wiki/Polling-policy) for more information.
-- Sync Data from TeslaMate via MQTT - Enable syncing of Data from an TeslaMate instance via MQTT, esentially enabling the Streaming API for updates. This requies MQTT to be configured in Home Assistant.
+- Sync Data from TeslaMate via MQTT - Enable syncing of Data from an TeslaMate instance via MQTT, essentially enabling the Streaming API for updates. This requires MQTT to be configured in Home Assistant.
 
 ## Potential Battery impacts
 

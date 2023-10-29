@@ -53,7 +53,7 @@ async def test_set_charge_limit(hass: HomeAssistant) -> None:
     with patch(
         "teslajsonpy.car.TeslaCar.change_charge_limit"
     ) as mock_change_charge_limit:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             NUMBER_DOMAIN,
             "set_value",
             {ATTR_ENTITY_ID: "number.my_model_s_charge_limit", "value": 50.0},
@@ -84,7 +84,7 @@ async def test_set_charging_amps(hass: HomeAssistant) -> None:
     await setup_platform(hass, NUMBER_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.set_charging_amps") as mock_set_charging_amps:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             NUMBER_DOMAIN,
             "set_value",
             {ATTR_ENTITY_ID: "number.my_model_s_charging_amps", "value": 15.0},
@@ -113,7 +113,7 @@ async def test_set_backup_reserve(hass: HomeAssistant) -> None:
     with patch(
         "teslajsonpy.energy.PowerwallSite.set_reserve_percent"
     ) as mock_set_reserve_percent:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             NUMBER_DOMAIN,
             "set_value",
             {ATTR_ENTITY_ID: "number.battery_home_backup_reserve", "value": 20.0},
