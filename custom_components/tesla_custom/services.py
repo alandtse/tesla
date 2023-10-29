@@ -49,18 +49,21 @@ def async_setup_services(hass) -> None:
     async def async_call_tesla_service(service_call) -> None:
         """Call correct Tesla service."""
         service = service_call.service
+        response = None
 
         if service == SERVICE_API:
-            await api(service_call)
+            response = await api(service_call)
+        elif service == SERVICE_SCAN_INTERVAL:
+            response = await set_update_interval(service_call)
 
-        if service == SERVICE_SCAN_INTERVAL:
-            await set_update_interval(service_call)
+        return response
 
     hass.services.async_register(
         DOMAIN,
         SERVICE_API,
         async_call_tesla_service,
         schema=API_SCHEMA,
+        supports_response=True,
     )
 
     hass.services.async_register(
@@ -68,6 +71,7 @@ def async_setup_services(hass) -> None:
         SERVICE_SCAN_INTERVAL,
         async_call_tesla_service,
         schema=SCAN_INTERVAL_SCHEMA,
+        supports_response=True,
     )
 
     async def api(call):
@@ -108,7 +112,8 @@ def async_setup_services(hass) -> None:
             parameters,
         )
         path_vars = parameters.pop(ATTR_PATH_VARS)
-        return await controller.api(name=command, path_vars=path_vars, **parameters)
+        response = await controller.api(name=command, path_vars=path_vars, **parameters)
+        return response
 
     async def set_update_interval(call):
         """Handle api service request.
@@ -158,7 +163,10 @@ def async_setup_services(hass) -> None:
                 vin,
             )
             controller.set_update_interval_vin(vin=vin, value=update_interval)
-        return True
+        return {
+            "result": True,
+            "message": f"Update interval set to {update_interval} for VIN {vin}",
+        }
 
 
 @callback
