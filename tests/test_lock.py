@@ -24,7 +24,7 @@ async def test_car_door(hass: HomeAssistant) -> None:
     await setup_platform(hass, LOCK_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.unlock") as mock_unlock:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
             {ATTR_ENTITY_ID: "lock.my_model_s_doors"},
@@ -33,7 +33,7 @@ async def test_car_door(hass: HomeAssistant) -> None:
         mock_unlock.assert_awaited_once()
 
     with patch("teslajsonpy.car.TeslaCar.lock") as mock_unlock:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_LOCK,
             {ATTR_ENTITY_ID: "lock.my_model_s_doors"},
@@ -47,7 +47,7 @@ async def test_charge_port_latch(hass: HomeAssistant) -> None:
     await setup_platform(hass, LOCK_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.charge_port_door_open") as mock_unlock:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             LOCK_DOMAIN,
             SERVICE_UNLOCK,
             {ATTR_ENTITY_ID: "lock.my_model_s_charge_port_latch"},

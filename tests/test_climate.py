@@ -52,7 +52,7 @@ async def test_set_temperature(hass: HomeAssistant) -> None:
     await setup_platform(hass, CLIMATE_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.set_temperature") as mock_set_temperature:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_temperature",
             {
@@ -69,7 +69,7 @@ async def test_set_hvac_mode(hass: HomeAssistant) -> None:
     await setup_platform(hass, CLIMATE_DOMAIN)
 
     with patch("teslajsonpy.car.TeslaCar.set_hvac_mode") as mock_set_hvac_mode:
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_hvac_mode",
             {
@@ -91,7 +91,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.defrost_mode", return_value=1
     ):
         # Test set preset_mode "Normal" with defrost_mode != 0
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_preset_mode",
             {
@@ -108,7 +108,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.climate_keeper_mode", return_value="on"
     ):
         # Test set preset_mode "Normal" with climate_keeper_mode != 0
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_preset_mode",
             {
@@ -121,7 +121,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.set_max_defrost") as mock_set_max_defrost:
         # Test set preset_mode "Defrost"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_preset_mode",
             {
@@ -136,7 +136,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.set_climate_keeper_mode"
     ) as mock_set_climate_keeper_mode:
         # Test set preset_mode "Dog Mode"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_preset_mode",
             {
