@@ -59,7 +59,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.remote_seat_heater_request"
     ) as mock_remote_seat_heater_request:
         # Test selecting "Off"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Off"},
@@ -67,7 +67,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         )
         mock_remote_seat_heater_request.assert_awaited_once_with(0, 0)
         # Test selecting "Low"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Low"},
@@ -75,7 +75,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         )
         mock_remote_seat_heater_request.assert_awaited_with(1, 0)
         # Test selecting "Medium"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Medium"},
@@ -83,7 +83,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         )
         mock_remote_seat_heater_request.assert_awaited_with(2, 0)
         # Test selecting "High"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "High"},
@@ -95,7 +95,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.remote_auto_seat_climate_request"
     ) as mock_remote_auto_seat_climate_request:
         # Test selecting "Auto"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Auto"},
@@ -104,7 +104,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         mock_remote_auto_seat_climate_request.assert_awaited_once_with(1, True)
         # Test from "Auto" selection
         car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Low"},
@@ -114,7 +114,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.set_hvac_mode") as mock_set_hvac_mode:
         # Test climate_on check
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Low"},
@@ -131,7 +131,7 @@ async def test_cabin_overheat_protection(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.set_cabin_overheat_protection"
     ) as mock_set_cabin_overheat_protection:
         # Test selecting "On"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -142,7 +142,7 @@ async def test_cabin_overheat_protection(hass: HomeAssistant) -> None:
         )
         mock_set_cabin_overheat_protection.assert_awaited_once_with("On")
         # Test selecting "Off"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -153,7 +153,7 @@ async def test_cabin_overheat_protection(hass: HomeAssistant) -> None:
         )
         mock_set_cabin_overheat_protection.assert_awaited_with("Off")
         # Test selecting "No A/C"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -173,7 +173,7 @@ async def test_grid_charging(hass: HomeAssistant) -> None:
         "teslajsonpy.energy.SolarPowerwallSite.set_grid_charging"
     ) as mock_set_grid_charging:
         # Test selecting "Yes"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -184,7 +184,7 @@ async def test_grid_charging(hass: HomeAssistant) -> None:
         )
         mock_set_grid_charging.assert_awaited_once_with(True)
         # Test selecting "No"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -204,7 +204,7 @@ async def test_energy_exports(hass: HomeAssistant) -> None:
         "teslajsonpy.energy.SolarPowerwallSite.set_export_rule"
     ) as mock_set_export_rule:
         # Test selecting "Solar"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -215,7 +215,7 @@ async def test_energy_exports(hass: HomeAssistant) -> None:
         )
         mock_set_export_rule.assert_awaited_once_with("pv_only")
         # Test selecting "Everything"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -235,7 +235,7 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
         "teslajsonpy.energy.SolarPowerwallSite.set_operation_mode"
     ) as mock_set_operation_mode:
         # Test selecting "Self-Powered"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -246,7 +246,7 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
         )
         mock_set_operation_mode.assert_awaited_once_with("self_consumption")
         # Test selecting "Time-Based Control"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -257,7 +257,7 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
         )
         mock_set_operation_mode.assert_awaited_with("autonomous")
         # Test selecting "Backup"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -279,7 +279,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.set_heated_steering_wheel_level"
     ) as mock_set_heated_steering_wheel_level:
         # Test selecting "Off"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -290,7 +290,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
         )
         mock_set_heated_steering_wheel_level.assert_awaited_once_with(0)
         # Test selecting "Low"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -301,7 +301,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
         )
         mock_set_heated_steering_wheel_level.assert_awaited_with(1)
         # Test selecting "High"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -316,7 +316,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
         "teslajsonpy.car.TeslaCar.remote_auto_steering_wheel_heat_climate_request"
     ) as mock_remote_auto_steering_wheel_heat_climate_request:
         # Test selecting "Auto"
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -330,7 +330,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
         )
         # Test from "Auto" selection
         car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
@@ -343,7 +343,7 @@ async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
 
     with patch("teslajsonpy.car.TeslaCar.set_hvac_mode") as mock_set_hvac_mode:
         # Test climate_on check
-        assert await hass.services.async_call(
+        await hass.services.async_call(
             SELECT_DOMAIN,
             SERVICE_SELECT_OPTION,
             {
