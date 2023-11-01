@@ -138,8 +138,9 @@ MAP_VEHICLE_STATE = {
 
 MAP_CHARGE_STATE = {
     "battery_level": ("battery_level", float),
-    "est_battery_range_km": ("battery_range", cast_km_to_miles),
-    "usable_battery_level": ("usable_battery_level", float),
+    "rated_battery_range_km": ("battery_range", cast_km_to_miles),
+    "est_battery_range_km": ("est_battery_range", cast_km_to_miles),
+    "ideal_battery_range_km": ("ideal_battery_range", cast_km_to_miles),
     "charge_energy_added": ("charge_energy_added", float),
     "charger_actual_current": ("charger_actual_current", int),
     "charger_power": ("charger_power", int),
