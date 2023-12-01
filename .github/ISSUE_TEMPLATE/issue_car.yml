@@ -8,8 +8,8 @@ body:
       label: Is there an existing issue for this?
       description: Before you open a new issue, search through the existing issues to see if others have had the same problem.
       options:
-      - label: I have searched the existing issues
-        required: true
+        - label: I have searched the existing issues
+          required: true
   - type: markdown
     attributes:
       value: |
@@ -17,7 +17,7 @@ body:
         - Issues without a description (using the header is not good enough) will be closed.
         - Issues without debug logging will be closed.
         - Issues without configuration will be closed
-      
+
   - type: input
     id: version_hacs
     attributes:
@@ -29,7 +29,7 @@ body:
   - type: input
     id: version_tesla
     attributes:
-      label: Version of the Tesla car software 
+      label: Version of the Tesla car software
       description: Open the Tesla app -> Select car -> Scroll to bottom
       placeholder: ex. 2023.44.1
     validations:
@@ -48,14 +48,14 @@ body:
       description: A concise description of what you're experiencing.
     validations:
       required: true
-      
+
   - type: textarea
     attributes:
-      label: Expected Behavior 
+      label: Expected Behavior
       description: A concise description of what you expected to happen.
     validations:
       required: true
-  
+
   - type: textarea
     attributes:
       label: Debug logs
@@ -64,7 +64,7 @@ body:
         Your logs here
     validations:
       required: true
-  
+
   - type: textarea
     attributes:
       label: Anything else?
