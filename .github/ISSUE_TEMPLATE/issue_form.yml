@@ -1,0 +1,58 @@
+name: Issue
+description: Create a report to help us improve
+title: "Issue: "
+labels: ["triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Before you open a new issue, search through the existing issues to see if others have had the same problem.
+      options:
+      - label: I have searched the existing issues
+        required: true
+  - type: markdown
+    attributes:
+      value: |
+        Issues not containing the minimum requirements will be closed:
+        - Issues without a description (using the header is not good enough) will be closed.
+        - Issues without debug logging will be closed.
+        - Issues without configuration will be closed
+      
+  - type: input
+    id: version
+    attributes:
+      label: Version of the Tesla component
+      description: You can find this under HACS -> Integrations -> Tesla. If you are not using the newest version, download and try that before opening an issue
+      placeholder: ex. v3.19.3
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Expected Behavior 
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
+  
+  - type: textarea
+    attributes:
+      label: Debug logs
+      description: Enable the debug logs https://my.home-assistant.io/redirect/integration/?domain=tesla_custom & click `Enable debug logging`
+      placeholder: |
+        Your logs here
+    validations:
+      required: true
+  
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the issue you are encountering
+    validations:
+      required: false
