@@ -16,7 +16,6 @@ body:
         Issues not containing the minimum requirements will be closed:
         - Issues without a description (using the header is not good enough) will be closed.
         - Issues without debug logging will be closed.
-        - Issues without configuration will be closed
 
   - type: input
     id: version_hacs
@@ -59,7 +58,8 @@ body:
   - type: textarea
     attributes:
       label: Debug logs
-      description: Enable the debug logs https://my.home-assistant.io/redirect/integration/?domain=tesla_custom & click `Enable debug logging`
+      description: Enable the debug logs ([In Home Assistant](https://my.home-assistant.io/redirect/integration/?domain=tesla_custom) & click `Enable debug logging`)
+      render: true
       placeholder: |
         Your logs here
     validations:
