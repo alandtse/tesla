@@ -6,9 +6,9 @@ body:
   - type: checkboxes
     attributes:
       label: Is there an existing issue for this?
-      description: Before you open a new issue, search through the existing issues to see if others have had the same problem.
+      description: Before you open a new issue, search through the existing open issues and closed issues to see if others have had the same problem.
       options:
-        - label: I have searched the existing issues
+        - label: I have searched both the existing open issues & recently closed issues and did not find a duplicate of this issue.
           required: true
   - type: markdown
     attributes:
