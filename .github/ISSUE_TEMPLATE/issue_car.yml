@@ -1,0 +1,74 @@
+name: Telsa Car Issue
+description: Create a report to help us improve
+title: "Car Issue: "
+labels: ["triage", "car"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Before you open a new issue, search through the existing open issues and closed issues to see if others have had the same problem.
+      options:
+        - label: I have searched both the existing open issues & recently closed issues and did not find a duplicate of this issue.
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        Issues not containing the minimum requirements will be closed:
+        - Issues without a description (using the header is not good enough) will be closed.
+        - Issues without debug logging will be closed.
+
+  - type: input
+    id: version_hacs
+    attributes:
+      label: Version of the Tesla component
+      description: You can find this under HACS -> Integrations -> Tesla. If you are not using the newest version, download and try that before opening an issue
+      placeholder: ex. v3.19.3
+    validations:
+      required: true
+  - type: input
+    id: version_tesla
+    attributes:
+      label: Version of the Tesla car software
+      description: Open the Tesla app -> Select car -> Scroll to bottom
+      placeholder: ex. 2023.44.1
+    validations:
+      required: true
+  - type: input
+    id: model_tesla
+    attributes:
+      label: Model
+      description: The model of the Tesla
+      placeholder: ex. Model 3
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Debug logs
+      description: Enable the debug logs ([In Home Assistant](https://my.home-assistant.io/redirect/integration/?domain=tesla_custom) & click `Enable debug logging`)
+      render: true
+      placeholder: |
+        Your logs here
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the issue you are encountering
+    validations:
+      required: false
