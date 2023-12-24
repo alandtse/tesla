@@ -87,13 +87,7 @@ class TeslaCarEntity(TeslaBaseEntity):
     @property
     def assumed_state(self) -> bool:
         """Return whether the data is from an online vehicle."""
-        vin = self._car.vin
-        controller = self.coordinator.controller
-        return not controller.is_car_online(vin=vin) and (
-            controller.get_last_update_time(vin=vin)
-            - controller.get_last_wake_up_time(vin=vin)
-            > controller.update_interval
-        )
+        return self.coordinator.assumed_state
 
 
 class TeslaEnergyEntity(TeslaBaseEntity):

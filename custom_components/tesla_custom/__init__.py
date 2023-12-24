@@ -280,15 +280,13 @@ async def async_setup_entry(hass, config_entry):
         config_entry=config_entry,
         controller=controller,
         reload_lock=reload_lock,
-        energy_site_ids=set(),
-        vins=set(),
         update_vehicles=False,
     )
     energy_coordinators = {
-        energy_site_id: _partial_coordinator(energy_site_ids={energy_site_id})
+        energy_site_id: _partial_coordinator(energy_site_id=energy_site_id)
         for energy_site_id in energysites
     }
-    car_coordinators = {vin: _partial_coordinator(vins={vin}) for vin in cars}
+    car_coordinators = {vin: _partial_coordinator(vin=vin) for vin in cars}
     coordinators = {**energy_coordinators, **car_coordinators}
 
     if car_coordinators:
@@ -395,19 +393,22 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         config_entry,
         controller: TeslaAPI,
         reload_lock: asyncio.Lock,
-        vins: set[str],
-        energy_site_ids: set[str],
-        update_vehicles: bool,
-    ):
+        vin: str | None = None,
+        energy_site_id: str | None = None,
+        update_vehicles: bool = False,
+    ) -> None:
         """Initialize global Tesla data updater."""
         self.controller = controller
         self.config_entry = config_entry
         self.reload_lock = reload_lock
-        self.vins = vins
-        self.energy_site_ids = energy_site_ids
+        self.vin = vin
+        self.vins = {vin} if vin else set()
+        self.energy_site_id = energy_site_id
+        self.energy_site_ids = {energy_site_id} if energy_site_id else set()
         self.update_vehicles = update_vehicles
         self._debounce_task = None
         self._last_update_time = None
+        self.assumed_state = True
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
 
@@ -420,10 +421,11 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from API endpoint."""
-        if self.controller.is_token_refreshed():
+        controller = self.controller
+        if controller.is_token_refreshed():
             # It doesn't matter which coordinator calls this, as long as there
             # are no awaits in the below code, it will be called only once.
-            result = self.controller.get_tokens()
+            result = controller.get_tokens()
             refresh_token = result["refresh_token"]
             access_token = result["access_token"]
             expiration = result["expiration"]
@@ -437,7 +439,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             # handled by the data update coordinator.
             async with async_timeout.timeout(30):
                 _LOGGER.debug("Running controller.update()")
-                return await self.controller.update(
+                data = await controller.update(
                     vins=self.vins,
                     energy_site_ids=self.energy_site_ids,
                     update_vehicles=self.update_vehicles,
@@ -453,6 +455,14 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+        else:
+            if vin := self.vin:
+                self.assumed_state = not controller.is_car_online(vin=vin) and (
+                    controller.get_last_update_time(vin=vin)
+                    - controller.get_last_wake_up_time(vin=vin)
+                    > controller.update_interval
+                )
+        return data
 
     def async_update_listeners_debounced(self, delay_since_last=0.1, max_delay=1.0):
         """
