@@ -42,7 +42,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
     )
-    _attr_hvac_modes = HVACMode.HEAT_COOL | HVACMode.OFF
+    _attr_hvac_modes = [HVACMode.HEAT_COOL, HVACMode.OFF]
     _attr_preset_modes = ["Normal", "Defrost", "Keep On", "Dog Mode", "Camp Mode"]
 
     @property
