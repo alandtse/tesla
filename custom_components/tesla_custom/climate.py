@@ -1,15 +1,12 @@
 """Support for Tesla climate."""
 import logging
 
-from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (
-    DEFAULT_MAX_TEMP,
-    DEFAULT_MIN_TEMP,
-    HVAC_MODE_HEAT_COOL,
-    HVAC_MODE_OFF,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
+from homeassistant.components.climate import (
+    ClimateEntity,
+    ClimateEntityFeature,
+    HVACMode,
 )
+from homeassistant.components.climate.const import DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
 
@@ -18,8 +15,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_HVAC = [HVAC_MODE_HEAT_COOL, HVAC_MODE_OFF]
-SUPPORT_PRESET = ["Normal", "Defrost", "Keep On", "Dog Mode", "Camp Mode"]
 
 KEEPER_MAP = {
     "Keep On": 1,
@@ -44,30 +39,22 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     """Representation of a Tesla car climate."""
 
     type = "HVAC (climate) system"
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
+    )
+    _attr_hvac_modes = [HVACMode.HEAT_COOL, HVACMode.OFF]
+    _attr_preset_modes = ["Normal", "Defrost", "Keep On", "Dog Mode", "Camp Mode"]
 
     @property
-    def supported_features(self):
-        """Return the list of supported features."""
-        return SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
-
-    @property
-    def hvac_mode(self):
+    def hvac_mode(self) -> HVACMode:
         """Return hvac operation ie. heat, cool mode.
 
         Need to be one of HVAC_MODE_*.
         """
         if self._car.is_climate_on:
-            return HVAC_MODE_HEAT_COOL
+            return HVACMode.HEAT_COOL
 
-        return HVAC_MODE_OFF
-
-    @property
-    def hvac_modes(self):
-        """Return list of available hvac operation modes.
-
-        Need to be a subset of HVAC_MODES.
-        """
-        return SUPPORT_HVAC
+        return HVACMode.OFF
 
     @property
     def temperature_unit(self):
@@ -116,9 +103,9 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         _LOGGER.debug("%s: Setting hvac mode to %s", self.name, hvac_mode)
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             await self._car.set_hvac_mode("off")
-        elif hvac_mode == HVAC_MODE_HEAT_COOL:
+        elif hvac_mode == HVACMode.HEAT_COOL:
             await self._car.set_hvac_mode("on")
         # set_hvac_mode changes multiple states so refresh all entities
         await self.coordinator.async_refresh()
@@ -139,14 +126,6 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             return "Keep On"
 
         return "Normal"
-
-    @property
-    def preset_modes(self):
-        """Return a list of available preset modes.
-
-        Requires SUPPORT_PRESET_MODE.
-        """
-        return SUPPORT_PRESET
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
