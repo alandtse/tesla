@@ -9,17 +9,13 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-    LENGTH_KILOMETERS,
-    LENGTH_MILES,
     PERCENTAGE,
-    POWER_KILO_WATT,
-    POWER_WATT,
-    PRESSURE_BAR,
-    PRESSURE_PSI,
-    SPEED_MILES_PER_HOUR,
-    TEMP_CELSIUS,
+    UnitOfEnergy,
+    UnitOfLength,
+    UnitOfPower,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
@@ -148,7 +144,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     type = "energy added"
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
-    _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+    _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:lightning-bolt"
 
     @property
@@ -173,7 +169,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
 
         if self._car.gui_distance_units == DISTANCE_UNITS_KM_HR:
             added_range = DistanceConverter.convert(
-                added_range, LENGTH_MILES, LENGTH_KILOMETERS
+                added_range, UnitOfLength.MILES, UnitOfLength.KILOMETERS
             )
 
         return {
@@ -187,7 +183,7 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     type = "charger power"
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = POWER_KILO_WATT
+    _attr_native_unit_of_measurement = UnitOfPower.KILO_WATT
 
     @property
     def native_value(self) -> int:
@@ -212,7 +208,7 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     type = "charging rate"
     _attr_device_class = SensorDeviceClass.SPEED
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = SPEED_MILES_PER_HOUR
+    _attr_native_unit_of_measurement = UnitOfSpeed.MILES_PER_HOUR
     _attr_icon = "mdi:speedometer"
 
     @property
@@ -239,7 +235,7 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
     type = "odometer"
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
-    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_native_unit_of_measurement = UnitOfLength.MILES
     _attr_icon = "mdi:counter"
 
     @property
@@ -293,7 +289,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
     type = "range"
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_native_unit_of_measurement = UnitOfLength.MILES
     _attr_icon = "mdi:gauge"
 
     @property
@@ -319,7 +315,7 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
         )
         if est_battery_range is not None:
             est_battery_range_km = DistanceConverter.convert(
-                est_battery_range, LENGTH_MILES, LENGTH_KILOMETERS
+                est_battery_range, UnitOfLength.MILES, UnitOfLength.KILOMETERS
             )
         else:
             est_battery_range_km = None
@@ -336,7 +332,7 @@ class TeslaCarTemp(TeslaCarEntity, SensorEntity):
     type = "temperature"
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = TEMP_CELSIUS
+    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_icon = "mdi:thermometer"
 
     def __init__(
@@ -367,7 +363,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = UnitOfPower.WATT
 
     def __init__(
         self,
@@ -435,7 +431,7 @@ class TeslaEnergyBatteryRemaining(TeslaEnergyEntity, SensorEntity):
     type = "battery remaining"
     _attr_device_class = SensorDeviceClass.ENERGY_STORAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = ENERGY_WATT_HOUR
+    _attr_native_unit_of_measurement = UnitOfEnergy.WATT_HOUR
 
     @property
     def native_value(self) -> int:
@@ -526,8 +522,8 @@ class TeslaCarTpmsPressureSensor(TeslaCarEntity, SensorEntity):
 
     _attr_device_class = SensorDeviceClass.PRESSURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = PRESSURE_BAR
-    _attr_suggested_unit_of_measurement = PRESSURE_PSI
+    _attr_native_unit_of_measurement = UnitOfPressure.BAR
+    _attr_suggested_unit_of_measurement = UnitOfPressure.PSI
     _attr_icon = "mdi:gauge-full"
 
     def __init__(
@@ -619,7 +615,7 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     type = "distance to arrival"
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = LENGTH_MILES
+    _attr_native_unit_of_measurement = UnitOfLength.MILES
     _attr_icon = "mdi:map-marker-distance"
 
     @property
