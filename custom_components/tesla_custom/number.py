@@ -1,6 +1,6 @@
 """Support for Tesla numbers."""
 from homeassistant.components.number import NumberEntity, NumberMode
-from homeassistant.const import ELECTRIC_CURRENT_AMPERE, PERCENTAGE
+from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.icon import icon_for_battery_level
 from teslajsonpy.const import (
@@ -108,7 +108,7 @@ class TeslaCarChargingAmps(TeslaCarEntity, NumberEntity):
     @property
     def native_unit_of_measurement(self) -> str:
         """Return percentage."""
-        return ELECTRIC_CURRENT_AMPERE
+        return UnitOfElectricCurrent.AMPERE
 
 
 class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):

@@ -10,18 +10,14 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-    LENGTH_KILOMETERS,
-    LENGTH_MILES,
     PERCENTAGE,
-    POWER_WATT,
-    PRESSURE_BAR,
-    PRESSURE_PSI,
-    SPEED_KILOMETERS_PER_HOUR,
-    SPEED_MILES_PER_HOUR,
     STATE_UNKNOWN,
-    TEMP_CELSIUS,
+    UnitOfEnergy,
+    UnitOfLength,
+    UnitOfPower,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -118,7 +114,7 @@ async def test_battery_power_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
 
 async def test_battery_remaining(hass: HomeAssistant) -> None:
@@ -132,7 +128,7 @@ async def test_battery_remaining(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY_STORAGE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
 
 
 async def test_backup_reserve(hass: HomeAssistant) -> None:
@@ -180,7 +176,7 @@ async def test_charger_energy_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
 
 async def test_charger_power_value(hass: HomeAssistant) -> None:
@@ -219,17 +215,22 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_charging_rate")
 
-    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_KILOMETERS_PER_HOUR:
+    if (
+        state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        == UnitOfSpeed.KILOMETERS_PER_HOUR
+    ):
         assert float(state.state) == round(
             SpeedConverter.convert(
                 car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"],
-                SPEED_MILES_PER_HOUR,
-                SPEED_KILOMETERS_PER_HOUR,
+                UnitOfSpeed.MILES_PER_HOUR,
+                UnitOfSpeed.KILOMETERS_PER_HOUR,
             ),
             1,
         )
     else:
-        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == SPEED_MILES_PER_HOUR
+        assert (
+            state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfSpeed.MILES_PER_HOUR
+        )
         assert (
             float(state.state)
             == car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"]
@@ -307,7 +308,7 @@ async def test_grid_power_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
 
 async def test_inside_temp_value(hass: HomeAssistant) -> None:
@@ -321,7 +322,7 @@ async def test_inside_temp_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfTemperature.CELSIUS
 
 
 async def test_load_power_value(hass: HomeAssistant) -> None:
@@ -333,7 +334,7 @@ async def test_load_power_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
 
 async def test_odometer_value(hass: HomeAssistant) -> None:
@@ -342,18 +343,18 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_odometer")
 
-    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
         assert float(state.state) == round(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"],
-                LENGTH_MILES,
-                LENGTH_KILOMETERS,
+                UnitOfLength.MILES,
+                UnitOfLength.KILOMETERS,
             ),
             1,
         )
 
     else:
-        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
         assert float(state.state) == round(
             car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1
         )
@@ -374,7 +375,7 @@ async def test_outside_temp_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.TEMPERATURE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == TEMP_CELSIUS
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfTemperature.CELSIUS
 
 
 async def test_range_value(hass: HomeAssistant) -> None:
@@ -383,18 +384,18 @@ async def test_range_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_range")
 
-    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
         assert float(state.state) == round(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"],
-                LENGTH_MILES,
-                LENGTH_KILOMETERS,
+                UnitOfLength.MILES,
+                UnitOfLength.KILOMETERS,
             ),
             2,
         )
 
     else:
-        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
         assert (
             float(state.state)
             == car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"]
@@ -410,8 +411,8 @@ async def test_range_value(hass: HomeAssistant) -> None:
     if est_range_miles is not None:
         est_range_km = DistanceConverter.convert(
             car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
-            LENGTH_MILES,
-            LENGTH_KILOMETERS,
+            UnitOfLength.MILES,
+            UnitOfLength.KILOMETERS,
         )
     else:
         est_range_km = None
@@ -434,8 +435,8 @@ async def test_range_attributes_not_available(hass: HomeAssistant) -> None:
     if est_range_miles is not None:
         est_range_km = DistanceConverter.convert(
             car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
-            LENGTH_MILES,
-            LENGTH_KILOMETERS,
+            UnitOfLength.MILES,
+            UnitOfLength.KILOMETERS,
         )
     else:
         est_range_km = None
@@ -452,7 +453,7 @@ async def test_solar_power_value(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
 
 async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
@@ -468,15 +469,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     assert float(state_fl.state) == round(
         PressureConverter.convert(
             round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fl"], 2),
-            PRESSURE_BAR,
-            PRESSURE_PSI,
+            UnitOfPressure.BAR,
+            UnitOfPressure.PSI,
         ),
         prec,
     )
 
     assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
 
     assert (
         state_fl.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -494,15 +495,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     assert float(state_fr.state) == round(
         PressureConverter.convert(
             round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_fr"], 2),
-            PRESSURE_BAR,
-            PRESSURE_PSI,
+            UnitOfPressure.BAR,
+            UnitOfPressure.PSI,
         ),
         prec,
     )
 
     assert state_fr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_fr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+    assert state_fr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
 
     assert (
         state_fr.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -520,15 +521,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     assert float(state_rl.state) == round(
         PressureConverter.convert(
             round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rl"], 2),
-            PRESSURE_BAR,
-            PRESSURE_PSI,
+            UnitOfPressure.BAR,
+            UnitOfPressure.PSI,
         ),
         prec,
     )
 
     assert state_rl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_rl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+    assert state_rl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
 
     assert (
         state_rl.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -546,15 +547,15 @@ async def test_tpms_pressure_sensor(hass: HomeAssistant) -> None:
     assert float(state_rr.state) == round(
         PressureConverter.convert(
             round(car_mock_data.VEHICLE_DATA["vehicle_state"]["tpms_pressure_rr"], 2),
-            PRESSURE_BAR,
-            PRESSURE_PSI,
+            UnitOfPressure.BAR,
+            UnitOfPressure.PSI,
         ),
         prec,
     )
 
     assert state_rr.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_rr.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+    assert state_rr.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
 
     assert (
         state_rr.attributes.get("tpms_last_seen_pressure_timestamp")
@@ -580,7 +581,7 @@ async def test_tpms_pressure_none(hass: HomeAssistant) -> None:
 
     assert state_fl.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.PRESSURE
     assert state_fl.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
-    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PRESSURE_PSI
+    assert state_fl.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPressure.PSI
 
     assert state_fl.attributes.get("tpms_last_seen_pressure_timestamp") is None
 
@@ -645,19 +646,19 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
         # TODO: Fix async test_distance_to_arrival failing in ci
         # This fixes an async test error. This doesn't happen when test is run individually
         return
-    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_KILOMETERS:
+    if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
         assert float(state.state) == round(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["drive_state"][
                     "active_route_miles_to_arrival"
                 ],
-                LENGTH_MILES,
-                LENGTH_KILOMETERS,
+                UnitOfLength.MILES,
+                UnitOfLength.KILOMETERS,
             ),
             2,
         )
     else:
-        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == LENGTH_MILES
+        assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
         assert float(state.state) == round(
             car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"],
             2,
