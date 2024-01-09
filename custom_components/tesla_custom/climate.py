@@ -7,7 +7,7 @@ from homeassistant.components.climate import (
     HVACMode,
 )
 from homeassistant.components.climate.const import DEFAULT_MAX_TEMP, DEFAULT_MIN_TEMP
-from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 
 from .base import TeslaCarEntity
@@ -62,7 +62,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
 
         Tesla API always returns in Celsius.
         """
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def current_temperature(self):
