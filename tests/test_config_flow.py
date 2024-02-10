@@ -1,4 +1,5 @@
 """Test the Tesla config flow."""
+
 import datetime
 from http import HTTPStatus
 from unittest.mock import patch
@@ -47,18 +48,22 @@ async def test_form(hass):
     assert result["type"] == "form"
     assert result["errors"] == {}
 
-    with patch(
-        "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
-        return_value={
-            "refresh_token": TEST_TOKEN,
-            CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
-            CONF_EXPIRATION: TEST_VALID_EXPIRATION,
-        },
-    ), patch(
-        "custom_components.tesla_custom.async_setup", return_value=True
-    ) as mock_setup, patch(
-        "custom_components.tesla_custom.async_setup_entry", return_value=True
-    ) as mock_setup_entry:
+    with (
+        patch(
+            "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
+            return_value={
+                "refresh_token": TEST_TOKEN,
+                CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
+                CONF_EXPIRATION: TEST_VALID_EXPIRATION,
+            },
+        ),
+        patch(
+            "custom_components.tesla_custom.async_setup", return_value=True
+        ) as mock_setup,
+        patch(
+            "custom_components.tesla_custom.async_setup_entry", return_value=True
+        ) as mock_setup_entry,
+    ):
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: "test@email.com"}
         )

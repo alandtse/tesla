@@ -1,4 +1,5 @@
 """Tests for the Tesla switch."""
+
 from unittest.mock import patch
 
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -71,12 +72,15 @@ async def test_heated_steering(hass: HomeAssistant) -> None:
     entity_id = "switch.my_model_s_heated_steering"
 
     # We need to enable the switch for Testing.
-    with patch(
-        "custom_components.tesla_custom.switch.TeslaCarHeatedSteeringWheel.entity_registry_enabled_default",
-        return_value=True,
-    ), patch(
-        "teslajsonpy.car.TeslaCar.set_heated_steering_wheel"
-    ) as mock_seat_heated_steering_wheel:
+    with (
+        patch(
+            "custom_components.tesla_custom.switch.TeslaCarHeatedSteeringWheel.entity_registry_enabled_default",
+            return_value=True,
+        ),
+        patch(
+            "teslajsonpy.car.TeslaCar.set_heated_steering_wheel"
+        ) as mock_seat_heated_steering_wheel,
+    ):
         await setup_platform(hass, SWITCH_DOMAIN)
 
         # Test switch on

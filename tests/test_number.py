@@ -1,4 +1,5 @@
 """Tests for the Tesla number."""
+
 from unittest.mock import patch
 
 from homeassistant.components.number import DOMAIN as NUMBER_DOMAIN

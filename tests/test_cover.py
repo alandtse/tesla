@@ -1,4 +1,5 @@
 """Tests for the Tesla cover."""
+
 from unittest.mock import patch
 
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN

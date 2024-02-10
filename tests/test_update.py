@@ -1,4 +1,5 @@
 """Tests for the Tesla update."""
+
 from unittest.mock import patch
 
 from homeassistant.components.update import DOMAIN as UPDATE_DOMAIN

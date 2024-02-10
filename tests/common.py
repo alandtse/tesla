@@ -1,4 +1,5 @@
 """Common methods used across tests for Tesla."""
+
 from datetime import datetime
 from unittest.mock import patch
 
@@ -80,9 +81,12 @@ async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
 
     mock_entry.add_to_hass(hass)
 
-    with patch("custom_components.tesla_custom.PLATFORMS", [platform]), patch(
-        "custom_components.tesla_custom.TeslaAPI", autospec=True
-    ) as mock_controller:
+    with (
+        patch("custom_components.tesla_custom.PLATFORMS", [platform]),
+        patch(
+            "custom_components.tesla_custom.TeslaAPI", autospec=True
+        ) as mock_controller,
+    ):
         setup_mock_controller(mock_controller)
         assert await async_setup_component(hass, TESLA_DOMIN, {})
     await hass.async_block_till_done()
