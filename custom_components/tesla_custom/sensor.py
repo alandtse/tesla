@@ -603,9 +603,11 @@ class TeslaCarArrivalTime(TeslaCarEntity, SensorEntity):
             "Energy at arrival": car.active_route_energy_at_arrival,
             "Minutes traffic delay": minutes,
             "Destination": car.active_route_destination,
-            "Minutes to arrival": None
-            if car.active_route_minutes_to_arrival is None
-            else round(float(car.active_route_minutes_to_arrival), 2),
+            "Minutes to arrival": (
+                None
+                if car.active_route_minutes_to_arrival is None
+                else round(float(car.active_route_minutes_to_arrival), 2)
+            ),
         }
 
 

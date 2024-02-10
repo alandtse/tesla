@@ -1,4 +1,5 @@
 """Support for Tesla buttons."""
+
 import logging
 
 from homeassistant.components.button import ButtonEntity

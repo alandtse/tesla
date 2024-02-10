@@ -1,4 +1,5 @@
 """Support for Tesla update."""
+
 from typing import Any
 
 from homeassistant.components.update import UpdateEntity, UpdateEntityFeature

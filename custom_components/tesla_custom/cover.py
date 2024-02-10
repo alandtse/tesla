@@ -1,4 +1,5 @@
 """Support for Tesla covers."""
+
 import logging
 
 from homeassistant.components.cover import (

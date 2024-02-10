@@ -1,4 +1,5 @@
 """Support for Tesla binary sensors."""
+
 import logging
 
 from homeassistant.components.binary_sensor import (
