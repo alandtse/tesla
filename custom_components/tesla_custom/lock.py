@@ -1,4 +1,5 @@
 """Support for Tesla locks."""
+
 import logging
 
 from homeassistant.components.lock import LockEntity, LockEntityFeature

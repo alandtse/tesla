@@ -1,4 +1,5 @@
 """Support for Tesla selects."""
+
 import logging
 
 from homeassistant.components.select import SelectEntity

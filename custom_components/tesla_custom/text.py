@@ -1,4 +1,5 @@
 """Support for Tesla numbers."""
+
 from homeassistant.components.text import TextEntity, TextMode
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory

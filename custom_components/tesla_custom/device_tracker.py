@@ -1,4 +1,5 @@
 """Support for Tesla device tracker."""
+
 import logging
 
 from homeassistant.components.device_tracker import SourceType

@@ -1,4 +1,5 @@
 """Support for Tesla switches."""
+
 import logging
 
 from homeassistant.components.switch import SwitchEntity

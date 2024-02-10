@@ -1,4 +1,5 @@
 """Tests for the Tesla climate."""
+
 from unittest.mock import patch
 
 from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
@@ -85,10 +86,9 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
     """Tests car setting HVAC mode."""
     await setup_platform(hass, CLIMATE_DOMAIN)
 
-    with patch(
-        "teslajsonpy.car.TeslaCar.set_max_defrost"
-    ) as mock_set_max_defrost, patch(
-        "teslajsonpy.car.TeslaCar.defrost_mode", return_value=1
+    with (
+        patch("teslajsonpy.car.TeslaCar.set_max_defrost") as mock_set_max_defrost,
+        patch("teslajsonpy.car.TeslaCar.defrost_mode", return_value=1),
     ):
         # Test set preset_mode "Normal" with defrost_mode != 0
         await hass.services.async_call(
@@ -102,10 +102,11 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
         )
         mock_set_max_defrost.assert_awaited_once_with(False)
 
-    with patch(
-        "teslajsonpy.car.TeslaCar.set_climate_keeper_mode"
-    ) as mock_set_climate_keeper_mode, patch(
-        "teslajsonpy.car.TeslaCar.climate_keeper_mode", return_value="on"
+    with (
+        patch(
+            "teslajsonpy.car.TeslaCar.set_climate_keeper_mode"
+        ) as mock_set_climate_keeper_mode,
+        patch("teslajsonpy.car.TeslaCar.climate_keeper_mode", return_value="on"),
     ):
         # Test set preset_mode "Normal" with climate_keeper_mode != 0
         await hass.services.async_call(

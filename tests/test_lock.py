@@ -1,4 +1,5 @@
 """Tests for the Tesla lock."""
+
 from unittest.mock import patch
 
 from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
