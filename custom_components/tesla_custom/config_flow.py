@@ -10,6 +10,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
+    CONF_CLIENT_ID,
 )
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
@@ -30,6 +31,8 @@ from .const import (
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    CONF_API_PROXY_URL,
+    CONF_API_PROXY_CERT,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
@@ -115,6 +118,9 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_DOMAIN, default=AUTH_DOMAIN): str,
                 vol.Required(CONF_INCLUDE_VEHICLES, default=True): bool,
                 vol.Required(CONF_INCLUDE_ENERGYSITES, default=True): bool,
+                vol.Optional(CONF_API_PROXY_URL): str,
+                vol.Optional(CONF_API_PROXY_CERT): str,
+                vol.Optional(CONF_CLIENT_ID): str,
             }
         )
 
@@ -205,6 +211,9 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
         config[CONF_DOMAIN] = data.get(CONF_DOMAIN, AUTH_DOMAIN)
         config[CONF_INCLUDE_VEHICLES] = data[CONF_INCLUDE_VEHICLES]
         config[CONF_INCLUDE_ENERGYSITES] = data[CONF_INCLUDE_ENERGYSITES]
+        config[CONF_API_PROXY_URL] = data[CONF_API_PROXY_URL]
+        config[CONF_API_PROXY_CERT] = data[CONF_API_PROXY_CERT]
+        config[CONF_CLIENT_ID] = data[CONF_CLIENT_ID]
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)

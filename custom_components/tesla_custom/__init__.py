@@ -14,6 +14,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
+    CONF_CLIENT_ID,
     EVENT_HOMEASSISTANT_CLOSE,
 )
 from homeassistant.core import callback
@@ -35,6 +36,8 @@ from .const import (
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    CONF_API_PROXY_CERT,
+    CONF_API_PROXY_URL,
     DATA_LISTENER,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
@@ -136,6 +139,15 @@ async def async_setup_entry(hass, config_entry):
     config = config_entry.data
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
+
+    try:
+        SSL_CONTEXT.load_verify_locations(config["api_proxy_cert"])
+        _LOGGER.debug(SSL_CONTEXT)
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        _LOGGER.debug("Unable to load custom SSL certificate. %s" % e)
+
     async_client = httpx.AsyncClient(
         headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
     )
@@ -165,6 +177,9 @@ async def async_setup_entry(hass, config_entry):
             polling_policy=config_entry.options.get(
                 CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
+            api_proxy_cert=config.get(CONF_API_PROXY_CERT),
+            api_proxy_url=config.get(CONF_API_PROXY_URL),
+            client_id=config.get(CONF_CLIENT_ID),
         )
         result = await controller.connect(
             include_vehicles=config.get(CONF_INCLUDE_VEHICLES),
