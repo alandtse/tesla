@@ -7,11 +7,11 @@ from unittest.mock import patch
 from homeassistant import config_entries, data_entry_flow, setup
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_CLIENT_ID,
     CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
-    CONF_CLIENT_ID,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from teslajsonpy.const import AUTH_DOMAIN
@@ -19,14 +19,14 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from custom_components.tesla_custom.const import (
     ATTR_POLLING_POLICY_CONNECTED,
+    CONF_API_PROXY_CERT,
+    CONF_API_PROXY_URL,
     CONF_ENABLE_TESLAMATE,
     CONF_EXPIRATION,
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
-    CONF_API_PROXY_URL,
-    CONF_API_PROXY_CERT,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,

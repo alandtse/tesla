@@ -146,7 +146,10 @@ async def async_setup_entry(hass, config_entry):
             SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
             _LOGGER.debug(SSL_CONTEXT)
         except (FileNotFoundError, ssl.SSLError):
-            _LOGGER.warning("Unable to load custom SSL certificate from %s", config[CONF_API_PROXY_CERT])
+            _LOGGER.warning(
+                "Unable to load custom SSL certificate from %s",
+                config[CONF_API_PROXY_CERT],
+            )
 
     async_client = httpx.AsyncClient(
         headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
