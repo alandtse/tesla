@@ -5,6 +5,7 @@ from datetime import timedelta
 from functools import partial
 from http import HTTPStatus
 import logging
+import ssl
 
 import async_timeout
 from homeassistant.config_entries import SOURCE_IMPORT
@@ -143,10 +144,8 @@ async def async_setup_entry(hass, config_entry):
     try:
         SSL_CONTEXT.load_verify_locations(config["api_proxy_cert"])
         _LOGGER.debug(SSL_CONTEXT)
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        _LOGGER.debug("Unable to load custom SSL certificate. %s" % e)
+    except (FileNotFoundError, ssl.SSLError):
+        _LOGGER.warning("Unable to load custom SSL certificate from %s", config["api_proxy_cert"])
 
     async_client = httpx.AsyncClient(
         headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
