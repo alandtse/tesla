@@ -11,6 +11,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
+    CONF_CLIENT_ID,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from teslajsonpy.const import AUTH_DOMAIN
@@ -24,6 +25,8 @@ from custom_components.tesla_custom.const import (
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    CONF_API_PROXY_URL,
+    CONF_API_PROXY_CERT,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
@@ -80,6 +83,9 @@ async def test_form(hass):
         CONF_INCLUDE_VEHICLES: True,
         CONF_INCLUDE_ENERGYSITES: True,
         "initial_setup": True,
+        CONF_API_PROXY_URL: None,
+        CONF_API_PROXY_CERT: None,
+        CONF_CLIENT_ID: None,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
