@@ -37,8 +37,8 @@ To use the component, you will need an application to generate a Tesla refresh t
 Note: This integration will wake up your vehicle(s) during installation.
 
 ## Tesla Fleet API Proxy (experimental)
-Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for modern vehicles.  If your vehicle is affected by this change, you can install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it.  This requires a complex setup; see the add-on documentation for details.  After configuring the add-on, provide your Client ID, Proxy URL, and SSL certificate path here.  Proxy URL will be internal to Home Assistant docker network, similar to `https://addon-xxxxxxxx-tesla-http-proxy` and recommended certificate path is `/share/tesla/selfsigned.pem`.
 
+Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for modern vehicles. If your vehicle is affected by this change, you can install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it. This requires a complex setup; see the add-on documentation for details. After configuring the add-on, provide your Client ID, Proxy URL, and SSL certificate path here. Proxy URL will be internal to Home Assistant docker network, similar to `https://addon-xxxxxxxx-tesla-http-proxy` and recommended certificate path is `/share/tesla/selfsigned.pem`.
 
 <!---->
 

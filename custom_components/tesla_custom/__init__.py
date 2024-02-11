@@ -10,11 +10,11 @@ import async_timeout
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_CLIENT_ID,
     CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
-    CONF_CLIENT_ID,
     EVENT_HOMEASSISTANT_CLOSE,
 )
 from homeassistant.core import callback
@@ -30,14 +30,14 @@ from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from .config_flow import CannotConnect, InvalidAuth, validate_input
 from .const import (
+    CONF_API_PROXY_CERT,
+    CONF_API_PROXY_URL,
     CONF_ENABLE_TESLAMATE,
     CONF_EXPIRATION,
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
-    CONF_API_PROXY_CERT,
-    CONF_API_PROXY_URL,
     DATA_LISTENER,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
