@@ -141,13 +141,12 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
-    try:
-        SSL_CONTEXT.load_verify_locations(config["api_proxy_cert"])
-        _LOGGER.debug(SSL_CONTEXT)
-    except (FileNotFoundError, ssl.SSLError):
-        _LOGGER.warning(
-            "Unable to load custom SSL certificate from %s", config["api_proxy_cert"]
-        )
+    if CONF_API_PROXY_CERT in config and config[CONF_API_PROXY_CERT] is not None:
+        try:
+            SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
+            _LOGGER.debug(SSL_CONTEXT)
+        except (FileNotFoundError, ssl.SSLError):
+            _LOGGER.warning("Unable to load custom SSL certificate from %s", config[CONF_API_PROXY_CERT])
 
     async_client = httpx.AsyncClient(
         headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
