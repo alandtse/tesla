@@ -100,7 +100,8 @@ class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
     type = "trunk"
     _attr_device_class = CoverDeviceClass.DOOR
     _attr_icon = "mdi:car-back"
-
+    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+    
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
         _LOGGER.debug("Closing cover: %s", self.name)
@@ -119,14 +120,6 @@ class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
     def is_closed(self):
         """Return True if trunk is closed."""
         return self._car.is_trunk_closed
-
-    @property
-    def supported_features(self) -> int:
-        """Return supported features."""
-        if self._car.powered_lift_gate:
-            return CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
-
-        return CoverEntityFeature.OPEN
 
 
 class TeslaCarWindows(TeslaCarEntity, CoverEntity):
