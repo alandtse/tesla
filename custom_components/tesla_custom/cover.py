@@ -101,7 +101,7 @@ class TeslaCarTrunk(TeslaCarEntity, CoverEntity):
     _attr_device_class = CoverDeviceClass.DOOR
     _attr_icon = "mdi:car-back"
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
-    
+
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
         _LOGGER.debug("Closing cover: %s", self.name)
