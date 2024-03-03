@@ -135,13 +135,13 @@ async def async_setup(hass, base_config):
 
 async def async_setup_entry(hass, config_entry):
     """Set up Tesla as config entry."""
-    # pylint: disable=too-many-locals,too-many-statements
+    # pylint: disable=too-many-locals,too-many-statements,too-many-branches
     hass.data.setdefault(DOMAIN, {})
     config = config_entry.data
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
-    if CONF_API_PROXY_CERT in config and config[CONF_API_PROXY_CERT] is not None:
+    if config[CONF_API_PROXY_CERT]:
         try:
             SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
             _LOGGER.debug(SSL_CONTEXT)
