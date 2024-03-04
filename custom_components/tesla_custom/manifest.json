@@ -20,9 +20,10 @@
     }
   ],
   "documentation": "https://github.com/alandtse/tesla/wiki",
+  "import_executor": true,
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "loggers": ["teslajsonpy"],
   "requirements": ["teslajsonpy==3.10.1"],
-  "version": "3.19.8"
+  "version": "3.19.9"
 }
