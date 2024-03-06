@@ -188,7 +188,11 @@ class TeslaCarChargerPower(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return the charger power."""
-        return float(self._car.charger_power)
+        return (
+            float(self._car.charger_power)
+            if self._car.charger_power is not None
+            else self._car.charger_power
+        )
 
     @property
     def extra_state_attributes(self):
