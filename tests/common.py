@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_CLIENT_ID,
     CONF_DOMAIN,
     CONF_TOKEN,
     CONF_USERNAME,
@@ -16,9 +17,22 @@ from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.energy import SolarPowerwallSite, SolarSite
 
-from custom_components.tesla_custom.const import CONF_EXPIRATION, DOMAIN as TESLA_DOMIN
+from custom_components.tesla_custom.const import (
+    CONF_API_PROXY_CERT,
+    CONF_API_PROXY_URL,
+    CONF_EXPIRATION,
+    DOMAIN as TESLA_DOMIN,
+)
 
-from .const import TEST_ACCESS_TOKEN, TEST_TOKEN, TEST_USERNAME, TEST_VALID_EXPIRATION
+from .const import (
+    TEST_ACCESS_TOKEN,
+    TEST_API_PROXY_CERT,
+    TEST_API_PROXY_URL,
+    TEST_CLIENT_ID,
+    TEST_TOKEN,
+    TEST_USERNAME,
+    TEST_VALID_EXPIRATION,
+)
 from .mock_data import car as car_mock_data, energysite as energysite_mock_data
 
 
@@ -75,6 +89,9 @@ async def setup_platform(hass: HomeAssistant, platform: str) -> MockConfigEntry:
             CONF_TOKEN: TEST_TOKEN,
             CONF_EXPIRATION: TEST_VALID_EXPIRATION,
             CONF_DOMAIN: AUTH_DOMAIN,
+            CONF_CLIENT_ID: TEST_CLIENT_ID,
+            CONF_API_PROXY_CERT: TEST_API_PROXY_CERT,
+            CONF_API_PROXY_URL: TEST_API_PROXY_URL,
         },
         options=None,
     )
