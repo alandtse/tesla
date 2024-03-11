@@ -2363,6 +2363,24 @@ tomli = {version = "2.0.1", markers = "python_version < \"3.11\""}
 tqdm = "4.64.0"
 
 [[package]]
+name = "pytest-httpx"
+version = "0.24.0"
+description = "Send responses to httpx."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pytest_httpx-0.24.0-py3-none-any.whl", hash = "sha256:193cecb57a005eb15288f68986f328d4c8d06c0b7c4ef1ce512e024cbb1d5961"},
+    {file = "pytest_httpx-0.24.0.tar.gz", hash = "sha256:259e6266cf3e04eb8fcc18dff262657ad96f6b8668dc2171fb353eaec5571889"},
+]
+
+[package.dependencies]
+httpx = "==0.24.*"
+pytest = ">=6.0,<8.0"
+
+[package.extras]
+testing = ["pytest-asyncio (==0.21.*)", "pytest-cov (==4.*)"]
+
+[[package]]
 name = "pytest-picked"
 version = "0.4.6"
 description = "Run the tests related to the changed files"
@@ -3259,4 +3277,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "140637eba1bbf8f0e90c71b0a1777514c87ae62ecc56f27b419f078b5b7a598e"
+content-hash = "3fb0510d3463954a60821b89ea1d76896bc7269e956c3b7ba39157686a3c9b93"

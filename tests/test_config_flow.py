@@ -1,6 +1,7 @@
 """Test the Tesla config flow."""
 
 from http import HTTPStatus
+import os
 from unittest.mock import patch
 
 from homeassistant import config_entries, data_entry_flow, setup
@@ -102,8 +103,23 @@ async def test_form(hass):
     assert len(mock_setup_entry.mock_calls) == 1
 
 
-async def test_form_with_proxy(hass):
+async def test_form_with_proxy(hass, httpx_mock):
     """Test we get the form if user chooses to use proxy."""
+
+    os.environ["SUPERVISOR_TOKEN"] = "test-token"
+    httpx_mock.add_response(
+        url="http://supervisor/addons",
+        json={
+            "data": {
+                "addons": [{"name": "Tesla HTTP Proxy", "slug": "tesla_http_proxy"}]
+            }
+        },
+    )
+    httpx_mock.add_response(
+        url="http://supervisor/addons/tesla_http_proxy/info",
+        json={"data": {"hostname": "http-proxy", "options": {"client_id": "test"}}},
+    )
+
     await setup.async_setup_component(hass, "persistent_notification", {})
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
