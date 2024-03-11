@@ -193,18 +193,22 @@ async def test_form_invalid_auth_incomplete_credentials(hass):
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
+    result2 = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_API_PROXY_ENABLE: False}
+    )
+    await hass.async_block_till_done()
 
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         side_effect=IncompleteCredentials(401),
     ):
-        result2 = await hass.config_entries.flow.async_configure(
+        result3 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_USERNAME: TEST_USERNAME, CONF_TOKEN: TEST_TOKEN},
         )
 
-    assert result2["type"] == "form"
-    assert result2["errors"] == {"base": "invalid_auth"}
+    assert result3["type"] == "form"
+    assert result3["errors"] == {"base": "invalid_auth"}
 
 
 async def test_form_cannot_connect(hass):
@@ -212,18 +216,22 @@ async def test_form_cannot_connect(hass):
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
+    result2 = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_API_PROXY_ENABLE: False}
+    )
+    await hass.async_block_till_done()
 
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         side_effect=TeslaException(code=HTTPStatus.NOT_FOUND),
     ):
-        result2 = await hass.config_entries.flow.async_configure(
+        result3 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: TEST_USERNAME},
         )
 
-    assert result2["type"] == "form"
-    assert result2["errors"] == {"base": "cannot_connect"}
+    assert result3["type"] == "form"
+    assert result3["errors"] == {"base": "cannot_connect"}
 
 
 async def test_form_repeat_identifier(hass):
@@ -239,6 +247,11 @@ async def test_form_repeat_identifier(hass):
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
+    result2 = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_API_PROXY_ENABLE: False}
+    )
+    await hass.async_block_till_done()
+
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
@@ -247,13 +260,13 @@ async def test_form_repeat_identifier(hass):
             CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         },
     ):
-        result2 = await hass.config_entries.flow.async_configure(
+        result3 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_USERNAME: TEST_USERNAME, CONF_TOKEN: TEST_TOKEN},
         )
 
-    assert result2["type"] == "abort"
-    assert result2["reason"] == "already_configured"
+    assert result3["type"] == "abort"
+    assert result3["reason"] == "already_configured"
 
 
 async def test_form_reauth(hass):
@@ -271,6 +284,11 @@ async def test_form_reauth(hass):
         context={"source": config_entries.SOURCE_REAUTH},
         data={CONF_USERNAME: TEST_USERNAME},
     )
+    result2 = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_API_PROXY_ENABLE: False}
+    )
+    await hass.async_block_till_done()
+
     with patch(
         "custom_components.tesla_custom.config_flow.TeslaAPI.connect",
         return_value={
@@ -279,13 +297,13 @@ async def test_form_reauth(hass):
             CONF_EXPIRATION: TEST_VALID_EXPIRATION,
         },
     ):
-        result2 = await hass.config_entries.flow.async_configure(
+        result3 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_USERNAME: TEST_USERNAME, CONF_TOKEN: "new-password"},
         )
 
-    assert result2["type"] == "abort"
-    assert result2["reason"] == "reauth_successful"
+    assert result3["type"] == "abort"
+    assert result3["reason"] == "reauth_successful"
 
 
 async def test_import(hass):
@@ -307,6 +325,10 @@ async def test_import(hass):
                 CONF_USERNAME: TEST_USERNAME,
                 CONF_INCLUDE_VEHICLES: True,
                 CONF_INCLUDE_ENERGYSITES: True,
+                CONF_API_PROXY_ENABLE: False,
+                CONF_API_PROXY_CERT: None,
+                CONF_API_PROXY_URL: None,
+                CONF_CLIENT_ID: None,
             },
         )
     assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY

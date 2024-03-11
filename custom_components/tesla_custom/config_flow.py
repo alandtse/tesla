@@ -56,6 +56,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Initialize the tesla flow."""
         self.username = None
         self.reauth = False
+        self.use_proxy = False
 
     async def async_step_import(self, import_config):
         """Import a config entry from configuration.yaml."""
@@ -74,13 +75,19 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="user",
                 data_schema=data_schema,
             )
-        return await self.async_step_credentials(user_input)
+
+        # in case we import a config entry from configuration.yaml
+        if CONF_API_PROXY_CERT in user_input:
+            return await self.async_step_credentials(user_input)
+
+        self.use_proxy = user_input[CONF_API_PROXY_ENABLE]
+        return await self.async_step_credentials()
 
     async def async_step_credentials(self, user_input=None):
         """Handle the second step of the config flow."""
         errors = {}
 
-        if "username" in user_input:
+        if user_input is not None:
             existing_entry = self._async_entry_for_username(user_input[CONF_USERNAME])
             if existing_entry and not self.reauth:
                 return self.async_abort(reason="already_configured")
@@ -108,9 +115,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="credentials",
-            data_schema=self._async_schema(
-                api_proxy_enable=user_input[CONF_API_PROXY_ENABLE]
-            ),
+            data_schema=self._async_schema(api_proxy_enable=self.use_proxy),
             errors=errors,
             description_placeholders={},
         )
