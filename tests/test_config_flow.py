@@ -97,7 +97,7 @@ async def test_form(hass):
         "initial_setup": True,
         CONF_API_PROXY_URL: None,
         CONF_API_PROXY_CERT: None,
-        CONF_CLIENT_ID: None,
+        CONF_CLIENT_ID: "ownerapi",
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -344,7 +344,7 @@ async def test_import(hass):
                 CONF_API_PROXY_ENABLE: False,
                 CONF_API_PROXY_CERT: None,
                 CONF_API_PROXY_URL: None,
-                CONF_CLIENT_ID: None,
+                CONF_CLIENT_ID: "ownerapi",
             },
         )
     assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
