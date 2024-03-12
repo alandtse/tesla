@@ -279,7 +279,7 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
         config[CONF_INCLUDE_ENERGYSITES] = data[CONF_INCLUDE_ENERGYSITES]
         config[CONF_API_PROXY_URL] = data.get(CONF_API_PROXY_URL)
         config[CONF_API_PROXY_CERT] = data.get(CONF_API_PROXY_CERT)
-        config[CONF_CLIENT_ID] = data.get(CONF_CLIENT_ID)
+        config[CONF_CLIENT_ID] = data.get(CONF_CLIENT_ID, "ownerapi")
 
     except IncompleteCredentials as ex:
         _LOGGER.error("Authentication error: %s %s", ex.message, ex)
