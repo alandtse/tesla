@@ -80,7 +80,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if CONF_API_PROXY_CERT in user_input:
             return await self.async_step_credentials(user_input)
 
-        self.use_proxy = user_input[CONF_API_PROXY_ENABLE]
+        self.use_proxy = user_input.get(CONF_API_PROXY_ENABLE, False)
         return await self.async_step_credentials()
 
     async def async_step_credentials(self, user_input=None):
