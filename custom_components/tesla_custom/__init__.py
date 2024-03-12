@@ -141,7 +141,7 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
-    if config[CONF_API_PROXY_CERT]:
+    if config.get(CONF_API_PROXY_CERT):
         try:
             SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
             _LOGGER.debug(SSL_CONTEXT)
