@@ -453,6 +453,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             )
             _LOGGER.debug("Saving new tokens in config_entry")
 
+        data = None
         try:
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
