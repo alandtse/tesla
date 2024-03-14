@@ -146,11 +146,11 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             }
         )
 
+        api_proxy_cert = api_proxy_url = client_id = None
         if api_proxy_enable:
             # autofill fields if HTTP Proxy is running as addon
             if "SUPERVISOR_TOKEN" in os.environ:
-                api_proxy_cert = "/share/tesla/selfsigned.pem"
-
+                _LOGGER.debug("Running in supervised environment")
                 # find out if addon is running from normal repo or local
                 req = httpx.get(
                     "http://supervisor/addons",
@@ -162,21 +162,21 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     if addon["name"] == "Tesla HTTP Proxy":
                         addon_slug = addon["slug"]
                         break
-                if not addon_slug:
+
+                try:
+                    # read Client ID from addon
+                    req = httpx.get(
+                        f"http://supervisor/addons/{addon_slug}/info",
+                        headers={
+                            "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
+                        },
+                    )
+                    client_id = req.json()["data"]["options"]["client_id"]
+                    api_proxy_url = "https://" + req.json()["data"]["hostname"]
+                    api_proxy_cert = "/share/tesla/selfsigned.pem"
+                    _LOGGER.debug("Found addon: %s", addon_slug)
+                except NameError:
                     _LOGGER.warning("Unable to communicate with Tesla HTTP Proxy addon")
-
-                # read Client ID from addon
-                req = httpx.get(
-                    f"http://supervisor/addons/{addon_slug}/info",
-                    headers={
-                        "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
-                    },
-                )
-                client_id = req.json()["data"]["options"]["client_id"]
-                api_proxy_url = "https://" + req.json()["data"]["hostname"]
-
-            else:
-                api_proxy_url = client_id = api_proxy_cert = None
 
             schema = schema.extend(
                 {
