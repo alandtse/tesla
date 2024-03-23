@@ -33,16 +33,15 @@ To use the component, you will need an application to generate a Tesla refresh t
 6. Place the files you downloaded in the new directory (folder) you created.
 7. Restart Home Assistant.
 8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Settings" -> "Devices & Services" then click "+" and search for "Tesla Custom Integration".
+9. For most vehicles, you will need to the Tesla Fleet API Proxy (see below).
 
 Note: This integration will wake up your vehicle(s) during installation.
 
 ## Tesla Fleet API Proxy
 
-Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for _most_ vehicles in favor of a new Fleet API with end-to-end encryption. You'll know you're affected if you see this error in the log:
+Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for _most_ vehicles in favor of a new Fleet API with end-to-end encryption. You'll know you're affected if you see errors in the log when attempting to send commands (sensors will work regardless)
 
-> [teslajsonpy.connection] 403: {"response":null,"error":"Tesla Vehicle Command Protocol required, please refer to the documentation here: https://developer.tesla.com/docs/fleet-api#2023-10-09-rest-api-vehicle-commands-endpoint-deprecation-warning","error_description":""}
-
-If your vehicle is affected by this, you'll need to install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it. This requires a complex setup; see [here](https://github.com/llamafilm/tesla-http-proxy-addon/blob/main/tesla_http_proxy/DOCS.md) for details. After configuring the add-on, tick the box for "Fleet API Proxy" in this component, and the config flow will autofill your Client ID, Proxy URL, and SSL certificate.
+If your vehicle is affected by this (most likely), you'll need to install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it. This requires a complex setup; see [here](https://github.com/llamafilm/tesla-http-proxy-addon/blob/main/tesla_http_proxy/DOCS.md) for details. After configuring the add-on, tick the box for "Fleet API Proxy" in this component, and the config flow will autofill your Client ID, Proxy URL, and SSL certificate.
 
 <!---->
 
