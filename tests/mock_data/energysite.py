@@ -394,7 +394,7 @@ SITE_DATA = {
 }
 
 BATTERY_DATA = {
-    "site_name": "Battery Home",    
+    "site_name": "Battery Home",
     "total_pack_energy": 1,
     "grid_status": "Active",
     "backup": {
