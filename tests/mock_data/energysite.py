@@ -496,7 +496,6 @@ BATTERY_DATA = {
 BATTERY_SUMMARY = {
     "site_name": "Battery Home",
     "id": "XXX",
-    "energy_left": 13610.736842105263,
     "total_pack_energy": 14056,
     "percentage_charged": 96.8322199922116,
     "battery_power": 370,
