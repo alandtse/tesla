@@ -144,7 +144,7 @@ async def async_setup_entry(hass, config_entry):
     if config.get(CONF_API_PROXY_CERT):
         try:
             SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
-            _LOGGER.debug(SSL_CONTEXT)
+            _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",

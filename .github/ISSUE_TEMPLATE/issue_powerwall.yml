@@ -1,6 +1,5 @@
 name: Powerwall Issue
 description: Create a report to help us improve
-title: "Powerwall Issue: "
 labels: ["triage", "powerwall"]
 body:
   - type: checkboxes

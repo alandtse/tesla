@@ -378,7 +378,6 @@ SITE_CONFIG_POWERWALL = {
 
 SITE_DATA = {
     "solar_power": 7720,
-    "energy_left": 0,
     "total_pack_energy": 1,
     "percentage_charged": 0,
     "battery_power": 0,
@@ -396,7 +395,6 @@ SITE_DATA = {
 
 BATTERY_DATA = {
     "site_name": "Battery Home",
-    "energy_left": 0,
     "total_pack_energy": 1,
     "grid_status": "Active",
     "backup": {
@@ -498,7 +496,6 @@ BATTERY_DATA = {
 BATTERY_SUMMARY = {
     "site_name": "Battery Home",
     "id": "XXX",
-    "energy_left": 13610.736842105263,
     "total_pack_energy": 14056,
     "percentage_charged": 96.8322199922116,
     "battery_power": 370,
