@@ -1,6 +1,5 @@
 name: Telsa Car Issue
 description: Create a report to help us improve
-title: "Car: "
 labels: ["triage", "car"]
 body:
   - type: checkboxes
@@ -12,8 +11,8 @@ body:
           required: true
   - type: checkboxes
     attributes:
-      label: I have read about the [Fleet API](https://github.com/alandtse/tesla?tab=readme-ov-file#tesla-fleet-api-proxy) and understand I may need to use it
-      description: Unless you have a Pre-2021 Model S/X the Fleet API will need to be used for all other vehicles in the future.
+      label: I have read about the Fleet API and understand I may need to use it
+      description: Unless you have a Pre-2021 Model S/X the [Fleet API](https://github.com/alandtse/tesla?tab=readme-ov-file#tesla-fleet-api-proxy) will need to be used for all other vehicles in the future.
       options:
         - label: I understand issues relating to read only commands will be auto closed if not using the Fleet API.
           required: true
