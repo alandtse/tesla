@@ -123,7 +123,9 @@ async def test_battery_remaining(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.battery_home_battery_remaining")
     assert float(state.state) == round(
-        energysite_mock_data.BATTERY_SUMMARY["energy_left"]
+        energysite_mock_data.SITE_CONFIG_POWERWALL["nameplate_energy"]
+        * energysite_mock_data.BATTERY_SUMMARY["percentage_charged"]
+        / 100
     )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY_STORAGE
