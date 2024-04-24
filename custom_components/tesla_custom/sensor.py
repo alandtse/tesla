@@ -652,6 +652,7 @@ class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
             date_obj = last_time.replace(tzinfo=dt.UTC)
         return date_obj
 
+
 class TeslaCarPollingInterval(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car polling interval."""
 
@@ -665,5 +666,7 @@ class TeslaCarPollingInterval(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return the SERVICE_SCAN_INTERVAL"""
-        update_interval = self.coordinator.controller.get_update_interval_vin(vin=self._car.vin)
+        update_interval = self.coordinator.controller.get_update_interval_vin(
+            vin=self._car.vin
+        )
         return update_interval
