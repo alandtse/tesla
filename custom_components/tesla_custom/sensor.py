@@ -652,6 +652,7 @@ class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
             date_obj = last_time.replace(tzinfo=dt.UTC)
         return date_obj
 
+
 class TeslaCarPollingInterval(TeslaCarEntity, SensorEntity):
     """Representation of a Tesla car polling interval."""
 
