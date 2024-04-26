@@ -30,12 +30,6 @@ class TeslaBaseEntity(CoordinatorEntity[TeslaDataUpdateCoordinator]):
         self._attr_name = self.type.capitalize()
         self._attr_entity_registry_enabled_default = self._enabled_by_default
 
-    async def async_added_to_hass(self) -> None:
-        """Register state update callback."""
-        self.async_on_remove(
-            self.coordinator.async_add_listener(self.async_write_ha_state)
-        )
-
 
 class TeslaCarEntity(TeslaBaseEntity):
     """Representation of a Tesla car device."""
@@ -73,6 +67,8 @@ class TeslaCarEntity(TeslaBaseEntity):
         coordinator = self.coordinator
         current_last_update_success = coordinator.last_update_success
         current_last_controller_update_time = coordinator.last_controller_update_time
+        self._last_update_success = current_last_update_success
+        self._last_controller_update_time = current_last_controller_update_time
         if (
             prev_last_update_success == current_last_update_success
             and prev_last_controller_update_time == current_last_controller_update_time
