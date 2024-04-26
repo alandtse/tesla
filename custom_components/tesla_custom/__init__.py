@@ -436,6 +436,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name=DOMAIN,
             update_interval=update_interval,
+            always_update=False,
         )
 
     async def _async_update_data(self):
