@@ -82,6 +82,23 @@ async def test_set_hvac_mode(hass: HomeAssistant) -> None:
         mock_set_hvac_mode.assert_awaited_once_with("on")
 
 
+async def test_set_fan_mode(hass: HomeAssistant) -> None:
+    """Tests car setting HVAC mode."""
+    await setup_platform(hass, CLIMATE_DOMAIN)
+
+    with patch("teslajsonpy.car.TeslaCar.set_fan_mode") as mock_set_fan_mode:
+        await hass.services.async_call(
+            CLIMATE_DOMAIN,
+            "set_fan_mode",
+            {
+                ATTR_ENTITY_ID: DEVICE_ID,
+                "fan_mode": "Bioweapon Mode",
+            },
+            blocking=True,
+        )
+        mock_set_fan_mode.assert_awaited_once_with("Bioweapon Mode")
+
+
 async def test_set_preset_mode(hass: HomeAssistant) -> None:
     """Tests car setting HVAC mode."""
     await setup_platform(hass, CLIMATE_DOMAIN)
