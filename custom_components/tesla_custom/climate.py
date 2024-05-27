@@ -150,7 +150,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
             await self._car.set_climate_keeper_mode(KEEPER_MAP[preset_mode])
         # max_defrost changes multiple states so refresh all entities
         await self.coordinator.async_refresh()
-    
+
     @property
     def fan_mode(self):
         """Return the bioweapon mode as fan mode.
