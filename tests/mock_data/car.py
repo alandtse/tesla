@@ -90,6 +90,7 @@ VEHICLE_DATA = {
         "allow_cabin_overheat_protection": True,
         "battery_heater": False,
         "battery_heater_no_power": False,
+        "bioweapon_mode": False,
         "cabin_overheat_protection": "Off",
         "climate_keeper_mode": "off",
         "defrost_mode": 0,
