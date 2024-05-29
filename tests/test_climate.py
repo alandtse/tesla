@@ -83,10 +83,10 @@ async def test_set_hvac_mode(hass: HomeAssistant) -> None:
 
 
 async def test_set_fan_mode(hass: HomeAssistant) -> None:
-    """Tests car setting HVAC mode."""
+    """Tests car setting Bioweapon mode."""
     await setup_platform(hass, CLIMATE_DOMAIN)
 
-    with patch("teslajsonpy.car.TeslaCar.set_fan_mode") as mock_set_fan_mode:
+    with patch("teslajsonpy.car.TeslaCar.set_bioweapon_mode") as mock_set_fan_mode:
         await hass.services.async_call(
             CLIMATE_DOMAIN,
             "set_fan_mode",
