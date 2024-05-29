@@ -96,7 +96,7 @@ async def test_set_fan_mode(hass: HomeAssistant) -> None:
             },
             blocking=True,
         )
-        mock_set_fan_mode.assert_awaited_once_with("Bioweapon Mode")
+        mock_set_fan_mode.assert_awaited_once_with(True)
 
 
 async def test_set_preset_mode(hass: HomeAssistant) -> None:
