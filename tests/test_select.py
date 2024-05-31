@@ -92,6 +92,15 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
         )
         mock_remote_seat_heater_request.assert_awaited_with(3, 0)
 
+        # Test selecting "Cool"
+        await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Cool"},
+            blocking=True,
+        )
+        mock_remote_seat_heater_request.assert_awaited_with(34, 0)
+
     with patch(
         "teslajsonpy.car.TeslaCar.remote_auto_seat_climate_request"
     ) as mock_remote_auto_seat_climate_request:

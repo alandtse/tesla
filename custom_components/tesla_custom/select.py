@@ -42,6 +42,7 @@ FRONT_HEATER_OPTIONS = [
     "Low",
     "Medium",
     "High",
+    "Cool",
     "Auto",
 ]
 
