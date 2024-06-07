@@ -147,14 +147,17 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
-        # If auto 
+        # If selected auto 
         if self._is_auto_available and option == FRONT_HEATER_OPTIONS[4]:
             _LOGGER.debug("Setting %s to %s", self.name, option)
             await self._car.remote_auto_seat_climate_request(
                 AUTO_SEAT_ID_MAP[self._seat_name], True
             )
+        # If any options other than auto
         else:
+            # First turn off auto if currently on
             if self.current_option == FRONT_HEATER_OPTIONS[4]:
+                _LOGGER.debug("Turning off Auto heat/cool on %s", self.name)
                 await self._car.remote_auto_seat_climate_request(
                     AUTO_SEAT_ID_MAP[self._seat_name], False
                 )
@@ -166,8 +169,19 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 # If turning off
                 if option == FRONT_COOL_HEAT_OPTIONS[0]:
                     _LOGGER.debug("Turning off Cooling/%s", self.name)
+                    # If auto, turn off both heat and cool
+                    if getattr(
+                        self._car, "is_auto_seat_climate_" + self._seat_name
+                    ):
+                        _LOGGER.debug("Currently on Auto, Turning off Both heat and cooling on Cooling/%s", self.name)
+                        await self._car.remote_seat_heater_request(
+                            level, SEAT_ID_MAP[self._seat_name]
+                        )
+                        await self._car.remote_seat_cooler_request(
+                            1, AUTO_SEAT_ID_MAP[self._seat_name]
+                        )
                     # If heating, turn off heat
-                    if self._car.get_seat_heater_status(
+                    elif self._car.get_seat_heater_status(
                         SEAT_ID_MAP[self._seat_name]
                     ):
                         await self._car.remote_seat_heater_request(

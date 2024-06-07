@@ -171,7 +171,7 @@ VEHICLE_DATA = {
         "front_drive_unit": "NoneOrSmall",
         "has_air_suspension": False,
         "has_ludicrous_mode": False,
-        "has_seat_cooling": False,
+        "has_seat_cooling": True,
         "headlamp_type": "Hid",
         "interior_trim_type": "AllBlack",
         "motorized_charge_port": True,
