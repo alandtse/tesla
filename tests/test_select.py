@@ -106,7 +106,7 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Off"},
             blocking=True,
         )
-        mock_remote_seat_heater_request.assert_awaited_once_with(1, 1)
+        mock_remote_seat_cooler_request.assert_awaited_once_with(1, 1)
         # Test selecting "Low"
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -114,7 +114,7 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Cool Low"},
             blocking=True,
         )
-        mock_remote_seat_heater_request.assert_awaited_with(2, 1)
+        mock_remote_seat_cooler_request.assert_awaited_with(2, 1)
         # Test selecting "Medium"
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -122,7 +122,7 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Cool Medium"},
             blocking=True,
         )
-        mock_remote_seat_heater_request.assert_awaited_with(3, 1)
+        mock_remote_seat_cooler_request.assert_awaited_with(3, 1)
         # Test selecting "High"
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -130,7 +130,7 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "select.my_model_s_heated_seat_left", "option": "Cool High"},
             blocking=True,
         )
-        mock_remote_seat_heater_request.assert_awaited_with(4, 1)
+        mock_remote_seat_cooler_request.assert_awaited_with(4, 1)
 
     with patch(
         "teslajsonpy.car.TeslaCar.remote_auto_seat_climate_request"
