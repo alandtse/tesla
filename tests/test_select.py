@@ -58,7 +58,7 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
 
     # Test cars with heated seats only
     del car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"]
-    car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = "0"
+    car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = False
     with patch(
         "teslajsonpy.car.TeslaCar.remote_seat_heater_request"
     ) as mock_remote_seat_heater_request:
@@ -132,7 +132,7 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
 
 	# Test cars with cooling/heated seats
     del car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"]
-    car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = "1"
+    car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = True
 
     with patch(
         "teslajsonpy.car.TeslaCar.remote_seat_cooler_request"
