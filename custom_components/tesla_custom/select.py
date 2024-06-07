@@ -1,6 +1,7 @@
 """Support for Tesla selects."""
 
 import logging
+import re
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
@@ -163,7 +164,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 if not self._car.is_climate_on and level > 0:
                     await self._car.set_hvac_mode("on")
                 # If turning off
-                if level == 0:
+                if option == FRONT_COOL_HEAT_OPTIONS[0]:
                     _LOGGER.debug("Turning off Cooling/%s", self.name)
                     # If heating, turn off heat
                     if self._car.get_seat_heater_status(
@@ -178,14 +179,15 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                             1, AUTO_SEAT_ID_MAP[self._seat_name]
                         )
                 # If heat levels selected
-                elif level <= 3:
+                elif re.search("Heat", option):
                     _LOGGER.debug("Setting Cooling/%s to heat %s", self.name, level)
                     await self._car.remote_seat_heater_request(
                         level, SEAT_ID_MAP[self._seat_name]
                     )
                 # If cool levels selected
-                elif level >=5:
-                    level = level - 3
+                elif re.search("Cool", option):
+                    # Cool Low == 2, Cool Medium == 3, Cool High ==4
+                    level = level - ( FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2 )
                     _LOGGER.debug("Setting Cooling/%s to cool %s", self.name, level)         
                     await self._car.remote_seat_cooler_request(
                         level, AUTO_SEAT_ID_MAP[self._seat_name]
