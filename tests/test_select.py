@@ -56,6 +56,8 @@ async def test_car_heated_seat_select(hass: HomeAssistant) -> None:
     """Tests car heated seat select."""
     await setup_platform(hass, SELECT_DOMAIN)
 
+    del car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"]
+    car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = "0"
     with patch(
         "teslajsonpy.car.TeslaCar.remote_seat_heater_request"
     ) as mock_remote_seat_heater_request:
