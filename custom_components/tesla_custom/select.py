@@ -158,7 +158,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                     AUTO_SEAT_ID_MAP[self._seat_name], False
                 )
             # If front seat and car has seat cooling
-            if self._is_auto_available and not self._car.has_seat_cooling:
+            if self._is_auto_available and self._car.has_seat_cooling:
                 level: int = FRONT_COOL_HEAT_OPTIONS.index(option)
                 if not self._car.is_climate_on and level > 0:
                     await self._car.set_hvac_mode("on")
@@ -211,7 +211,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
             current_value = 4
             return FRONT_HEATER_OPTIONS[current_value]
         # If heated seats only
-        elif self._car.has_seat_cooling:
+        elif not self._car.has_seat_cooling:
             current_value = self._car.get_seat_heater_status(
                 SEAT_ID_MAP[self._seat_name]
             )
@@ -238,7 +238,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
     @property
     def options(self):
         """Return heated seat options."""
-        if not self._car.has_seat_cooling and self._is_auto_available:
+        if self._car.has_seat_cooling and self._is_auto_available:
             return FRONT_COOL_HEAT_OPTIONS
         if self._is_auto_available:
             return FRONT_HEATER_OPTIONS
