@@ -428,7 +428,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         self.update_vehicles = update_vehicles
         self._cancel_debounce_timer = None
         self._last_update_time = None
-        self.last_controller_update_time: float | None = None
+        self.last_update_time: float | None = None
         self.assumed_state = True
 
         update_interval = timedelta(seconds=MIN_SCAN_INTERVAL)
@@ -479,12 +479,9 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Error communicating with API: {err}") from err
         else:
             if vin := self.vin:
-                self.last_controller_update_time = controller.get_last_update_time(
-                    vin=vin
-                )
+                self.last_update_time = controller.get_last_update_time(vin=vin)
                 self.assumed_state = not controller.is_car_online(vin=vin) and (
-                    self.last_controller_update_time
-                    - controller.get_last_wake_up_time(vin=vin)
+                    self.last_update_time - controller.get_last_wake_up_time(vin=vin)
                     > controller.update_interval
                 )
         return data
