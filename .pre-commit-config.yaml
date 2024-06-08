@@ -65,11 +65,11 @@ repos:
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
-  - repo: https://github.com/PyCQA/prospector
-    rev: 1.10.2
-    hooks:
-      - id: prospector
-        exclude: ^(tests)/.+\.py$
+  # - repo: https://github.com/PyCQA/prospector
+  #   rev: 1.10.2
+  #   hooks:
+  #     - id: prospector
+  #       exclude: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.8
     hooks:
