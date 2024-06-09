@@ -147,7 +147,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
 
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
-        # If selected auto 
+        # If selected auto
         if self._is_auto_available and option == FRONT_HEATER_OPTIONS[4]:
             _LOGGER.debug("Setting %s to %s", self.name, option)
             await self._car.remote_auto_seat_climate_request(
@@ -170,10 +170,11 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 if option == FRONT_COOL_HEAT_OPTIONS[0]:
                     _LOGGER.debug("Turning off Cooling/%s", self.name)
                     # If auto, turn off both heat and cool
-                    if getattr(
-                        self._car, "is_auto_seat_climate_" + self._seat_name
-                    ):
-                        _LOGGER.debug("Currently on Auto, Turning off Both heat and cooling on Cooling/%s", self.name)
+                    if getattr(self._car, "is_auto_seat_climate_" + self._seat_name):
+                        _LOGGER.debug(
+                            "Currently on Auto, Turning off Both heat and cooling on Cooling/%s",
+                            self.name,
+                        )
                         await self._car.remote_seat_heater_request(
                             level, SEAT_ID_MAP[self._seat_name]
                         )
@@ -181,9 +182,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                             1, AUTO_SEAT_ID_MAP[self._seat_name]
                         )
                     # If heating, turn off heat
-                    elif self._car.get_seat_heater_status(
-                        SEAT_ID_MAP[self._seat_name]
-                    ):
+                    elif self._car.get_seat_heater_status(SEAT_ID_MAP[self._seat_name]):
                         await self._car.remote_seat_heater_request(
                             level, SEAT_ID_MAP[self._seat_name]
                         )
@@ -201,8 +200,8 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 # If cool levels selected
                 elif re.search("Cool", option):
                     # Cool Low == 2, Cool Medium == 3, Cool High ==4
-                    level = level - ( FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2 )
-                    _LOGGER.debug("Setting Cooling/%s to cool %s", self.name, level)         
+                    level = level - (FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2)
+                    _LOGGER.debug("Setting Cooling/%s to cool %s", self.name, level)
                     await self._car.remote_seat_cooler_request(
                         level, AUTO_SEAT_ID_MAP[self._seat_name]
                     )
@@ -215,7 +214,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 await self._car.remote_seat_heater_request(
                     level, SEAT_ID_MAP[self._seat_name]
                 )
-                        
+
         await self.update_controller(force=True)
 
     @property
@@ -247,7 +246,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 if current_value == 1:
                     current_value = 0
                 else:
-                # Low is 2 but is item 5 on select list
+                    # Low is 2 but is item 5 on select list
                     current_value = current_value + 3
             return FRONT_COOL_HEAT_OPTIONS[current_value]
 
