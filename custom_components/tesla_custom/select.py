@@ -104,7 +104,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             entities.append(TeslaCarHeatedSteeringWheel(car, coordinator))
         for seat_name in SEAT_ID_MAP:
             # car.rear_seat_heaters does not return value when car is asleep. Won't initialize seat if integration loaded when car is asleep
-            if "rear" in seat_name and car.get_seat_heater_status(SEAT_ID_MAP[seat_name]) is not None:
+            if (
+                "rear" in seat_name
+                and car.get_seat_heater_status(SEAT_ID_MAP[seat_name]) is not None
+            ):
                 continue
             # Check for str "None" (car does not have third row seats)
             # or None (car is asleep)
@@ -227,7 +230,11 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
             self._car, "is_auto_seat_climate_" + self._seat_name
         ):
             current_value = 4
-            _LOGGER.debug("Current setting for %s is %s", self.name, FRONT_HEATER_OPTIONS[current_value])
+            _LOGGER.debug(
+                "Current setting for %s is %s",
+                self.name,
+                FRONT_HEATER_OPTIONS[current_value],
+            )
             return FRONT_HEATER_OPTIONS[current_value]
         # If heated seats only
         elif not self._car.has_seat_cooling:
@@ -237,11 +244,19 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
             # If heater is off
             if current_value is None:
                 current_value = 0
-                _LOGGER.debug("Current setting for %s is %s", self.name, HEATER_OPTIONS[current_value])
+                _LOGGER.debug(
+                    "Current setting for %s is %s",
+                    self.name,
+                    HEATER_OPTIONS[current_value],
+                )
                 return HEATER_OPTIONS[current_value]
             # If heater is on
             else:
-                _LOGGER.debug("Current setting for %s is %s", self.name, HEATER_OPTIONS[current_value])
+                _LOGGER.debug(
+                    "Current setting for %s is %s",
+                    self.name,
+                    HEATER_OPTIONS[current_value],
+                )
                 return HEATER_OPTIONS[current_value]
         # If cooling/heating front seats
         else:
@@ -257,8 +272,14 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                     current_value = 0
                 else:
                     # Low is 2 but is item 5 on select list
-                    current_value = current_value - (FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2)
-            _LOGGER.debug("Current setting for Cooling/%s is %s", self.name, FRONT_COOL_HEAT_OPTIONS[current_value])
+                    current_value = current_value - (
+                        FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2
+                    )
+            _LOGGER.debug(
+                "Current setting for Cooling/%s is %s",
+                self.name,
+                FRONT_COOL_HEAT_OPTIONS[current_value],
+            )
             return FRONT_COOL_HEAT_OPTIONS[current_value]
 
     @property
@@ -270,6 +291,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
             return FRONT_HEATER_OPTIONS
         else:
             return HEATER_OPTIONS
+
 
 class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
     """Representation of a Tesla car heated steering wheel select."""
