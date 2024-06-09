@@ -6,6 +6,7 @@ with the latest data.
 
 import asyncio
 import logging
+import time
 from typing import TYPE_CHECKING
 
 from homeassistant.components.mqtt import mqtt_config_entry_enabled
@@ -155,7 +156,7 @@ class TeslaMate:
     def __init__(
         self,
         hass: HomeAssistant,
-        coordinators: list["TeslaDataUpdateCoordinator"],
+        coordinators: dict[str, "TeslaDataUpdateCoordinator"],
         cars: dict[str, TeslaCar],
     ) -> None:
         """Init Class."""
@@ -372,6 +373,8 @@ class TeslaMate:
             # Nothing matched. Return without updating listeners.
             return
 
+        coordinator.last_update_time = round(time.time())
+        coordinator.assumed_state = False
         coordinator.async_update_listeners_debounced()
 
     def update_charging_state(self, car: TeslaCar, val: str):
