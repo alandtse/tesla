@@ -245,7 +245,7 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                     current_value = 0
                 else:
                     # Cool Low is 2 but is item 5 on select list
-                    current_value = current_value - (
+                    current_value = current_value + (
                         FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2
                     )
             _LOGGER.debug(
