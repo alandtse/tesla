@@ -296,7 +296,7 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize heated stearing wheel entity."""
+        """Initialize heated steering wheel entity."""
         self._enabled_by_default = car.steering_wheel_heater
         super().__init__(car, coordinator)
 
