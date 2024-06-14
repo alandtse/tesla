@@ -1,7 +1,6 @@
 """Support for Tesla selects."""
 
 import logging
-import re
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
@@ -112,6 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
                 car.third_row_seats == "None" or car.third_row_seats is None
             ):
                 continue
+            _LOGGER.debug("Setting up seat %s.", seat_name)
             entities.append(TeslaCarHeatedSeat(car, coordinator, seat_name))
 
     for energy_site_id, energysite in energysites.items():
@@ -183,22 +183,24 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                         )
                     # If heating, turn off heat
                     elif self._car.get_seat_heater_status(SEAT_ID_MAP[self._seat_name]):
+                        _LOGGER.debug("Turning off heat on Cooling/%s", self.name)
                         await self._car.remote_seat_heater_request(
                             level, SEAT_ID_MAP[self._seat_name]
                         )
                     # If cooling, turn off cooling, 1 is off
                     else:
+                        _LOGGER.debug("Turning off cooling on Cooling/%s", self.name)
                         await self._car.remote_seat_cooler_request(
                             1, AUTO_SEAT_ID_MAP[self._seat_name]
                         )
                 # If heat levels selected
-                elif re.search("Heat", option):
+                elif "Heat" in option:
                     _LOGGER.debug("Setting Cooling/%s to heat %s", self.name, level)
                     await self._car.remote_seat_heater_request(
                         level, SEAT_ID_MAP[self._seat_name]
                     )
                 # If cool levels selected
-                elif re.search("Cool", option):
+                elif "Cool" in option:
                     # Cool Low == 2, Cool Medium == 3, Cool High ==4
                     level = level - (FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2)
                     _LOGGER.debug("Setting Cooling/%s to cool %s", self.name, level)
@@ -220,21 +222,19 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
     @property
     def current_option(self):
         """Return current heated/cooling seat setting."""
+        # If front seats and auto
         if self._is_auto_available and getattr(
             self._car, "is_auto_seat_climate_" + self._seat_name
         ):
             current_value = 4
-            return FRONT_HEATER_OPTIONS[current_value]
-        # If heated seats only
-        elif not self._car.has_seat_cooling:
-            current_value = self._car.get_seat_heater_status(
-                SEAT_ID_MAP[self._seat_name]
+            _LOGGER.debug(
+                "Current setting for %s is %s",
+                self._seat_name,
+                FRONT_HEATER_OPTIONS[current_value],
             )
-            if current_value is None:
-                return FRONT_HEATER_OPTIONS[0]
             return FRONT_HEATER_OPTIONS[current_value]
-        # If cooling/heating front seats
-        else:
+        # If front seats and car has heated/cooling seats
+        if self._is_auto_available and self._car.has_seat_cooling:
             current_value = self._car.get_seat_heater_status(
                 SEAT_ID_MAP[self._seat_name]
             )
@@ -246,18 +246,43 @@ class TeslaCarHeatedSeat(TeslaCarEntity, SelectEntity):
                 if current_value == 1:
                     current_value = 0
                 else:
-                    # Low is 2 but is item 5 on select list
-                    current_value = current_value + 3
+                    # Cool Low is 2 but is item 5 on select list
+                    current_value = current_value + (
+                        FRONT_COOL_HEAT_OPTIONS.index("Cool Low") - 2
+                    )
+            _LOGGER.debug(
+                "Current setting for Cooling/%s is %s",
+                self._seat_name,
+                FRONT_COOL_HEAT_OPTIONS[current_value],
+            )
             return FRONT_COOL_HEAT_OPTIONS[current_value]
+        # If front seats w/o cooling seats, or if rear seats
+        if (
+            self._is_auto_available and not self._car.has_seat_cooling
+        ) or "rear" in self._seat_name:
+            current_value = self._car.get_seat_heater_status(
+                SEAT_ID_MAP[self._seat_name]
+            )
+            # If heater is off
+            if current_value is None:
+                current_value = 0
+
+            _LOGGER.debug(
+                "Current setting for %s is %s",
+                self._seat_name,
+                HEATER_OPTIONS[current_value],
+            )
+            return HEATER_OPTIONS[current_value]
 
     @property
     def options(self):
         """Return heated seat options."""
         if self._car.has_seat_cooling and self._is_auto_available:
             return FRONT_COOL_HEAT_OPTIONS
-        if self._is_auto_available:
+        elif self._is_auto_available:
             return FRONT_HEATER_OPTIONS
-        return HEATER_OPTIONS
+        else:
+            return HEATER_OPTIONS
 
 
 class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
@@ -271,7 +296,7 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
         car: TeslaCar,
         coordinator: TeslaDataUpdateCoordinator,
     ):
-        """Initialize heated seat entity."""
+        """Initialize heated steering wheel entity."""
         self._enabled_by_default = car.steering_wheel_heater
         super().__init__(car, coordinator)
 
@@ -316,7 +341,7 @@ class TeslaCarHeatedSteeringWheel(TeslaCarEntity, SelectEntity):
 
     @property
     def options(self):
-        """Return heated seat options."""
+        """Return heated steering wheel options."""
         return STEERING_HEATER_OPTIONS
 
     @property
