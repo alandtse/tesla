@@ -35,14 +35,14 @@ repos:
       - id: check-yaml
         exclude: ^recipes/.*
     repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
 
   # --- Commit msg checks ---
   - hooks:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.13.0
+    rev: v3.27.0
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -59,9 +59,9 @@ repos:
           (?x)^(
             CHANGELOG.md
           )$
-    rev: v3.0.0
+    rev: v4.0.0-alpha.8
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.9.0
+    rev: v3.16.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -71,7 +71,7 @@ repos:
   #     - id: prospector
   #       exclude: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
+    rev: 1.7.9
     hooks:
       - id: bandit
         args:
@@ -80,7 +80,7 @@ repos:
           - --configfile=tests/bandit.yaml
         files: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
   #  - repo: local
