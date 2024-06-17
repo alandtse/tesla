@@ -50,6 +50,10 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
     _attr_fan_modes = ["Off", "Bioweapon Mode"]
 
     @property
+    def translation_key(self):
+        return "car_climate"
+
+    @property
     def hvac_mode(self) -> HVACMode:
         """Return hvac operation ie. heat, cool mode.
 
