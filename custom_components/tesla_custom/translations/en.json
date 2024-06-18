@@ -89,7 +89,7 @@
         "state_attributes": {
           "fan_mode": {
             "state": {
-              "bioweapon":"Bioweapon Mode",
+              "bioweapon": "Bioweapon Mode",
               "off": "Normal"
             }
           },
