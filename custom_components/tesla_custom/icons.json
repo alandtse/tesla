@@ -1,0 +1,25 @@
+{
+  "entity": {
+    "climate": {
+      "car_climate": {
+        "state_attributes": {
+          "fan_mode": {
+            "state": {
+              "bioweapon": "mdi:biohazard",
+              "off": "mdi:power"
+            }
+          },
+          "preset_mode": {
+            "state": {
+              "normal": "mdi:fan",
+              "defrost": "mdi:car-defrost-rear",
+              "keep": "mdi:infinity",
+              "dog": "mdi:dog",
+              "camp": "mdi:tent"
+            }
+          }
+        }
+      }
+    }
+  }
+}

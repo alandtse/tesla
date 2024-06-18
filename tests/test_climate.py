@@ -92,7 +92,7 @@ async def test_set_fan_mode(hass: HomeAssistant) -> None:
             "set_fan_mode",
             {
                 ATTR_ENTITY_ID: DEVICE_ID,
-                "fan_mode": "Bioweapon Mode",
+                "fan_mode": "bioweapon",
             },
             blocking=True,
         )
@@ -113,7 +113,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
             "set_preset_mode",
             {
                 ATTR_ENTITY_ID: DEVICE_ID,
-                "preset_mode": "Normal",
+                "preset_mode": "normal",
             },
             blocking=True,
         )
@@ -131,7 +131,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
             "set_preset_mode",
             {
                 ATTR_ENTITY_ID: DEVICE_ID,
-                "preset_mode": "Normal",
+                "preset_mode": "normal",
             },
             blocking=True,
         )
@@ -144,7 +144,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
             "set_preset_mode",
             {
                 ATTR_ENTITY_ID: DEVICE_ID,
-                "preset_mode": "Defrost",
+                "preset_mode": "defrost",
             },
             blocking=True,
         )
@@ -159,7 +159,7 @@ async def test_set_preset_mode(hass: HomeAssistant) -> None:
             "set_preset_mode",
             {
                 ATTR_ENTITY_ID: DEVICE_ID,
-                "preset_mode": "Dog Mode",
+                "preset_mode": "dog",
             },
             blocking=True,
         )
