@@ -5,17 +5,17 @@
         "state_attributes": {
           "fan_mode": {
             "state": {
-              "Bioweapon Mode": "mdi:biohazard",
-              "Off": "mdi:power"
+              "bioweapon": "mdi:biohazard",
+              "off": "mdi:power"
             }
           },
           "preset_mode": {
             "state": {
-              "Normal": "mdi:fan",
-              "Defrost": "mdi:car-defrost-rear",
-              "Keep On": "mdi:infinity",
-              "Dog Mode": "mdi:dog",
-              "Camp Mode": "mdi:tent"
+              "normal": "mdi:fan",
+              "defrost": "mdi:car-defrost-rear",
+              "keep": "mdi:infinity",
+              "dog": "mdi:dog",
+              "camp": "mdi:tent"
             }
           }
         }
