@@ -82,5 +82,28 @@
         }
       }
     }
+  },
+  "entity": {
+    "climate": {
+      "car_climate": {
+        "state_attributes": {
+          "fan_mode": {
+            "state": {
+              "bioweapon": "Bioweapon Mode",
+              "off": "Normal"
+            }
+          },
+          "preset_mode": {
+            "state": {
+              "normal": "Normal",
+              "defrost": "Defrost",
+              "keep": "Keep On",
+              "dog": "Dog Mode",
+              "camp": "Camp Mode"
+            }
+          }
+        }
+      }
+    }
   }
 }
