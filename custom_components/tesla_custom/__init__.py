@@ -147,7 +147,8 @@ async def async_setup_entry(hass, config_entry):
             await hass.async_add_executor_job(
                 SSL_CONTEXT.load_verify_locations, api_proxy_cert
             )
-            _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
