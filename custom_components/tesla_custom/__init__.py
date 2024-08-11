@@ -142,14 +142,17 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
-    if config.get(CONF_API_PROXY_CERT):
+    if api_proxy_cert := config.get(CONF_API_PROXY_CERT):
         try:
-            SSL_CONTEXT.load_verify_locations(config[CONF_API_PROXY_CERT])
-            _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
+            await hass.async_add_executor_job(
+                SSL_CONTEXT.load_verify_locations, api_proxy_cert
+            )
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
-                config[CONF_API_PROXY_CERT],
+                api_proxy_cert,
             )
 
     async_client = httpx.AsyncClient(
@@ -181,7 +184,6 @@ async def async_setup_entry(hass, config_entry):
             polling_policy=config_entry.options.get(
                 CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
             ),
-            api_proxy_cert=config.get(CONF_API_PROXY_CERT),
             api_proxy_url=config.get(CONF_API_PROXY_URL),
             client_id=config.get(CONF_CLIENT_ID),
         )
