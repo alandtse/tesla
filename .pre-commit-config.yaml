@@ -35,14 +35,14 @@ repos:
       - id: check-yaml
         exclude: ^recipes/.*
     repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
 
   # --- Commit msg checks ---
   - hooks:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.29.0
+    rev: v3.29.1
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -51,7 +51,7 @@ repos:
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 24.10.0
   - repo: https://github.com/pre-commit/mirrors-prettier
     hooks:
       - id: prettier
@@ -71,7 +71,7 @@ repos:
   #     - id: prospector
   #       exclude: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
+    rev: 1.7.10
     hooks:
       - id: bandit
         args:
