@@ -32,16 +32,16 @@ To use the component, you will need an application to generate a Tesla refresh t
 5. Download _all_ the files from the `custom_components/tesla_custom/` directory (folder) in this repository.
 6. Place the files you downloaded in the new directory (folder) you created.
 7. Restart Home Assistant.
-8. [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Settings" -> "Devices & Services" then click "+" and search for "Tesla Custom Integration".
-9. For most vehicles, you will need to the Tesla Fleet API Proxy (see below).
+8. Add the integration: [![Add Integration][add-integration-badge]][add-integration] or in the HA UI go to "Settings" -> "Devices & Services" then click "+" and search for "Tesla Custom Integration".
+9. For most vehicles, you will need to the Tesla Fleet API Proxy (see [below](#tesla-fleet-api-proxy)).
 
 Note: This integration will wake up your vehicle(s) during installation.
 
 ## Tesla Fleet API Proxy
 
-Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for _most_ vehicles in favor of a new Fleet API with end-to-end encryption. You'll know you're affected if you see errors in the log when attempting to send commands (sensors will work regardless)
+Tesla has [deprecated](https://developer.tesla.com/docs/fleet-api) the Owner API for _most_ vehicles in favor of a new Fleet API with end-to-end encryption. You'll know you're affected if you see `teslajsonpy.exceptions.TeslaException` errors in the log when attempting to send commands (sensors will work regardless).
 
-If your vehicle is affected by this (most likely), you'll need to install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it. This requires a complex setup; see [here](https://github.com/llamafilm/tesla-http-proxy-addon/blob/main/tesla_http_proxy/DOCS.md) for details. After configuring the add-on, tick the box for "Fleet API Proxy" in this component, and the config flow will autofill your Client ID, Proxy URL, and SSL certificate.
+If your vehicle is affected by this (most likely), you'll need to install the [Tesla HTTP Proxy](https://github.com/llamafilm/tesla-http-proxy-addon) add-on and configure this component to use it. This requires a complex setup; see [here](https://github.com/alandtse/tesla/wiki/Proxy-setup-with-DuckDNS-and-NGinx) for step-by-step instructions.
 
 <!---->
 
