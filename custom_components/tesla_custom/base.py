@@ -46,7 +46,9 @@ class TeslaCarEntity(TeslaBaseEntity):
         display_name = car.display_name
         vehicle_name = (
             display_name
-            if display_name is not None and display_name != vin[-6:]
+            if display_name is not None
+            and display_name != vin[-6:]
+            and display_name != ""
             else f"Tesla Model {str(vin[3]).upper()}"
         )
         self._attr_device_info = DeviceInfo(
