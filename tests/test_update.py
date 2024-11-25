@@ -38,6 +38,7 @@ async def test_status_download_wait_wifi(hass: HomeAssistant) -> None:
     assert state.attributes.get("latest_version") == "2022.36.20 (Waiting on Wi-Fi)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
+    assert state.attributes.get("update_percentage") is None
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.36.20/release-notes"
@@ -67,6 +68,7 @@ async def test_status_downloading(hass: HomeAssistant) -> None:
     assert state.attributes.get("latest_version") == "2022.36.20 (Downloading)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
+    assert state.attributes.get("update_percentage") is None
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.36.20/release-notes"
@@ -96,6 +98,7 @@ async def test_status_available(hass: HomeAssistant) -> None:
     assert state.attributes.get("latest_version") == "2022.36.20 (Available to install)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
+    assert state.attributes.get("update_percentage") is None
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.36.20/release-notes"
@@ -132,6 +135,7 @@ async def test_status_scheduled(hass: HomeAssistant) -> None:
     )
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
+    assert state.attributes.get("update_percentage") is None
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.36.20/release-notes"
@@ -163,7 +167,8 @@ async def test_status_installing(hass: HomeAssistant) -> None:
     assert state.state == STATE_ON
     assert state.attributes.get("latest_version") == "2022.36.20 (Installing)"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
-    assert state.attributes.get("in_progress") == 30
+    assert state.attributes.get("in_progress") is True
+    assert state.attributes.get("update_percentage") == 30
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.36.20/release-notes"
@@ -193,6 +198,7 @@ async def test_status_none(hass: HomeAssistant) -> None:
     assert state.attributes.get("latest_version") == "2022.8.10.1"
     assert state.attributes.get("installed_version") == "2022.8.10.1"
     assert state.attributes.get("in_progress") is False
+    assert state.attributes.get("update_percentage") is None
     assert (
         state.attributes.get("release_url")
         == "https://www.notateslaapp.com/software-updates/version/2022.8.10.1/release-notes"
