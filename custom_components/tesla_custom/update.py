@@ -94,22 +94,33 @@ class TeslaCarUpdate(TeslaCarEntity, UpdateEntity):
         return version_str
 
     @property
-    def in_progress(self):
+    def in_progress(self) -> bool:
         """Get Progress, if updating."""
         update_status = None
 
         if self._car.software_update:
             update_status = self._car.software_update.get("status")
-        # If the update is scheduled, don't consider in-progress so the
-        # user can still install immediately if desired
-        if update_status == "scheduled":
-            return False
         # If its actually installing, we can use the install_perc
         if update_status == "installing":
-            progress = self._car.software_update.get("install_perc")
-            return progress
+            return True
         # Otherwise, we're not updating, so return False
         return False
+
+    @property
+    def update_percentage(self) -> int | None:
+        """Get update percentate, if updating."""
+        update_status = None
+
+        if self._car.software_update:
+            update_status = self._car.software_update.get("status")
+
+        # If its actually installing, we can use the install_perc
+        if update_status == "installing":
+            install_perc = self._car.software_update.get("install_perc")
+            return install_perc
+
+        # Otherwise, we're not updating, so return None
+        return None
 
     async def async_install(self, version, backup: bool, **kwargs: Any) -> None:
         """Install an Update."""

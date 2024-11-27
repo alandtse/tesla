@@ -112,7 +112,7 @@ def async_setup_services(hass) -> None:
             command,
             parameters,
         )
-        path_vars = parameters.pop(ATTR_PATH_VARS)
+        path_vars = parameters.pop(ATTR_PATH_VARS, {})
         response = await controller.api(name=command, path_vars=path_vars, **parameters)
         return response
 
