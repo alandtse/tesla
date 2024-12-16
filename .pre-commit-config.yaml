@@ -35,14 +35,14 @@ repos:
       - id: check-yaml
         exclude: ^recipes/.*
     repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
 
   # --- Commit msg checks ---
   - hooks:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.29.0
+    rev: v4.1.0
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -61,7 +61,7 @@ repos:
           )$
     rev: v4.0.0-alpha.8
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
+    rev: v3.19.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -71,7 +71,7 @@ repos:
   #     - id: prospector
   #       exclude: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.10
+    rev: 1.8.0
     hooks:
       - id: bandit
         args:
@@ -92,7 +92,7 @@ repos:
   #        pass_filenames: false
   #        always_run: true
   - repo: https://github.com/floatingpurr/sync_with_poetry
-    rev: "1.1.0" # the revision or tag to clone at
+    rev: "1.2.0" # the revision or tag to clone at
     hooks:
       - id: sync_with_poetry
         args: [] # optional args
