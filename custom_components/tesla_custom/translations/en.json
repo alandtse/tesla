@@ -40,6 +40,7 @@
         "data": {
           "enable_wake_on_start": "Force cars awake on startup",
           "scan_interval": "Seconds between polling",
+          "scan_driving_interval": "Seconds between polling while driving",
           "enable_teslamate": "Sync Data from TeslaMate via MQTT"
         }
       }

@@ -24,6 +24,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "loggers": ["teslajsonpy"],
-  "requirements": ["teslajsonpy==3.12.3"],
+  "requirements": ["teslajsonpy==3.13.0"],
   "version": "3.24.3"
 }

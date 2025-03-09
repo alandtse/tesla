@@ -34,9 +34,11 @@ from .const import (
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
+    CONF_SCAN_DRIVING_INTERVAL,
     CONF_WAKE_ON_START,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
+    DEFAULT_SCAN_DRIVING_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     DOMAIN,
@@ -217,6 +219,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     ),
                 ): vol.All(cv.positive_int, vol.Clamp(min=MIN_SCAN_INTERVAL)),
                 vol.Optional(
+                    CONF_SCAN_DRIVING_INTERVAL,
+                    default=self.config_entry.options.get(
+                        CONF_SCAN_DRIVING_INTERVAL, DEFAULT_SCAN_DRIVING_INTERVAL
+                    ),
+                ): vol.All(cv.positive_int, vol.Clamp(min=MIN_SCAN_INTERVAL)),
+                vol.Optional(
                     CONF_WAKE_ON_START,
                     default=self.config_entry.options.get(
                         CONF_WAKE_ON_START, DEFAULT_WAKE_ON_START
@@ -262,6 +270,7 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
             email=data[CONF_USERNAME],
             refresh_token=data[CONF_TOKEN],
             update_interval=DEFAULT_SCAN_INTERVAL,
+            driving_interval=DEFAULT_SCAN_DRIVING_INTERVAL,
             expiration=data.get(CONF_EXPIRATION, 0),
             auth_domain=data.get(CONF_DOMAIN, AUTH_DOMAIN),
             polling_policy=data.get(CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY),

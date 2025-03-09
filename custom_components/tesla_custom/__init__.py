@@ -39,10 +39,12 @@ from .const import (
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
+    CONF_SCAN_DRIVING_INTERVAL,
     CONF_WAKE_ON_START,
     DATA_LISTENER,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
+    DEFAULT_SCAN_DRIVING_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     DOMAIN,
@@ -88,6 +90,7 @@ async def async_setup(hass, base_config):
         data = data or {}
         options = options or {
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+            CONF_SCAN_DRIVING_INTERVAL: DEFAULT_SCAN_DRIVING_INTERVAL,
             CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
             CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
         }
@@ -104,6 +107,7 @@ async def async_setup(hass, base_config):
     email = config[CONF_USERNAME]
     token = config[CONF_TOKEN]
     scan_interval = config[CONF_SCAN_INTERVAL]
+    driving_scan_interval = config[CONF_SCAN_DRIVING_INTERVAL]
 
     if email in _async_configured_emails(hass):
         try:
@@ -118,7 +122,10 @@ async def async_setup(hass, base_config):
                 CONF_TOKEN: info[CONF_TOKEN],
                 CONF_EXPIRATION: info[CONF_EXPIRATION],
             },
-            options={CONF_SCAN_INTERVAL: scan_interval},
+            options={
+                CONF_SCAN_INTERVAL: scan_interval,
+                CONF_SCAN_DRIVING_INTERVAL: driving_scan_interval,
+            },
         )
     else:
         hass.async_create_task(
@@ -129,7 +136,10 @@ async def async_setup(hass, base_config):
             )
         )
         hass.data.setdefault(DOMAIN, {})
-        hass.data[DOMAIN][email] = {CONF_SCAN_INTERVAL: scan_interval}
+        hass.data[DOMAIN][email] = {
+            CONF_SCAN_INTERVAL: scan_interval,
+            CONF_SCAN_DRIVING_INTERVAL: driving_scan_interval,
+        }
 
     return True
 
@@ -163,10 +173,19 @@ async def async_setup_entry(hass, config_entry):
     if not hass.data[DOMAIN]:
         async_setup_services(hass)
 
-    if email in hass.data[DOMAIN] and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]:
+    if (
+        email in hass.data[DOMAIN]
+        and CONF_SCAN_INTERVAL in hass.data[DOMAIN][email]
+        and CONF_SCAN_DRIVING_INTERVAL in hass.data[DOMAIN][email]
+    ):
         scan_interval = hass.data[DOMAIN][email][CONF_SCAN_INTERVAL]
+        driving_scan_interval = hass.data[DOMAIN][email][CONF_SCAN_DRIVING_INTERVAL]
         hass.config_entries.async_update_entry(
-            config_entry, options={CONF_SCAN_INTERVAL: scan_interval}
+            config_entry,
+            options={
+                CONF_SCAN_INTERVAL: scan_interval,
+                CONF_SCAN_DRIVING_INTERVAL: driving_scan_interval,
+            },
         )
         hass.data[DOMAIN].pop(email)
 
@@ -180,6 +199,9 @@ async def async_setup_entry(hass, config_entry):
             auth_domain=config.get(CONF_DOMAIN, AUTH_DOMAIN),
             update_interval=config_entry.options.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+            ),
+            driving_interval=config_entry.options.get(
+                CONF_SCAN_DRIVING_INTERVAL, DEFAULT_SCAN_DRIVING_INTERVAL
             ),
             polling_policy=config_entry.options.get(
                 CONF_POLLING_POLICY, DEFAULT_POLLING_POLICY
@@ -396,6 +418,17 @@ async def update_listener(hass, config_entry):
             "Changing scan_interval from %s to %s",
             old_update_interval,
             controller.update_interval,
+        )
+
+    old_driving_interval = controller.driving_interval
+    controller.driving_interval = config_entry.options.get(
+        CONF_SCAN_DRIVING_INTERVAL, DEFAULT_SCAN_DRIVING_INTERVAL
+    )
+    if old_driving_interval != controller.driving_interval:
+        _LOGGER.debug(
+            "Changing driving_interval from %s to %s",
+            old_driving_interval,
+            controller.driving_interval,
         )
 
     enable_teslamate = config_entry.options.get(

@@ -25,7 +25,8 @@
       "init": {
         "data": {
           "enable_wake_on_start": "Forza il risveglio delle auto all'avvio",
-          "scan_interval": "Secondi tra le scansioni"
+          "scan_interval": "Secondi tra le scansioni",
+          "scan_driving_interval": "Secondi tra le scansioni durante la guida"
         }
       }
     }

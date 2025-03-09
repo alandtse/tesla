@@ -27,9 +27,11 @@ from custom_components.tesla_custom.const import (
     CONF_INCLUDE_ENERGYSITES,
     CONF_INCLUDE_VEHICLES,
     CONF_POLLING_POLICY,
+    CONF_SCAN_DRIVING_INTERVAL,
     CONF_WAKE_ON_START,
     DEFAULT_ENABLE_TESLAMATE,
     DEFAULT_POLLING_POLICY,
+    DEFAULT_SCAN_DRIVING_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     DOMAIN,
@@ -53,14 +55,15 @@ async def test_form(hass):
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
-    assert result["type"] == "form"
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "user"
 
     result2 = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_API_PROXY_ENABLE: False}
     )
     await hass.async_block_till_done()
-    assert result2["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result2["type"] == data_entry_flow.FlowResultType.FORM
+    print(f"result2['type']: {result2['type']}")
     assert result2["step_id"] == "credentials"
 
     with (
@@ -84,7 +87,7 @@ async def test_form(hass):
         )
         await hass.async_block_till_done()
 
-    assert result3["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result3["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result3["title"] == TEST_USERNAME
     assert result3["data"] == {
         CONF_USERNAME: TEST_USERNAME,
@@ -124,14 +127,14 @@ async def test_form_with_proxy(hass, httpx_mock):
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
-    assert result["type"] == "form"
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "user"
 
     result2 = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_API_PROXY_ENABLE: True}
     )
     await hass.async_block_till_done()
-    assert result2["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result2["type"] == data_entry_flow.FlowResultType.FORM
     assert result2["step_id"] == "credentials"
 
     with (
@@ -162,7 +165,7 @@ async def test_form_with_proxy(hass, httpx_mock):
         )
         await hass.async_block_till_done()
 
-    assert result3["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result3["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result3["title"] == TEST_USERNAME
     assert result3["data"] == {
         CONF_USERNAME: TEST_USERNAME,
@@ -200,7 +203,7 @@ async def test_form_invalid_auth(hass):
             {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: TEST_USERNAME},
         )
 
-    assert result3["type"] == "form"
+    assert result3["type"] == data_entry_flow.FlowResultType.FORM
     assert result3["errors"] == {"base": "invalid_auth"}
 
 
@@ -223,7 +226,7 @@ async def test_form_invalid_auth_incomplete_credentials(hass):
             {CONF_USERNAME: TEST_USERNAME, CONF_TOKEN: TEST_TOKEN},
         )
 
-    assert result3["type"] == "form"
+    assert result3["type"] == data_entry_flow.FlowResultType.FORM
     assert result3["errors"] == {"base": "invalid_auth"}
 
 
@@ -246,7 +249,7 @@ async def test_form_cannot_connect(hass):
             {CONF_TOKEN: TEST_TOKEN, CONF_USERNAME: TEST_USERNAME},
         )
 
-    assert result3["type"] == "form"
+    assert result3["type"] == data_entry_flow.FlowResultType.FORM
     assert result3["errors"] == {"base": "cannot_connect"}
 
 
@@ -295,11 +298,8 @@ async def test_form_reauth(hass):
     )
     entry.add_to_hass(hass)
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_REAUTH},
-        data={CONF_USERNAME: TEST_USERNAME},
-    )
+    entry.async_start_reauth(hass)
+
     result2 = await hass.config_entries.flow.async_configure(
         result["flow_id"], user_input={CONF_API_PROXY_ENABLE: False}
     )
@@ -347,7 +347,7 @@ async def test_import(hass):
                 CONF_CLIENT_ID: "ownerapi",
             },
         )
-    assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["title"] == TEST_USERNAME
     assert result["data"][CONF_ACCESS_TOKEN] == TEST_ACCESS_TOKEN
     assert result["data"][CONF_TOKEN] == TEST_TOKEN
@@ -361,21 +361,23 @@ async def test_option_flow(hass):
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
 
-    assert result["type"] == "form"
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "init"
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={
             CONF_SCAN_INTERVAL: 350,
+            CONF_SCAN_DRIVING_INTERVAL: 200,
             CONF_WAKE_ON_START: True,
             CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
             CONF_ENABLE_TESLAMATE: True,
         },
     )
-    assert result["type"] == "create_entry"
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SCAN_INTERVAL: 350,
+        CONF_SCAN_DRIVING_INTERVAL: 200,
         CONF_WAKE_ON_START: True,
         CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
         CONF_ENABLE_TESLAMATE: True,
@@ -389,15 +391,16 @@ async def test_option_flow_defaults(hass):
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
 
-    assert result["type"] == "form"
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "init"
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], user_input={}
     )
-    assert result["type"] == "create_entry"
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+        CONF_SCAN_DRIVING_INTERVAL: DEFAULT_SCAN_DRIVING_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
         CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
         CONF_ENABLE_TESLAMATE: DEFAULT_ENABLE_TESLAMATE,
@@ -411,15 +414,16 @@ async def test_option_flow_input_floor(hass):
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
 
-    assert result["type"] == "form"
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "init"
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], user_input={CONF_SCAN_INTERVAL: 1}
     )
-    assert result["type"] == "create_entry"
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
+        CONF_SCAN_DRIVING_INTERVAL: DEFAULT_SCAN_DRIVING_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
         CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
         CONF_ENABLE_TESLAMATE: DEFAULT_ENABLE_TESLAMATE,

@@ -1,6 +1,6 @@
 """Const file for Tesla cars."""
 
-VERSION = "3.24.3"
+VERSION = "3.25.0-beta"
 CONF_EXPIRATION = "expiration"
 CONF_INCLUDE_VEHICLES = "include_vehicles"
 CONF_INCLUDE_ENERGYSITES = "include_energysites"
@@ -10,10 +10,12 @@ CONF_ENABLE_TESLAMATE = "enable_teslamate"
 CONF_API_PROXY_ENABLE = "api_proxy_enable"
 CONF_API_PROXY_URL = "api_proxy_url"
 CONF_API_PROXY_CERT = "api_proxy_cert"
+CONF_SCAN_DRIVING_INTERVAL = "scan_driving_interval"
 DOMAIN = "tesla_custom"
 ATTRIBUTION = "Data provided by Tesla"
 DATA_LISTENER = "listener"
 DEFAULT_SCAN_INTERVAL = 660
+DEFAULT_SCAN_DRIVING_INTERVAL = 60
 DEFAULT_WAKE_ON_START = False
 DEFAULT_ENABLE_TESLAMATE = False
 ERROR_URL_NOT_DETECTED = "url_not_detected"
