@@ -15,9 +15,12 @@ from .const import (
     ATTR_PARAMETERS,
     ATTR_PATH_VARS,
     ATTR_VIN,
+    CONF_SCAN_DRIVING_INTERVAL,
+    DEFAULT_SCAN_DRIVING_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     SERVICE_API,
+    SERVICE_SCAN_DRIVING_INTERVAL,
     SERVICE_SCAN_INTERVAL,
 )
 
@@ -42,6 +45,16 @@ SCAN_INTERVAL_SCHEMA = vol.Schema(
     }
 )
 
+SCAN_DRIVING_INTERVAL_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_EMAIL): vol.All(cv.string, vol.Length(min=1)),
+        vol.Optional(ATTR_VIN): vol.All(cv.string, vol.Length(min=1)),
+        vol.Required(
+            CONF_SCAN_DRIVING_INTERVAL, default=DEFAULT_SCAN_DRIVING_INTERVAL
+        ): vol.All(vol.Coerce(int), vol.Range(min=-1, max=3600)),
+    }
+)
+
 
 @callback
 def async_setup_services(hass) -> None:
@@ -56,6 +69,8 @@ def async_setup_services(hass) -> None:
             response = await api(service_call)
         elif service == SERVICE_SCAN_INTERVAL:
             response = await set_update_interval(service_call)
+        elif service == SERVICE_SCAN_DRIVING_INTERVAL:
+            response = await set_driving_interval(service_call)
 
         return response
 
@@ -72,6 +87,14 @@ def async_setup_services(hass) -> None:
         SERVICE_SCAN_INTERVAL,
         async_call_tesla_service,
         schema=SCAN_INTERVAL_SCHEMA,
+        supports_response=True,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SCAN_DRIVING_INTERVAL,
+        async_call_tesla_service,
+        schema=SCAN_DRIVING_INTERVAL_SCHEMA,
         supports_response=True,
     )
 
@@ -169,9 +192,65 @@ def async_setup_services(hass) -> None:
             "message": f"Update interval set to {update_interval} for VIN {vin}",
         }
 
+    async def set_driving_interval(call):
+        """Handle api service request.
+
+        Arguments
+            call.CONF_EMAIL {str: ""} -- email, optional
+            call.ATTR_VIN {str: ""} -- vehicle VIN, optional
+            call.CONF_SCAN_DRIVING_INTERVAL {int: 60} -- New scan interval while driving
+
+        Returns
+            bool -- True if new interval is set
+
+        """
+        _LOGGER.debug("call %s", call)
+        service_data = call.data
+        email = service_data.get(CONF_EMAIL, "")
+
+        if len(hass.config_entries.async_entries(DOMAIN)) > 1 and not email:
+            raise ValueError("Email address missing")
+        controller: Controller = None
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if (
+                len(hass.config_entries.async_entries(DOMAIN)) > 1
+                and entry.title != email
+            ):
+                continue
+            entry_data = hass.data[DOMAIN][entry.entry_id]
+            controller = entry_data["controller"]
+        if controller is None:
+            raise ValueError(f"No Tesla controllers found for email {email}")
+
+        vin = service_data.get(ATTR_VIN, "")
+        driving_interval = service_data.get(
+            CONF_SCAN_DRIVING_INTERVAL, DEFAULT_SCAN_DRIVING_INTERVAL
+        )
+        _LOGGER.debug(
+            "Service %s called with email: %s vin %s interval %s",
+            SERVICE_SCAN_DRIVING_INTERVAL,
+            email,
+            vin,
+            driving_interval,
+        )
+        old_driving_interval = controller.get_driving_interval_vin(vin=vin)
+        if old_driving_interval != driving_interval:
+            _LOGGER.debug(
+                "Changing driving_interval from %s to %s for %s",
+                old_driving_interval,
+                driving_interval,
+                vin,
+            )
+            controller.set_update_interval_vin(vin=vin, value=driving_interval)
+        return {
+            "result": True,
+            "message": f"Update driving_interval set to {driving_interval} for VIN {vin}",
+        }
+
 
 @callback
 def async_unload_services(hass) -> None:
     """Unload Tesla services."""
     hass.services.async_remove(DOMAIN, SERVICE_API)
     hass.services.async_remove(DOMAIN, SERVICE_SCAN_INTERVAL)
+    hass.services.async_remove(DOMAIN, SERVICE_SCAN_DRIVING_INTERVAL)
