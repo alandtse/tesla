@@ -8,7 +8,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v4"
 
       - name: HACS validation
         uses: "hacs/action@main"
@@ -23,8 +23,8 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v1"
+      - uses: "actions/checkout@v4"
+      - uses: "actions/setup-python@v5"
         with:
           python-version: "3.x"
       - run: python3 -m pip install black
@@ -35,9 +35,9 @@ jobs:
     name: Run tests
     steps:
       - name: Check out code from GitHub
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v4"
       - name: Set up Python 3.12
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install Poetry
@@ -52,7 +52,7 @@ jobs:
       #----------------------------------------------
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
