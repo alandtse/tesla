@@ -343,6 +343,17 @@ async def test_energy_exports(hass: HomeAssistant) -> None:
     with patch(
         "teslajsonpy.energy.SolarPowerwallSite.set_export_rule"
     ) as mock_set_export_rule:
+        # Test selecting "Nothing"
+        await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: "select.battery_home_energy_exports",
+                "option": "Nothing",
+            },
+            blocking=True,
+        )
+        mock_set_export_rule.assert_awaited_with("never")
         # Test selecting "Solar"
         await hass.services.async_call(
             SELECT_DOMAIN,
@@ -353,7 +364,7 @@ async def test_energy_exports(hass: HomeAssistant) -> None:
             },
             blocking=True,
         )
-        mock_set_export_rule.assert_awaited_once_with("pv_only")
+        mock_set_export_rule.assert_awaited_with("pv_only")
         # Test selecting "Everything"
         await hass.services.async_call(
             SELECT_DOMAIN,
