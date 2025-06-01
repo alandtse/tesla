@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 CHARGING_STATE_CHARGING = "Charging"
+CHARGING_STATE_STOPPED = "Stopped"
 
 
 def is_car_state_charging(car_state: str) -> bool:
@@ -95,7 +96,9 @@ def cast_plugged_in(val: str, car: TeslaCar) -> str:
 
     if plugged_in:
         return (
-            CHARGING_STATE_CHARGING if is_car_state_charging(car.state) else "Stopped"
+            CHARGING_STATE_CHARGING
+            if is_car_state_charging(car.state)
+            else CHARGING_STATE_STOPPED
         )
 
     return "Disconnected"
@@ -366,6 +369,8 @@ class TeslaMate:
 
             if is_car_state_charging(state):
                 self.update_charging_state(car, CHARGING_STATE_CHARGING)
+            else:
+                self.update_charging_state(car, CHARGING_STATE_STOPPED)
 
             self.update_car_state(car, None, "state", state)
 
