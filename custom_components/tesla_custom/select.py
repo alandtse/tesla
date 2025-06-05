@@ -21,6 +21,7 @@ CABIN_OPTIONS = [
 ]
 
 EXPORT_RULE = [
+    "Nothing",
     "Solar",
     "Everything",
 ]
@@ -409,8 +410,10 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
         if option == EXPORT_RULE[0]:
-            await self._energysite.set_export_rule("pv_only")
+            await self._energysite.set_export_rule("never")
         if option == EXPORT_RULE[1]:
+            await self._energysite.set_export_rule("pv_only")
+        if option == EXPORT_RULE[2]:
             await self._energysite.set_export_rule("battery_ok")
 
         self.async_write_ha_state()
@@ -418,10 +421,12 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return current energy export rule setting."""
-        if self._energysite.export_rule == "pv_only":
+        if self._energysite.export_rule == "never":
             return EXPORT_RULE[0]
-        if self._energysite.export_rule == "battery_ok":
+        if self._energysite.export_rule == "pv_only":
             return EXPORT_RULE[1]
+        if self._energysite.export_rule == "battery_ok":
+            return EXPORT_RULE[2]
         return ""
 
 

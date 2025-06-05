@@ -30,9 +30,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-CHARGING_STATE_CHARGING = "Charging"
-
-
 def is_car_state_charging(car_state: str) -> bool:
     """Check if car_state is charging."""
     return car_state == "charging"
@@ -78,29 +75,6 @@ def cast_speed(speed: int) -> int:
     return int(speed_miles)
 
 
-def cast_plugged_in(val: str, car: TeslaCar) -> str:
-    """Casts new car plugged_in.
-
-    When receiving a new value here, we also need to check the
-    car state to see if it is charging or not before returning
-    a value to be set as 'charging_state'
-    """
-    plugged_in = cast_bool(val)
-
-    logger.debug(
-        "Casting plugged_in. Current state: '%s', plugged_in: '%s'",
-        car.state,
-        plugged_in,
-    )
-
-    if plugged_in:
-        return (
-            CHARGING_STATE_CHARGING if is_car_state_charging(car.state) else "Stopped"
-        )
-
-    return "Disconnected"
-
-
 MAP_DRIVE_STATE = {
     "latitude": ("latitude", float),
     "longitude": ("longitude", float),
@@ -144,6 +118,7 @@ MAP_CHARGE_STATE = {
     "charge_port_door_open": ("charge_port_door_open", cast_bool),
     "charge_current_request": ("charge_current_request", int),
     "charge_current_request_max": ("charge_current_request_max", int),
+    "charging_state": ("charging_state", str),
 }
 
 
@@ -358,15 +333,8 @@ class TeslaMate:
             attr, cast = MAP_CHARGE_STATE[mqtt_attr]
             self.update_car_state(car, "charge_state", attr, cast(msg.payload))
 
-        elif mqtt_attr == "plugged_in":
-            self.update_charging_state(car, cast_plugged_in(msg.payload, car))
-
         elif mqtt_attr == "state":
             state = msg.payload
-
-            if is_car_state_charging(state):
-                self.update_charging_state(car, CHARGING_STATE_CHARGING)
-
             self.update_car_state(car, None, "state", state)
 
         else:

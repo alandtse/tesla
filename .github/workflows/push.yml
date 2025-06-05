@@ -10,7 +10,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v4"
 
       - name: HACS validation
         uses: "hacs/action@main"
@@ -25,7 +25,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v4"
       - uses: "actions/setup-python@v1"
         with:
           python-version: "3.x"
@@ -36,7 +36,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Setup TODO issues
     steps:
-      - uses: "actions/checkout@v3"
+      - uses: "actions/checkout@v4"
       - name: "TODO to Issue"
         uses: "alstr/todo-to-issue-action@v4"
 
@@ -45,7 +45,7 @@ jobs:
     name: Run tests
     steps:
       - name: Check out code from GitHub
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v4"
       - name: Set up Python 3.12
         uses: actions/setup-python@v2
         with:
