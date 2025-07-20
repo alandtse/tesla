@@ -122,8 +122,13 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, NumberEntity):
 
     async def async_set_native_value(self, value: int) -> None:
         """Update backup reserve percentage."""
-        await self._energysite.set_reserve_percent(value)
-        self.async_write_ha_state()
+        try:
+            await self._energysite.set_reserve_percent(value)
+        except:
+            # Hack to stop exception blocking automation until teslajsonpy is updated
+            pass
+        finally:
+            self.async_write_ha_state()
 
     @property
     def native_value(self) -> int:
