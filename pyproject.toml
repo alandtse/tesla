@@ -31,8 +31,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
-version_variable = 'pyproject.toml:version,custom_components/tesla_custom/const.py:VERSION'
-version_pattern = 'custom_components/tesla_custom/manifest.json:"version": "{version}"'
+version_toml = [
+  "pyproject.toml:tool.poetry.version"
+]
+version_variables = [
+  "custom_components/tesla_custom/const.py:VERSION",
+  "custom_components/tesla_custom/manifest.json:version"
+]
 upload_to_pypi = false
 upload_to_release = false
 changelog_sections = "feature,fix,breaking,documentation,performance,refactor"
