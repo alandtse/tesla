@@ -44,6 +44,8 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v10.2.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
+          commit: true
+          push: true
       - name: Zip tesla dir
         run: |
           cd /home/runner/work/tesla/tesla/custom_components/tesla_custom
