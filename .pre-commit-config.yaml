@@ -92,7 +92,7 @@ repos:
   #        pass_filenames: false
   #        always_run: true
   - repo: https://github.com/floatingpurr/sync_with_poetry
-    rev: "1.2.0" # the revision or tag to clone at
+    rev: "1.2.1" # the revision or tag to clone at
     hooks:
       - id: sync_with_poetry
         args: [] # optional args
