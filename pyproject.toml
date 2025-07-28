@@ -13,7 +13,7 @@ async-timeout = ">=4.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-homeassistant = ">=2024.11.0"
+homeassistant = ">=2025.2.0"
 pytest-homeassistant-custom-component = ">=0.13.107"
 bandit = ">=1.7.0"
 black = { version = ">=21.12b0", allow-prereleases = true }
@@ -42,7 +42,7 @@ commit_subject = "[skip ci] {version}"
 
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py313']
 exclude = '''
 
 (
