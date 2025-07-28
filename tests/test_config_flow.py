@@ -60,7 +60,7 @@ async def test_form(hass):
         result["flow_id"], {CONF_API_PROXY_ENABLE: False}
     )
     await hass.async_block_till_done()
-    assert result2["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result2["type"] == "form"
     assert result2["step_id"] == "credentials"
 
     with (
@@ -84,7 +84,7 @@ async def test_form(hass):
         )
         await hass.async_block_till_done()
 
-    assert result3["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result3["type"] == "create_entry"
     assert result3["title"] == TEST_USERNAME
     assert result3["data"] == {
         CONF_USERNAME: TEST_USERNAME,
@@ -131,7 +131,7 @@ async def test_form_with_proxy(hass, httpx_mock):
         result["flow_id"], {CONF_API_PROXY_ENABLE: True}
     )
     await hass.async_block_till_done()
-    assert result2["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result2["type"] == "form"
     assert result2["step_id"] == "credentials"
 
     with (
@@ -162,7 +162,7 @@ async def test_form_with_proxy(hass, httpx_mock):
         )
         await hass.async_block_till_done()
 
-    assert result3["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result3["type"] == "create_entry"
     assert result3["title"] == TEST_USERNAME
     assert result3["data"] == {
         CONF_USERNAME: TEST_USERNAME,
@@ -297,7 +297,7 @@ async def test_form_reauth(hass):
 
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
-        context={"source": config_entries.SOURCE_REAUTH},
+        context={"source": config_entries.SOURCE_REAUTH, "entry_id": entry.entry_id},
         data={CONF_USERNAME: TEST_USERNAME},
     )
     result2 = await hass.config_entries.flow.async_configure(
@@ -347,7 +347,7 @@ async def test_import(hass):
                 CONF_CLIENT_ID: "ownerapi",
             },
         )
-    assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+    assert result["type"] == "create_entry"
     assert result["title"] == TEST_USERNAME
     assert result["data"][CONF_ACCESS_TOKEN] == TEST_ACCESS_TOKEN
     assert result["data"][CONF_TOKEN] == TEST_TOKEN

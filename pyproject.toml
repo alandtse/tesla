@@ -1,19 +1,19 @@
 [tool.poetry]
 name = "tesla"
-version = "3.25.0"
+version = "3.25.1"
 description = "A fork of the Home Assistant tesla integration using a oauth proxy to login."
 authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = "^3.13.2"
 teslajsonpy = "3.13.1"
 async-timeout = ">=4.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-homeassistant = ">=2024.11.0"
+homeassistant = ">=2025.2.0"
 pytest-homeassistant-custom-component = ">=0.13.107"
 bandit = ">=1.7.0"
 black = { version = ">=21.12b0", allow-prereleases = true }
@@ -42,7 +42,7 @@ commit_subject = "[skip ci] {version}"
 
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py313']
 exclude = '''
 
 (
