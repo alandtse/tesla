@@ -41,7 +41,7 @@ jobs:
       #   run: |
       #     git commit -m "docs: update localization" -a
       - name: Python Semantic Release
-        uses: relekang/python-semantic-release@v7.34.6
+        uses: python-semantic-release/python-semantic-release@v10.2.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
       - name: Zip tesla dir
