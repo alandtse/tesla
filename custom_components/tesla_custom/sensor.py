@@ -215,7 +215,6 @@ class TeslaCarChargerRate(TeslaCarEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.SPEED
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfSpeed.MILES_PER_HOUR
-    _attr_suggested_display_precision = 1
     _attr_icon = "mdi:speedometer"
 
     @property
@@ -243,7 +242,6 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = UnitOfLength.MILES
-    _attr_suggested_display_precision = 1
     _attr_icon = "mdi:counter"
 
     @property
@@ -254,7 +252,7 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
         if odometer_value is None:
             return None
 
-        return round(odometer_value, 1)
+        return round(odometer_value, 2)
 
 
 class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
@@ -298,7 +296,6 @@ class TeslaCarRange(TeslaCarEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfLength.MILES
-    _attr_suggested_display_precision = 2
     _attr_icon = "mdi:gauge"
 
     @property
@@ -627,7 +624,6 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.DISTANCE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfLength.MILES
-    _attr_suggested_display_precision = 2
     _attr_icon = "mdi:map-marker-distance"
 
     @property
