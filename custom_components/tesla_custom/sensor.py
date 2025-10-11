@@ -254,7 +254,7 @@ class TeslaCarOdometer(TeslaCarEntity, SensorEntity):
         if odometer_value is None:
             return None
 
-        return round(odometer_value, 2)
+        return round(odometer_value, 1)
 
 
 class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
