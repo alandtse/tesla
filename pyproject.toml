@@ -8,7 +8,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13.2"
-teslajsonpy = "3.13.1"
+teslajsonpy = "3.13.2"
 async-timeout = ">=4.0.0"
 
 
