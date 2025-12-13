@@ -221,13 +221,13 @@ async def test_charger_rate_value(hass: HomeAssistant) -> None:
         state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         == UnitOfSpeed.KILOMETERS_PER_HOUR
     ):
-        assert float(state.state) == round(
+        assert float(state.state) == pytest.approx(
             SpeedConverter.convert(
                 car_mock_data.VEHICLE_DATA["charge_state"]["charge_rate"],
                 UnitOfSpeed.MILES_PER_HOUR,
                 UnitOfSpeed.KILOMETERS_PER_HOUR,
             ),
-            1,
+            rel=1e-5,
         )
     else:
         assert (
@@ -346,19 +346,19 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.my_model_s_odometer")
 
     if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
-        assert float(state.state) == round(
+        assert float(state.state) == pytest.approx(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"],
                 UnitOfLength.MILES,
                 UnitOfLength.KILOMETERS,
             ),
-            1,
+            rel=1e-5,
         )
 
     else:
         assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
-        assert float(state.state) == round(
-            car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], 1
+        assert float(state.state) == pytest.approx(
+            car_mock_data.VEHICLE_DATA["vehicle_state"]["odometer"], rel=1e-5
         )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
@@ -387,13 +387,13 @@ async def test_range_value(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.my_model_s_range")
 
     if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
-        assert float(state.state) == round(
+        assert float(state.state) == pytest.approx(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["charge_state"]["battery_range"],
                 UnitOfLength.MILES,
                 UnitOfLength.KILOMETERS,
             ),
-            2,
+            rel=1e-5,
         )
 
     else:
@@ -649,7 +649,7 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
         # This fixes an async test error. This doesn't happen when test is run individually
         return
     if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
-        assert float(state.state) == round(
+        assert float(state.state) == pytest.approx(
             DistanceConverter.convert(
                 car_mock_data.VEHICLE_DATA["drive_state"][
                     "active_route_miles_to_arrival"
@@ -657,13 +657,13 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
                 UnitOfLength.MILES,
                 UnitOfLength.KILOMETERS,
             ),
-            2,
+            rel=1e-5,
         )
     else:
         assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
-        assert float(state.state) == round(
+        assert float(state.state) == pytest.approx(
             car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"],
-            2,
+            rel=1e-5,
         )
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
