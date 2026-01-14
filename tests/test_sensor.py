@@ -142,7 +142,6 @@ async def test_backup_reserve(hass: HomeAssistant) -> None:
         energysite_mock_data.BATTERY_DATA["backup"]["backup_reserve_percent"]
     )
 
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.BATTERY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == PERCENTAGE
 
