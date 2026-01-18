@@ -458,7 +458,6 @@ class TeslaEnergyBackupReserve(TeslaEnergyEntity, SensorEntity):
     """Representation of a Tesla energy backup reserve sensor."""
 
     type = "backup reserve"
-    _attr_device_class = SensorDeviceClass.BATTERY
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = PERCENTAGE
 
