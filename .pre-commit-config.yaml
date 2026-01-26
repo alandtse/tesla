@@ -42,7 +42,7 @@ repos:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.11.2
+    rev: v4.12.1
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -51,7 +51,7 @@ repos:
   - hooks:
       - id: black
     repo: https://github.com/psf/black
-    rev: 25.9.0
+    rev: 26.1.0
   - repo: https://github.com/pre-commit/mirrors-prettier
     hooks:
       - id: prettier
@@ -71,7 +71,7 @@ repos:
   #     - id: prospector
   #       exclude: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
+    rev: 1.9.3
     hooks:
       - id: bandit
         args:
