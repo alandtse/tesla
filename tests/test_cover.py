@@ -174,11 +174,15 @@ async def test_sunroof_close(hass: HomeAssistant) -> None:
             {ATTR_ENTITY_ID: "cover.my_model_s_sunroof"},
             blocking=True,
         )
-        mock_send_command.assert_awaited_once_with("CHANGE_SUNROOF_STATE", state="close")
+        mock_send_command.assert_awaited_once_with(
+            "CHANGE_SUNROOF_STATE", state="close"
+        )
         assert car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] == "closed"
 
 
-async def test_sunroof_no_duplicate_command_when_already_open(hass: HomeAssistant) -> None:
+async def test_sunroof_no_duplicate_command_when_already_open(
+    hass: HomeAssistant,
+) -> None:
     """Tests that vent command is not sent when sunroof is already vented."""
     await setup_platform(hass, COVER_DOMAIN)
 
@@ -196,7 +200,9 @@ async def test_sunroof_no_duplicate_command_when_already_open(hass: HomeAssistan
     car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] = "closed"
 
 
-async def test_sunroof_no_duplicate_command_when_already_closed(hass: HomeAssistant) -> None:
+async def test_sunroof_no_duplicate_command_when_already_closed(
+    hass: HomeAssistant,
+) -> None:
     """Tests that close command is not sent when sunroof is already closed."""
     await setup_platform(hass, COVER_DOMAIN)
 
