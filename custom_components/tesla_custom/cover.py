@@ -8,7 +8,9 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
 
+from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -165,7 +167,17 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
     _attr_device_class = CoverDeviceClass.DAMPER
     _attr_icon = "mdi:car-select"
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
-    _enabled_by_default = False
+
+    def __init__(
+        self,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize sunroof entity."""
+        self._enabled_by_default = car._vehicle_data.get(
+            "vehicle_config", {}
+        ).get("sun_roof_installed")
+        super().__init__(car, coordinator)
 
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
