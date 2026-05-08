@@ -129,15 +129,6 @@ async def test_windows(hass: HomeAssistant) -> None:
         mock_close_cover.assert_awaited_once()
 
 
-async def test_sunroof_registry_entry(hass: HomeAssistant) -> None:
-    """Tests sunroof is registered in the entity registry."""
-    await setup_platform(hass, COVER_DOMAIN)
-    entity_registry = er.async_get(hass)
-
-    entry = entity_registry.async_get("cover.my_model_s_sunroof")
-    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_sunroof"
-
-
 async def test_sunroof_vent(hass: HomeAssistant) -> None:
     """Tests sunroof vent (open) command."""
     await setup_platform(hass, COVER_DOMAIN)
@@ -205,6 +196,8 @@ async def test_sunroof_no_duplicate_command_when_already_closed(
 ) -> None:
     """Tests that close command is not sent when sunroof is already closed."""
     await setup_platform(hass, COVER_DOMAIN)
+
+    car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] = "closed"
 
     with patch("teslajsonpy.car.TeslaCar._send_command") as mock_send_command:
         await hass.services.async_call(

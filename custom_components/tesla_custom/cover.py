@@ -172,7 +172,11 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Closing cover: %s", self.name)
         if not self.is_closed:
             data = await self._car._send_command("CHANGE_SUNROOF_STATE", state="close")
-            if data and data["response"]["result"] is True:
+            if (
+                isinstance(data, dict)
+                and isinstance(data.get("response"), dict)
+                and data["response"].get("result") is True
+            ):
                 self._car._vehicle_data["vehicle_state"]["sun_roof_state"] = "closed"
             self.async_write_ha_state()
 
@@ -181,7 +185,11 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
         _LOGGER.debug("Opening cover: %s", self.name)
         if self.is_closed:
             data = await self._car._send_command("CHANGE_SUNROOF_STATE", state="vent")
-            if data and data["response"]["result"] is True:
+            if (
+                isinstance(data, dict)
+                and isinstance(data.get("response"), dict)
+                and data["response"].get("result") is True
+            ):
                 self._car._vehicle_data["vehicle_state"]["sun_roof_state"] = "vent"
             self.async_write_ha_state()
 
