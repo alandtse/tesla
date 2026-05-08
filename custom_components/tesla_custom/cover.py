@@ -196,10 +196,9 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
     @property
     def available(self) -> bool:
         """Return True if sunroof is installed."""
-        return (
-            super().available
-            and self._car._vehicle_data.get("vehicle_config", {}).get("sun_roof_installed")
-        )
+        return super().available and self._car._vehicle_data.get(
+            "vehicle_config", {}
+        ).get("sun_roof_installed")
 
     @property
     def is_closed(self):
