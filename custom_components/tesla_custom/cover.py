@@ -174,9 +174,9 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
         coordinator: TeslaDataUpdateCoordinator,
     ) -> None:
         """Initialize sunroof entity."""
-        self._enabled_by_default = car._vehicle_data.get(
-            "vehicle_config", {}
-        ).get("sun_roof_installed")
+        self._enabled_by_default = car._vehicle_data.get("vehicle_config", {}).get(
+            "sun_roof_installed"
+        )
         super().__init__(car, coordinator)
 
     async def async_close_cover(self, **kwargs):
