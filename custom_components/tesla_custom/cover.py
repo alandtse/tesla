@@ -165,6 +165,7 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
     _attr_device_class = CoverDeviceClass.DAMPER
     _attr_icon = "mdi:car-select"
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+    _enabled_by_default = False
 
     async def async_close_cover(self, **kwargs):
         """Send close cover command."""
