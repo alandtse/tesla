@@ -28,8 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarFrunk(car, coordinator))
         entities.append(TeslaCarTrunk(car, coordinator))
         entities.append(TeslaCarWindows(car, coordinator))
-        if car._vehicle_data.get("vehicle_config", {}).get("sun_roof_installed"):
-            entities.append(TeslaCarSunRoof(car, coordinator))
+        entities.append(TeslaCarSunRoof(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -192,6 +191,14 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
             ):
                 self._car._vehicle_data["vehicle_state"]["sun_roof_state"] = "vent"
             self.async_write_ha_state()
+
+    @property
+    def available(self) -> bool:
+        """Return True if sunroof is installed."""
+        return (
+            super().available
+            and self._car._vehicle_data.get("vehicle_config", {}).get("sun_roof_installed")
+        )
 
     @property
     def is_closed(self):
