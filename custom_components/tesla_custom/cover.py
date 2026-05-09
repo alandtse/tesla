@@ -164,7 +164,7 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
     """Representation of a Tesla car sunroof cover."""
 
     type = "sunroof"
-    _attr_device_class = CoverDeviceClass.DAMPER
+    _attr_device_class = CoverDeviceClass.WINDOW
     _attr_icon = "mdi:car-select"
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
@@ -183,26 +183,16 @@ class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
         """Send close cover command."""
         _LOGGER.debug("Closing cover: %s", self.name)
         if not self.is_closed:
-            data = await self._car._send_command("CHANGE_SUNROOF_STATE", state="close")
-            if (
-                isinstance(data, dict)
-                and isinstance(data.get("response"), dict)
-                and data["response"].get("result") is True
-            ):
-                self._car._vehicle_data["vehicle_state"]["sun_roof_state"] = "closed"
+            await self._car._send_command("CHANGE_SUNROOF_STATE", state="close")
+            await self.coordinator.async_request_refresh()
             self.async_write_ha_state()
 
     async def async_open_cover(self, **kwargs):
         """Send open cover command (vent)."""
         _LOGGER.debug("Opening cover: %s", self.name)
         if self.is_closed:
-            data = await self._car._send_command("CHANGE_SUNROOF_STATE", state="vent")
-            if (
-                isinstance(data, dict)
-                and isinstance(data.get("response"), dict)
-                and data["response"].get("result") is True
-            ):
-                self._car._vehicle_data["vehicle_state"]["sun_roof_state"] = "vent"
+            await self._car._send_command("CHANGE_SUNROOF_STATE", state="vent")
+            await self.coordinator.async_request_refresh()
             self.async_write_ha_state()
 
     @property
