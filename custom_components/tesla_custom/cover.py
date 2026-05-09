@@ -8,7 +8,9 @@ from homeassistant.components.cover import (
     CoverEntityFeature,
 )
 from homeassistant.core import HomeAssistant
+from teslajsonpy.car import TeslaCar
 
+from . import TeslaDataUpdateCoordinator
 from .base import TeslaCarEntity
 from .const import DOMAIN
 
@@ -28,6 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarFrunk(car, coordinator))
         entities.append(TeslaCarTrunk(car, coordinator))
         entities.append(TeslaCarWindows(car, coordinator))
+        entities.append(TeslaCarSunRoof(car, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -155,3 +158,52 @@ class TeslaCarWindows(TeslaCarEntity, CoverEntity):
     def is_closed(self):
         """Return True if all windows are closed."""
         return self._car.is_window_closed
+
+
+class TeslaCarSunRoof(TeslaCarEntity, CoverEntity):
+    """Representation of a Tesla car sunroof cover."""
+
+    type = "sunroof"
+    _attr_device_class = CoverDeviceClass.WINDOW
+    _attr_icon = "mdi:car-select"
+    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
+
+    def __init__(
+        self,
+        car: TeslaCar,
+        coordinator: TeslaDataUpdateCoordinator,
+    ) -> None:
+        """Initialize sunroof entity."""
+        self._enabled_by_default = car._vehicle_data.get("vehicle_config", {}).get(
+            "sun_roof_installed"
+        )
+        super().__init__(car, coordinator)
+
+    async def async_close_cover(self, **kwargs):
+        """Send close cover command."""
+        _LOGGER.debug("Closing cover: %s", self.name)
+        if not self.is_closed:
+            await self._car._send_command("CHANGE_SUNROOF_STATE", state="close")
+            await self.coordinator.async_request_refresh()
+            self.async_write_ha_state()
+
+    async def async_open_cover(self, **kwargs):
+        """Send open cover command (vent)."""
+        _LOGGER.debug("Opening cover: %s", self.name)
+        if self.is_closed:
+            await self._car._send_command("CHANGE_SUNROOF_STATE", state="vent")
+            await self.coordinator.async_request_refresh()
+            self.async_write_ha_state()
+
+    @property
+    def available(self) -> bool:
+        """Return True if sunroof is installed."""
+        return super().available and self._car._vehicle_data.get(
+            "vehicle_config", {}
+        ).get("sun_roof_installed")
+
+    @property
+    def is_closed(self):
+        """Return True if sunroof is closed."""
+        state = self._car._vehicle_data.get("vehicle_state", {}).get("sun_roof_state")
+        return state == "closed"

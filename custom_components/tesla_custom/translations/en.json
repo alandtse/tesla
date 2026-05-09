@@ -56,11 +56,11 @@
         },
         "command": {
           "name": "Command",
-          "description": "Command to run. See https://github.com/zabuldon/teslajsonpy/blob/master/teslajsonpy/endpoints.json"
+          "description": "Command to run. Examples: WAKE_UP, CLIMATE_ON, START_CHARGE"
         },
         "parameters": {
           "name": "Parameters",
-          "description": "Parameters in a dictionary. `path_vars` replace variables in endpoints.json path. All others are passed directly to controller.api. For command parameters see https://tesla-api.timdorr.com/vehicle/commands."
+          "description": "Parameters as a dictionary. Use `path_vars` to replace endpoint variables. Other parameters are passed directly to the API controller."
         }
       }
     },
@@ -70,7 +70,7 @@
       "fields": {
         "scan_interval": {
           "name": "Interval (seconds)",
-          "description": "Number of seconds between each poll.  See https://github.com/alandtse/tesla/wiki/Polling-policy more information."
+          "description": "Number of seconds between each poll. Use -1 for adaptive polling, or specify 1-3600 seconds for manual intervals."
         },
         "email": {
           "name": "Email address",
