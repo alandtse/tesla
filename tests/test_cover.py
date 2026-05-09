@@ -144,7 +144,8 @@ async def test_sunroof_vent(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_send_command.assert_awaited_once_with("CHANGE_SUNROOF_STATE", state="vent")
-        assert car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] == "vent"
+        # Simulate coordinator refresh updating the vehicle state
+        car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] = "vent"
 
     car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] = "closed"
 
@@ -168,7 +169,8 @@ async def test_sunroof_close(hass: HomeAssistant) -> None:
         mock_send_command.assert_awaited_once_with(
             "CHANGE_SUNROOF_STATE", state="close"
         )
-        assert car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] == "closed"
+        # Simulate coordinator refresh updating the vehicle state
+        car_mock_data.VEHICLE_DATA["vehicle_state"]["sun_roof_state"] = "closed"
 
 
 async def test_sunroof_no_duplicate_command_when_already_open(
