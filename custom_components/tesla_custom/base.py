@@ -12,6 +12,21 @@ from . import TeslaDataUpdateCoordinator
 from .const import ATTRIBUTION, DOMAIN
 
 
+def device_identifier(tesla_device: TeslaCar | EnergySite) -> tuple[str, int]:
+    """Return the (DOMAIN, id) device-registry identifier for a Tesla device.
+
+    Centralizes device identity so device registration (``device_info``) and
+    device removal (``async_remove_config_entry_device``) cannot drift apart.
+    Cars are identified by ``car.id``; energy sites by
+    ``energysite.energysite_id``. Note Home Assistant types identifiers as
+    ``tuple[str, str]``, but the integer ids are kept here so existing
+    registered devices are not migrated.
+    """
+    if isinstance(tesla_device, EnergySite):
+        return (DOMAIN, tesla_device.energysite_id)
+    return (DOMAIN, tesla_device.id)
+
+
 class TeslaBaseEntity(CoordinatorEntity[TeslaDataUpdateCoordinator]):
     """Representation of a Tesla device."""
 
@@ -52,7 +67,7 @@ class TeslaCarEntity(TeslaBaseEntity):
             else f"Tesla Model {str(vin[3]).upper()}"
         )
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, car.id)},
+            identifiers={device_identifier(car)},
             name=vehicle_name,
             manufacturer="Tesla",
             model=car.car_type,
@@ -126,7 +141,7 @@ class TeslaEnergyEntity(TeslaBaseEntity):
             # Non-Powerwall sites do not provide version info
             sw_version = "Unavailable"
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, energysite_id)},
+            identifiers={device_identifier(energysite)},
             manufacturer="Tesla",
             model=energysite.resource_type.title(),
             name=energysite.site_name,
