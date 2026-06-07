@@ -187,18 +187,21 @@ async def test_remove_with_real_loaded_entry(
 
     device_registry = dr.async_get(hass)
 
-    # The car and both energy sites must be registered and protected.
+    # The car must be registered and protected.
     car_device = device_registry.async_get_device(identifiers={(DOMAIN, CAR_ID)})
     assert car_device is not None
     assert await async_remove_config_entry_device(hass, mock_entry, car_device) is False
 
-    for site_id in (SOLAR_SITE_ID, BATTERY_SITE_ID):
-        site_device = device_registry.async_get_device(identifiers={(DOMAIN, site_id)})
-        assert site_device is not None
-        assert (
-            await async_remove_config_entry_device(hass, mock_entry, site_device)
-            is False
-        )
+    # Every device the platform actually registered for this entry is live and
+    # must be protected. Which energy sites register depends on the platform
+    # (e.g. binary_sensor only creates entities for battery sites), so enumerate
+    # the registry rather than assuming a fixed set.
+    entry_devices = dr.async_entries_for_config_entry(
+        device_registry, mock_entry.entry_id
+    )
+    assert entry_devices
+    for device in entry_devices:
+        assert await async_remove_config_entry_device(hass, mock_entry, device) is False
 
     # A stale device under the same entry (e.g. a car removed from the
     # account) is no longer provided and must be removable.
