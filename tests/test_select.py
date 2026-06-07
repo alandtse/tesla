@@ -134,6 +134,11 @@ async def test_car_cooling_seat_select(hass: HomeAssistant) -> None:
     # Test cars with cooling/heated seats
     del car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"]
     car_mock_data.VEHICLE_DATA["vehicle_config"]["has_seat_cooling"] = True
+    # The "Off" assertion below relies on the seat being in auto mode so that
+    # turning off issues a heater request. Set it explicitly rather than
+    # inheriting the leaked global state from test_car_heated_seat_select, which
+    # is not guaranteed to run first under pytest-xdist (-n auto).
+    car_mock_data.VEHICLE_DATA["climate_state"]["auto_seat_climate_left"] = True
 
     with patch(
         "teslajsonpy.car.TeslaCar.remote_seat_heater_request"
