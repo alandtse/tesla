@@ -23,7 +23,6 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.event import async_call_later
-from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import httpx
 from teslajsonpy import Controller as TeslaAPI
@@ -51,7 +50,7 @@ from .const import (
 )
 from .services import async_setup_services, async_unload_services
 from .teslamate import TeslaMate
-from .util import SSL_CONTEXT
+from .util import SSL_CONTEXT, create_tesla_auth_ssl_context, create_tesla_httpx_client
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -155,9 +154,8 @@ async def async_setup_entry(hass, config_entry):
                 api_proxy_cert,
             )
 
-    async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
-    )
+    auth_ssl_context = await hass.async_add_executor_job(create_tesla_auth_ssl_context)
+    async_client = create_tesla_httpx_client(auth_ssl_context)
     email = config_entry.title
 
     if not hass.data[DOMAIN]:
