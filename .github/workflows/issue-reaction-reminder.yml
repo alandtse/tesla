@@ -1,0 +1,52 @@
+name: Issue reaction reminder
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  issues: write
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post reminder comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const issue = context.payload.issue;
+
+            const hasRelevantLabel = issue.labels.some(label =>
+              label.name === "car" || label.name === "powerwall"
+            );
+
+            if (!hasRelevantLabel) return;
+
+            const reminderText =
+            const reminderText =
+              "If you’re affected by this issue or see an existing comment that applies to you, please use 👍 reactions instead of commenting \"same here\". " +
+              "Only add a comment if you have new information that can help investigate the issue. " +
+              "This helps keep the thread clean and easier to track.";
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number
+            });
+
+            const alreadyPosted = comments.some(c =>
+              c.body?.includes("use 👍 reactions") &&
+              c.body?.includes("same here")
+            );
+
+            if (alreadyPosted) return;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: reminderText
+            });
