@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tesla"
-version = "3.26.1"
+version = "3.26.2"
 description = "A fork of the Home Assistant tesla integration using a oauth proxy to login."
 authors = ["Alan D. Tse <alandtse@gmail.com>"]
 license = "Apache-2.0"
@@ -70,6 +70,7 @@ minversion = "7.2"
 addopts = "-ra -q"
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
