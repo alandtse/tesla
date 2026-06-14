@@ -249,7 +249,10 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
 
     config = {}
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE},
+        timeout=60,
+        verify=TESLA_SSL_CONTEXT,
+        http2=True,
     )
 
     try:

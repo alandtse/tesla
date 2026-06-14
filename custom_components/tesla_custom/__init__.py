@@ -156,7 +156,10 @@ async def async_setup_entry(hass, config_entry):
             )
 
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE},
+        timeout=60,
+        verify=TESLA_SSL_CONTEXT,
+        http2=True,
     )
     email = config_entry.title
 
