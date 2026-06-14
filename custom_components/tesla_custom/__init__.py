@@ -51,7 +51,7 @@ from .const import (
 )
 from .services import async_setup_services, async_unload_services
 from .teslamate import TeslaMate
-from .util import SSL_CONTEXT
+from .util import TESLA_SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -145,10 +145,10 @@ async def async_setup_entry(hass, config_entry):
     if api_proxy_cert := config.get(CONF_API_PROXY_CERT):
         try:
             await hass.async_add_executor_job(
-                SSL_CONTEXT.load_verify_locations, api_proxy_cert
+                TESLA_SSL_CONTEXT.load_verify_locations, api_proxy_cert
             )
             if _LOGGER.isEnabledFor(logging.DEBUG):
-                _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
+                _LOGGER.debug("Trusting CA: %s", TESLA_SSL_CONTEXT.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
@@ -156,7 +156,7 @@ async def async_setup_entry(hass, config_entry):
             )
 
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
     )
     email = config_entry.title
 

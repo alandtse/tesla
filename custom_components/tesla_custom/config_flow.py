@@ -42,7 +42,7 @@ from .const import (
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
-from .util import SSL_CONTEXT
+from .util import TESLA_SSL_CONTEXT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -249,7 +249,7 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
 
     config = {}
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
     )
 
     try:
