@@ -15,7 +15,7 @@ except ImportError:
     SSL_CONTEXT = client_context()
 
 
-def create_tesla_ssl_context() -> httpx.AsyncHTTPTransport:
+def create_tesla_ssl_context() -> ssl.SSLContext:
     """Return a fresh SSL context capped at TLS 1.2 for each caller.
 
     A module-level shared context would be mutated by every async_setup_entry

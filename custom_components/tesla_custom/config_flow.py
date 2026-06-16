@@ -16,6 +16,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
+import ssl
 import httpx
 from teslajsonpy import Controller as TeslaAPI, TeslaException
 from teslajsonpy.const import AUTH_DOMAIN
@@ -248,10 +249,19 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
     """
 
     config = {}
+    tesla_ssl_context = create_tesla_ssl_context()
+
+    if api_proxy_cert := data.get(CONF_API_PROXY_CERT):
+        try:
+            tesla_ssl_context.load_verify_locations(api_proxy_cert)
+        except (FileNotFoundError, ssl.SSLError):
+            _LOGGER.warning(
+                "Unable to load custom SSL certificate from %s",
+                api_proxy_cert,
+            )
+
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE},
-        timeout=60,
-        verify=create_tesla_ssl_context(),
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=tesla_ssl_context
     )
 
     try:
