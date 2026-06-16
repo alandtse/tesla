@@ -3,6 +3,7 @@
 from http import HTTPStatus
 import logging
 import os
+import ssl
 
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import (
@@ -16,7 +17,6 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
-import ssl
 import httpx
 from teslajsonpy import Controller as TeslaAPI, TeslaException
 from teslajsonpy.const import AUTH_DOMAIN
