@@ -253,7 +253,9 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
 
     if api_proxy_cert := data.get(CONF_API_PROXY_CERT):
         try:
-            tesla_ssl_context.load_verify_locations(api_proxy_cert)
+            await hass.async_add_executor_job(
+                tesla_ssl_context.load_verify_locations, api_proxy_cert
+            )
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
