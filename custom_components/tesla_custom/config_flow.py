@@ -3,6 +3,7 @@
 from http import HTTPStatus
 import logging
 import os
+import ssl
 
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import (
@@ -42,7 +43,7 @@ from .const import (
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
-from .util import TESLA_SSL_CONTEXT
+from .util import create_tesla_ssl_context
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -248,8 +249,21 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
     """
 
     config = {}
+    tesla_ssl_context = create_tesla_ssl_context()
+
+    if api_proxy_cert := data.get(CONF_API_PROXY_CERT):
+        try:
+            await hass.async_add_executor_job(
+                tesla_ssl_context.load_verify_locations, api_proxy_cert
+            )
+        except (FileNotFoundError, ssl.SSLError):
+            _LOGGER.warning(
+                "Unable to load custom SSL certificate from %s",
+                api_proxy_cert,
+            )
+
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=tesla_ssl_context
     )
 
     try:

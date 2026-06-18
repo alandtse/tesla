@@ -51,7 +51,7 @@ from .const import (
 )
 from .services import async_setup_services, async_unload_services
 from .teslamate import TeslaMate
-from .util import TESLA_SSL_CONTEXT
+from .util import create_tesla_ssl_context
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,13 +142,15 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
+    tesla_ssl_context = create_tesla_ssl_context()
+
     if api_proxy_cert := config.get(CONF_API_PROXY_CERT):
         try:
             await hass.async_add_executor_job(
-                TESLA_SSL_CONTEXT.load_verify_locations, api_proxy_cert
+                tesla_ssl_context.load_verify_locations, api_proxy_cert
             )
             if _LOGGER.isEnabledFor(logging.DEBUG):
-                _LOGGER.debug("Trusting CA: %s", TESLA_SSL_CONTEXT.get_ca_certs()[-1])
+                _LOGGER.debug("Trusting CA: %s", tesla_ssl_context.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
@@ -156,7 +158,7 @@ async def async_setup_entry(hass, config_entry):
             )
 
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=TESLA_SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=tesla_ssl_context
     )
     email = config_entry.title
 
