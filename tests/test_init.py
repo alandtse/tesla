@@ -1,5 +1,8 @@
 """Tests for the Tesla integration setup and device removal."""
 
+import asyncio
+from datetime import datetime
+from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 
 from homeassistant.config_entries import ConfigEntry
@@ -9,7 +12,10 @@ import pytest
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.energy import SolarPowerwallSite, SolarSite
 
-from custom_components.tesla_custom import async_remove_config_entry_device
+from custom_components.tesla_custom import (
+    TeslaDataUpdateCoordinator,
+    async_remove_config_entry_device,
+)
 from custom_components.tesla_custom.base import device_identifier
 from custom_components.tesla_custom.const import DOMAIN
 
@@ -215,3 +221,55 @@ async def test_remove_with_real_loaded_entry(
 def test_config_entry_title_is_username() -> None:
     """Sanity check that the shared fixture username constant is wired."""
     assert TEST_USERNAME == "test-username"
+
+
+def _controller_with_update_error(error: Exception):
+    """Return a minimal controller for coordinator update tests."""
+    controller = MagicMock()
+    controller.is_token_refreshed.return_value = False
+    controller.update = AsyncMock(side_effect=error)
+    controller.get_last_update_time.return_value = datetime.now().timestamp()
+    controller.get_last_wake_up_time.return_value = 0
+    controller.is_car_online.return_value = True
+    controller.update_interval = 660
+    return controller
+
+
+async def test_update_vehicles_key_error_reloads_entry(hass: HomeAssistant) -> None:
+    """A new vehicle appearing during product refresh reloads the entry."""
+    config_entry = _config_entry()
+    controller = _controller_with_update_error(KeyError("VIN2"))
+    hass.config_entries.async_reload = AsyncMock()
+    coordinator = TeslaDataUpdateCoordinator(
+        hass,
+        config_entry=config_entry,
+        controller=controller,
+        reload_lock=asyncio.Lock(),
+        update_vehicles=True,
+    )
+
+    assert await coordinator._async_update_data() is None
+
+    controller.update.assert_awaited_once_with(
+        vins=set(), energy_site_ids=set(), update_vehicles=True
+    )
+    hass.config_entries.async_reload.assert_awaited_once_with("test_entry")
+
+
+async def test_vehicle_key_error_is_not_swallowed(hass: HomeAssistant) -> None:
+    """Vehicle-specific KeyErrors still surface as programming/data errors."""
+    config_entry = _config_entry()
+    controller = _controller_with_update_error(KeyError("VIN2"))
+    hass.config_entries.async_reload = AsyncMock()
+    coordinator = TeslaDataUpdateCoordinator(
+        hass,
+        config_entry=config_entry,
+        controller=controller,
+        reload_lock=asyncio.Lock(),
+        vin=car_mock_data.VIN,
+    )
+
+    with pytest.raises(KeyError):
+        await coordinator._async_update_data()
+
+    hass.config_entries.async_reload.assert_not_awaited()
