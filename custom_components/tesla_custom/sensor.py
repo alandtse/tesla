@@ -1,3 +1,6 @@
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 """Support for the Tesla sensors."""
 
 from datetime import datetime, timedelta
@@ -390,17 +393,28 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         super().__init__(energysite, coordinator)
 
     @property
-    def native_value(self) -> float:
+    def native_value(self):
         """Return power in Watts."""
+        value = None
         if self.type == "solar power":
-            return round(self._energysite.solar_power)
-        if self.type == "grid power":
-            return round(self._energysite.grid_power)
-        if self.type == "load power":
-            return round(self._energysite.load_power)
-        if self.type == "battery power":
-            return round(self._energysite.battery_power)
-        return 0
+            value = self._energysite.solar_power
+        elif self.type == "grid power":
+            value = self._energysite.grid_power
+        elif self.type == "load power":
+            value = self._energysite.load_power
+        elif self.type == "battery power":
+            value = self._energysite.battery_power
+
+        if not isinstance(value, (int, float)):
+            if value is not None:
+                _LOGGER.warning(
+                    "Energy site %s returned unexpected data for %s: %s",
+                    self._energysite.energysite_id,
+                    self.type,
+                    type(value).__name__,
+                )
+            return None
+        return round(value)
 
 
 class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
