@@ -382,6 +382,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
     ) -> None:
         """Initialize power sensor."""
         self.type = sensor_type
+        self._unavailable_logged = False
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
         if self.type == "grid power":
@@ -406,14 +407,16 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
             value = self._energysite.battery_power
 
         if not isinstance(value, (int, float)):
-            if value is not None:
+            if value is not None and not self._unavailable_logged:
                 _LOGGER.warning(
                     "Energy site %s returned unexpected data for %s: %s",
                     self._energysite.energysite_id,
                     self.type,
                     type(value).__name__,
                 )
+                self._unavailable_logged = True
             return None
+        self._unavailable_logged = False
         return round(value)
 
 
