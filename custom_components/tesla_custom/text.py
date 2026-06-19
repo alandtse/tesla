@@ -1,4 +1,4 @@
-"""Support for Tesla numbers."""
+"""Support for Tesla text entities."""
 
 from homeassistant.components.text import TextEntity, TextMode
 from homeassistant.core import HomeAssistant
@@ -12,7 +12,7 @@ from .teslamate import TeslaMate
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
-    """Set up the Tesla numbers by config_entry."""
+    """Set up the Tesla text entities by config_entry."""
     entry_data = hass.data[DOMAIN][config_entry.entry_id]
     coordinators = entry_data["coordinators"]
     cars = entry_data["cars"]
