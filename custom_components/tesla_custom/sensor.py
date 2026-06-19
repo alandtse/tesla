@@ -645,9 +645,13 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the distance to arrival."""
-        if self._car.active_route_miles_to_arrival is None:
+        value = self._car.active_route_miles_to_arrival
+        if value is None:
             return None
-        return round(self._car.active_route_miles_to_arrival, 2)
+        try:
+            return round(float(value), 2)
+        except (ValueError, TypeError):
+            return None
 
 
 class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
