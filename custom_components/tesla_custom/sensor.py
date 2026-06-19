@@ -649,7 +649,7 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
         if value is None:
             return None
         try:
-            return float(value)
+            return round(float(value), 2)
         except (ValueError, TypeError):
             return None
 
