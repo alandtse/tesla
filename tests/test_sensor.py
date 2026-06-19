@@ -643,16 +643,15 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.my_model_s_distance_to_arrival")
     assert state
     assert state.state
-    if state.state == "unknown":
-        # TODO: Fix async test_distance_to_arrival failing in ci
-        # This fixes an async test error. This doesn't happen when test is run individually
-        return
+
+    expected_miles = car_mock_data.VEHICLE_DATA["drive_state"][
+        "active_route_miles_to_arrival"
+    ]
+
     if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
         assert float(state.state) == pytest.approx(
             DistanceConverter.convert(
-                car_mock_data.VEHICLE_DATA["drive_state"][
-                    "active_route_miles_to_arrival"
-                ],
+                expected_miles,
                 UnitOfLength.MILES,
                 UnitOfLength.KILOMETERS,
             ),
@@ -661,7 +660,7 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
     else:
         assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.MILES
         assert float(state.state) == pytest.approx(
-            car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"],
+            expected_miles,
             rel=1e-5,
         )
 
