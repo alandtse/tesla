@@ -466,6 +466,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=config_entry,
             name=DOMAIN,
             update_interval=update_interval,
         )
@@ -503,6 +504,15 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                 # another coordinator is already reloading.
                 _LOGGER.debug("Config entry is already being reloaded")
                 return
+            async with self.reload_lock:
+                await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+        except KeyError as err:
+            if not self.update_vehicles:
+                raise
+            if self.reload_lock.locked():
+                _LOGGER.debug("Config entry is already being reloaded")
+                return
+            _LOGGER.info("Reloading config entry after vehicle list changed")
             async with self.reload_lock:
                 await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
