@@ -643,7 +643,7 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     _attr_icon = "mdi:map-marker-distance"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the distance to arrival."""
         if self._car.active_route_miles_to_arrival is None:
             return None
