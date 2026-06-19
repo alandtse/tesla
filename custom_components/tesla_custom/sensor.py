@@ -394,7 +394,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         super().__init__(energysite, coordinator)
 
     @property
-    def native_value(self):
+    def native_value(self) -> float | None:
         """Return power in Watts."""
         value = None
         if self.type == "solar power":
@@ -406,7 +406,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         elif self.type == "battery power":
             value = self._energysite.battery_power
 
-        if not isinstance(value, (int, float)):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
             if value is not None and not self._unavailable_logged:
                 _LOGGER.warning(
                     "Energy site %s returned unexpected data for %s: %s",
