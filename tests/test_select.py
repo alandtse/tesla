@@ -432,11 +432,14 @@ async def test_powerwall_mode(hass: HomeAssistant) -> None:
     """Tests powerwall combined charge/discharge/hold mode select."""
     await setup_platform(hass, SELECT_DOMAIN)
 
-    with patch(
-        "teslajsonpy.energy.SolarPowerwallSite.set_operation_mode"
-    ) as mock_set_operation_mode, patch(
-        "teslajsonpy.energy.SolarPowerwallSite.set_grid_charging"
-    ) as mock_set_grid_charging:
+    with (
+        patch(
+            "teslajsonpy.energy.SolarPowerwallSite.set_operation_mode"
+        ) as mock_set_operation_mode,
+        patch(
+            "teslajsonpy.energy.SolarPowerwallSite.set_grid_charging"
+        ) as mock_set_grid_charging,
+    ):
         # Test selecting "Charge from Grid"
         await hass.services.async_call(
             SELECT_DOMAIN,
