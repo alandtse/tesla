@@ -1,3 +1,6 @@
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 """Support for the Tesla sensors."""
 
 from datetime import datetime, timedelta
@@ -379,6 +382,7 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
     ) -> None:
         """Initialize power sensor."""
         self.type = sensor_type
+        self._unavailable_logged = False
         if self.type == "solar power":
             self._attr_icon = "mdi:solar-power-variant"
         if self.type == "grid power":
@@ -390,17 +394,30 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         super().__init__(energysite, coordinator)
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return power in Watts."""
+        value = None
         if self.type == "solar power":
-            return round(self._energysite.solar_power)
-        if self.type == "grid power":
-            return round(self._energysite.grid_power)
-        if self.type == "load power":
-            return round(self._energysite.load_power)
-        if self.type == "battery power":
-            return round(self._energysite.battery_power)
-        return 0
+            value = self._energysite.solar_power
+        elif self.type == "grid power":
+            value = self._energysite.grid_power
+        elif self.type == "load power":
+            value = self._energysite.load_power
+        elif self.type == "battery power":
+            value = self._energysite.battery_power
+
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            if value is not None and not self._unavailable_logged:
+                _LOGGER.warning(
+                    "Energy site %s returned unexpected data for %s: %s",
+                    self._energysite.energysite_id,
+                    self.type,
+                    type(value).__name__,
+                )
+                self._unavailable_logged = True
+            return None
+        self._unavailable_logged = False
+        return round(value)
 
 
 class TeslaEnergyBattery(TeslaEnergyEntity, SensorEntity):
@@ -626,11 +643,15 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
     _attr_icon = "mdi:map-marker-distance"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the distance to arrival."""
-        if self._car.active_route_miles_to_arrival is None:
+        value = self._car.active_route_miles_to_arrival
+        if value is None:
             return None
-        return round(self._car.active_route_miles_to_arrival, 2)
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return None
 
 
 class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
