@@ -652,9 +652,9 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
         assert state.state == STATE_UNKNOWN
         return
 
-    assert state.state != STATE_UNKNOWN, (
-        f"Sensor returned unknown state despite valid mock data: {expected_miles}"
-    )
+    assert (
+        state.state != STATE_UNKNOWN
+    ), f"Sensor returned unknown state despite valid mock data: {expected_miles}"
 
     if state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfLength.KILOMETERS:
         assert float(state.state) == pytest.approx(
