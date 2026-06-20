@@ -387,14 +387,21 @@ class TeslaEnergyPowerwallMode(TeslaEnergyEntity, SelectEntity):
     async def async_select_option(self, option: str, **kwargs):
         """Change the selected option."""
         if option == POWERWALL_MODE[0]:  # Charge from Grid
-            await self._energysite.set_operation_mode("self_consumption")
-            await self._energysite.set_grid_charging(True)
+            op_mode, grid_charging = "self_consumption", True
         elif option == POWERWALL_MODE[1]:  # Discharge
-            await self._energysite.set_operation_mode("self_consumption")
-            await self._energysite.set_grid_charging(False)
+            op_mode, grid_charging = "self_consumption", False
         elif option == POWERWALL_MODE[2]:  # Hold (use Grid)
-            await self._energysite.set_operation_mode("autonomous")
-            await self._energysite.set_grid_charging(True)
+            op_mode, grid_charging = "autonomous", True
+        else:
+            return
+        try:
+            await self._energysite.set_operation_mode(op_mode)
+            await self._energysite.set_grid_charging(grid_charging)
+        except Exception:
+            _LOGGER.error(
+                "Failed to set powerwall mode to %s", option
+            )
+            return
         self.async_write_ha_state()
 
     @property
