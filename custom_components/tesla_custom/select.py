@@ -3,8 +3,8 @@
 import logging
 
 from homeassistant.components.select import SelectEntity
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
@@ -399,9 +399,7 @@ class TeslaEnergyPowerwallMode(TeslaEnergyEntity, SelectEntity):
             await self._energysite.set_operation_mode(op_mode)
             await self._energysite.set_grid_charging(grid_charging)
         except Exception:
-            _LOGGER.error(
-                "Failed to set powerwall mode to %s", option
-            )
+            _LOGGER.error("Failed to set powerwall mode to %s", option)
             return
         self.async_write_ha_state()
 
