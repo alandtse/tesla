@@ -3,6 +3,7 @@
 import logging
 
 from homeassistant.components.select import SelectEntity
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
@@ -415,7 +416,7 @@ class TeslaEnergyPowerwallMode(TeslaEnergyEntity, SelectEntity):
             return POWERWALL_MODE[1]
         if op_mode == "autonomous" and grid_charging:
             return POWERWALL_MODE[2]
-        return ""
+        return None
 
 
 class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
@@ -475,7 +476,7 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
             return EXPORT_RULE[1]
         if self._energysite.export_rule == "battery_ok":
             return EXPORT_RULE[2]
-        return ""
+        return None
 
 
 class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
@@ -505,4 +506,4 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
             return OPERATION_MODE[1]
         if self._energysite.operation_mode == "backup":
             return OPERATION_MODE[2]
-        return ""
+        return None
