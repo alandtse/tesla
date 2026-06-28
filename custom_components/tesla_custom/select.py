@@ -4,6 +4,7 @@ import logging
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
@@ -72,6 +73,12 @@ OPERATION_MODE = [
     "Backup",
 ]
 
+POWERWALL_MODE = [
+    "Charge from Grid",
+    "Discharge",
+    "Hold (use Grid)",
+]
+
 SEAT_ID_MAP = {
     "left": 0,
     "right": 1,
@@ -119,6 +126,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         coordinator = coordinators[energy_site_id]
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyOperationMode(energysite, coordinator))
+            entities.append(TeslaEnergyPowerwallMode(energysite, coordinator))
         if energysite.resource_type == RESOURCE_TYPE_BATTERY and energysite.has_solar:
             entities.append(TeslaEnergyExportRule(energysite, coordinator))
             entities.append(TeslaEnergyGridCharging(energysite, coordinator))
@@ -370,6 +378,45 @@ class TeslaCarCabinOverheatProtection(TeslaCarEntity, SelectEntity):
         return self._car.cabin_overheat_protection
 
 
+class TeslaEnergyPowerwallMode(TeslaEnergyEntity, SelectEntity):
+    """Representation of a Tesla Powerwall combined charge/discharge/hold mode."""
+
+    type = "powerwall mode"
+    _attr_options = POWERWALL_MODE
+    _attr_icon = "mdi:battery-charging"
+
+    async def async_select_option(self, option: str, **kwargs):
+        """Change the selected option."""
+        if option == POWERWALL_MODE[0]:  # Charge from Grid
+            op_mode, grid_charging = "self_consumption", True
+        elif option == POWERWALL_MODE[1]:  # Discharge
+            op_mode, grid_charging = "self_consumption", False
+        elif option == POWERWALL_MODE[2]:  # Hold (use Grid)
+            op_mode, grid_charging = "autonomous", True
+        else:
+            return
+        try:
+            await self._energysite.set_operation_mode(op_mode)
+            await self._energysite.set_grid_charging(grid_charging)
+        except Exception:
+            _LOGGER.error("Failed to set powerwall mode to %s", option)
+            return
+        self.async_write_ha_state()
+
+    @property
+    def current_option(self) -> str:
+        """Return current powerwall mode."""
+        op_mode = self._energysite.operation_mode
+        grid_charging = self._energysite.grid_charging
+        if op_mode == "self_consumption" and grid_charging:
+            return POWERWALL_MODE[0]
+        if op_mode == "self_consumption" and not grid_charging:
+            return POWERWALL_MODE[1]
+        if op_mode == "autonomous" and grid_charging:
+            return POWERWALL_MODE[2]
+        return None
+
+
 class TeslaEnergyGridCharging(TeslaEnergyEntity, SelectEntity):
     """Representation of a Tesla energy site grid charging select."""
 
@@ -427,7 +474,7 @@ class TeslaEnergyExportRule(TeslaEnergyEntity, SelectEntity):
             return EXPORT_RULE[1]
         if self._energysite.export_rule == "battery_ok":
             return EXPORT_RULE[2]
-        return ""
+        return None
 
 
 class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
@@ -457,4 +504,4 @@ class TeslaEnergyOperationMode(TeslaEnergyEntity, SelectEntity):
             return OPERATION_MODE[1]
         if self._energysite.operation_mode == "backup":
             return OPERATION_MODE[2]
-        return ""
+        return None

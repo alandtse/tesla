@@ -1,4 +1,5 @@
 import logging
+import math
 
 _LOGGER = logging.getLogger(__name__)
 """Support for the Tesla sensors."""
@@ -406,7 +407,11 @@ class TeslaEnergyPowerSensor(TeslaEnergyEntity, SensorEntity):
         elif self.type == "battery power":
             value = self._energysite.battery_power
 
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+        ):
             if value is not None and not self._unavailable_logged:
                 _LOGGER.warning(
                     "Energy site %s returned unexpected data for %s: %s",
@@ -649,9 +654,12 @@ class TeslaCarDistanceToArrival(TeslaCarEntity, SensorEntity):
         if value is None:
             return None
         try:
-            return float(value)
+            distance = float(value)
         except (ValueError, TypeError):
             return None
+        if not math.isfinite(distance):
+            return None
+        return distance
 
 
 class TeslaCarDataUpdateTime(TeslaCarEntity, SensorEntity):
