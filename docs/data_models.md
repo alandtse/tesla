@@ -5,13 +5,13 @@
 ```mermaid
 graph TB
     Coordinator["TeslaDataUpdateCoordinator<br/>State Container"]
-    
+
     Vehicles["Vehicle State<br/>Charge, Climate, Location, etc"]
     Sites["Energy Site State<br/>Battery, Power, Grid"]
-    
+
     Coordinator --> Vehicles
     Coordinator --> Sites
-    
+
     Entities["Entities<br/>Read from coordinator data"]
     Entities --> Vehicles
     Entities --> Sites
@@ -73,10 +73,10 @@ vehicle_response = {
     "display_name": str,                # User-set display name
     "api_version": int,                 # API version
     "option_codes": str,                # Vehicle option codes
-    
+
     # === VEHICLE STATE ===
     "state": str,                       # "online", "asleep", "offline"
-    
+
     # === CHARGE STATE ===
     "charge_state": {
         "charging_state": str,          # "Charging", "Complete", "Stopped", "Disconnected"
@@ -104,7 +104,7 @@ vehicle_response = {
         "scheduled_charging_start_time": int | None,
         "user_charge_enable_request": bool | None,
     },
-    
+
     # === CLIMATE STATE ===
     "climate_state": {
         "inside_temp": float | None,    # Celsius
@@ -123,18 +123,18 @@ vehicle_response = {
         "side_mirror_heaters": bool | None,
         "wiper_blade_heater": bool,
     },
-    
+
     # === VEHICLE STATE (DOORS, WINDOWS, LOCKS) ===
     "vehicle_state": {
         "is_user_present": bool,
         "locked": bool,
-        
+
         # Door states (0=closed, >0=open)
         "fd_window": int,               # Front driver window
         "rd_window": int,               # Rear driver window
         "fp_window": int,               # Front passenger window
         "rp_window": int,               # Rear passenger window
-        
+
         # Door open status (0=closed, 1=open)
         "df": int,                      # Driver front
         "dr": int,                      # Driver rear
@@ -142,37 +142,37 @@ vehicle_response = {
         "pr": int,                      # Passenger rear
         "ft": int,                      # Frunk (front trunk)
         "rt": int,                      # Rear trunk
-        
+
         # Charge port
         "charge_port_latch": str,       # "Engaged", "Disengaged"
         "charge_port_door_open": bool,
-        
+
         # Sunroof
         "sun_roof_installed": bool | None,
         "sun_roof_percent_open": int | None,
         "sun_roof_state": str | None,
-        
+
         # Security
         "sentry_mode": bool,
         "is_user_present": bool,
-        
+
         # Seats
         "seat_heater_left": int | None,  # 0-3 (off to high)
         "seat_heater_right": int | None,
         "seat_heater_rear_center": int | None,
         "seat_heater_rear_left": int | None,
         "seat_heater_rear_right": int | None,
-        
+
         # Parking brake
         "parking_brake_on": bool,
-        
+
         # Other
         "odometer": float,              # miles or km
         "front_bumper_damage": bool | None,
         "rear_bumper_damage": bool | None,
         # ... and more
     },
-    
+
     # === DRIVE STATE (LOCATION & NAVIGATION) ===
     "drive_state": {
         "latitude": float,              # GPS latitude
@@ -181,7 +181,7 @@ vehicle_response = {
         "gps_as_of": int,               # Unix timestamp
         "power": int,                   # kW (positive=drive, negative=regen)
         "shift_state": str | None,      # "D", "R", "N", "P"
-        
+
         # Active route/navigation
         "active_route_destination": str,
         "active_route_energy_at_arrival": int | None,
@@ -189,11 +189,11 @@ vehicle_response = {
         "active_route_longitude": float | None,
         "active_route_miles_to_arrival": float | None,
         "active_route_minutes_to_arrival": int | None,
-        
+
         # Speed & movement
         "speed": int | None,            # mph or km/h
     },
-    
+
     # === SOFTWARE UPDATE ===
     "software_update": {
         "install_perc": int | None,     # 0-100
@@ -202,7 +202,7 @@ vehicle_response = {
         "expected_duration_sec": int | None,
         "scheduled_time_ms": int | None,
     },
-    
+
     # === TIRE PRESSURE ===
     "vehicle_state": {
         # ... (nested in vehicle_state above)
@@ -213,7 +213,7 @@ vehicle_response = {
         "rl": float,                    # Rear left
         "rr": float,                    # Rear right
     },
-    
+
     # === OTHER STATE ===
     "gui_settings": {
         "gui_distance_units": str,      # "km/hr" or "mi/hr"
@@ -225,26 +225,31 @@ vehicle_response = {
 ### Vehicle State Common Values
 
 #### State Values
+
 ```python
 "state": "online" | "asleep" | "offline" | "charging"
 ```
 
 #### Charging States
+
 ```python
 "charging_state": "Charging" | "Complete" | "Stopped" | "Disconnected"
 ```
 
 #### Shift States
+
 ```python
 "shift_state": "D" | "R" | "N" | "P" | None
 ```
 
 #### Climate Keeper Modes
+
 ```python
 "climate_keeper_mode": "off" | "on" | "dog" | "camp"
 ```
 
 #### Charge Port Latch
+
 ```python
 "charge_port_latch": "Engaged" | "Disengaged" | "Engaged"
 ```
@@ -264,7 +269,7 @@ site_response = {
     "id": int,                          # Site ID
     "site_name": str,                   # User-set site name
     "timezone": str,                    # e.g., "America/Los_Angeles"
-    
+
     # === BATTERY/POWERWALL ===
     "battery_list": [
         {
@@ -281,13 +286,13 @@ site_response = {
             # ... more fields
         }
     ],
-    
+
     # === BACKUP STATE ===
     "backup": {
         "backup_reserve_percent": float,  # 0-100
         "events": [...],
     },
-    
+
     # === COMPONENTS ===
     "components": {
         "battery": {
@@ -307,21 +312,21 @@ site_response = {
             "power": float,             # W (home consumption)
         },
     },
-    
+
     # === SITE STATUS ===
     "site_status": {
         "running": bool,
     },
-    
+
     # === ENERGY EXPORT & OPERATION ===
     "energy_site_id": str,
-    
+
     # Configuration
     "components_battery": bool,
     "components_solar": bool,
     "components_load": bool,
     "components_grid": bool,
-    
+
     # Current operation
     "export_rule": str,                 # "pv_only", "battery_ok", "pv_and_battery"
     "grid_charging_enabled": bool,
@@ -332,16 +337,19 @@ site_response = {
 ### Energy Site Common Values
 
 #### Operation Modes
+
 ```python
 "operation_mode": "self_consumption" | "backup" | "autonomous"
 ```
 
 #### Export Rules
+
 ```python
 "export_rule": "pv_only" | "battery_ok" | "pv_and_battery"
 ```
 
 #### Energy Storage Modes
+
 ```python
 "energy_storage_mode": "self_consumption" | "backup" | "autonomous"
 ```
@@ -389,7 +397,7 @@ config_entry.options = {
 sensor_entity = {
     # State (value)
     "state": "42.0",                    # Latest reading
-    
+
     # Attributes
     "attributes": {
         "unit_of_measurement": "°C",    # Units
@@ -397,7 +405,7 @@ sensor_entity = {
         "friendly_name": "Tesla Temperature",
         "icon": "mdi:thermometer",
         "last_updated": "2024-11-15T10:30:00",
-        
+
         # Entity-specific attributes
         "vehicle_name": "My Tesla",
         "vin": "5YJ...",

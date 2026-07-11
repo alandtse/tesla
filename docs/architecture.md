@@ -10,16 +10,16 @@ graph TB
     CF["Config Flow<br/>OAuth Setup"]
     TDC["TeslaDataUpdateCoordinator<br/>Central Hub"]
     TAC["Tesla API Client<br/>teslajsonpy"]
-    
+
     Entities["Entity Platforms<br/>Sensors, Switches, Climate, etc."]
-    
+
     HA --> CF
     CF --> TDC
     HA --> Entities
     TDC --> Entities
     TDC --> TAC
     TAC --> TeslaCloud["Tesla Cloud API"]
-    
+
     TeslaMate["TeslaMate MQTT<br/>Alternative Data Source"]
     TDC -.-> TeslaMate
 ```
@@ -37,7 +37,7 @@ sequenceDiagram
     participant Coordinator
     participant TeslaAPI
     participant Entities
-    
+
     User->>ConfigFlow: Add Integration
     ConfigFlow->>TeslaAPI: Authenticate (OAuth token)
     ConfigFlow->>Coordinator: Initialize with tokens
@@ -47,6 +47,7 @@ sequenceDiagram
 ```
 
 **Key Functions**:
+
 - `async_setup()` - Platform initialization (register services, set up coordinator)
 - `async_setup_entry()` - Per-config-entry setup (create entities, start polling)
 - `async_unload_entry()` - Clean up integration (stop polling, remove entities)
@@ -56,6 +57,7 @@ sequenceDiagram
 **Core Class**: `TeslaDataUpdateCoordinator`
 
 Responsibilities:
+
 - Manage API client lifecycle and authentication tokens
 - Coordinate polling of all registered vehicles and energy sites
 - Handle vehicle wake-up/sleep logic to minimize battery drain
@@ -70,15 +72,16 @@ graph LR
     B --> C["Fetch Vehicle State"]
     B --> D["Fetch Energy Site State"]
     B --> E["Update Token if Needed"]
-    
+
     C --> F["Cache State"]
     D --> F
     F --> G["Notify Listeners<br/>All Entities"]
-    
+
     G --> H["Entity Updates<br/>State & Attributes"]
 ```
 
 **Key Methods**:
+
 - `_async_update_data()` - Fetch latest state from Tesla API
 - `async_update_listeners_debounced()` - Notify entities of state changes
 - `_async_update_vehicles()` - Fetch and cache all vehicle states
@@ -93,26 +96,27 @@ The entity layer implements Home Assistant entity framework patterns for differe
 ```mermaid
 graph TB
     TBE["TeslaBaseEntity<br/>Common State & Properties"]
-    
+
     TCE["TeslaCarEntity<br/>Vehicle Data Access"]
     TEE["TeslaEnergyEntity<br/>Site Data Access"]
-    
+
     TBE --> TCE
     TBE --> TEE
-    
+
     TCE --> S1["Sensors"]
     TCE --> S2["Switches"]
     TCE --> S3["Climate"]
     TCE --> S4["Covers"]
     TCE --> S5["Locks"]
     TCE --> S6["...Other Car Entities"]
-    
+
     TEE --> E1["Sensors"]
     TEE --> E2["Switches"]
     TEE --> E3["Selects"]
 ```
 
 **Entity Lifecycle**:
+
 1. Created during `async_setup_entry()`
 2. Registered with Home Assistant entity registry
 3. Receive updates from `TeslaDataUpdateCoordinator`
@@ -120,6 +124,7 @@ graph TB
 5. Removed during `async_unload_entry()`
 
 **Platform Modules** (one per entity domain):
+
 - `sensor.py` - Numeric and text state values
 - `binary_sensor.py` - On/off state indicators
 - `switch.py` - Toggle controls
@@ -153,6 +158,7 @@ graph TD
 ```
 
 **Key Components**:
+
 - `TeslaConfigFlow` - Main flow handler
 - `OptionsFlowHandler` - Options configuration
 - Async validation of credentials
@@ -171,13 +177,14 @@ graph LR
     MQTT["MQTT Broker"]
     TeslaMate["TeslaMate Module<br/>MQTT listener"]
     TDC["TeslaDataUpdateCoordinator"]
-    
+
     TM --> MQTT
     MQTT --> TeslaMate
     TeslaMate --> TDC
 ```
 
 **Benefits**:
+
 - Real-time updates without frequent polling
 - Reduced battery drain
 - Syncs location, charging state, climate state
@@ -186,6 +193,7 @@ graph LR
 #### Services (`services.py`)
 
 Custom services for Home Assistant automations:
+
 - `set_update_interval` - Change polling frequency at runtime
 - `async_call_tesla_service` - Generic Tesla API command wrapper
 
@@ -203,7 +211,8 @@ Custom services for Home Assistant automations:
 7. Wait for next polling interval
 ```
 
-**Sleep Optimization**: 
+**Sleep Optimization**:
+
 - Coordinator tracks vehicle sleep state
 - Skips polling for sleeping vehicles to save battery
 - Respects user preference: wake on start or let sleep
@@ -216,7 +225,7 @@ sequenceDiagram
     participant Coordinator
     participant Entity
     participant HA as Home Assistant
-    
+
     Coordinator->>Coordinator: Fetch new data
     Coordinator->>Entity: _handle_coordinator_update()
     Entity->>Entity: Read new state from coordinator
@@ -238,6 +247,7 @@ sequenceDiagram
 ## Key Design Patterns
 
 ### 1. Data Coordinator Pattern
+
 - Centralized data fetching and caching
 - Single API client manages all connections
 - Automatic retry and backoff
@@ -245,6 +255,7 @@ sequenceDiagram
 - Reduces API calls and improves responsiveness
 
 ### 2. Entity Framework Integration
+
 - All entities inherit from Home Assistant entity classes
 - Async/await throughout for non-blocking operations
 - State machine integration for persistence
@@ -252,12 +263,14 @@ sequenceDiagram
 - Device grouping by vehicle/site
 
 ### 3. Async/Await Pattern
+
 - Non-blocking I/O for API calls
 - Concurrent polling of multiple vehicles
 - Timeout handling with `async-timeout`
 - Exception handling and logging
 
 ### 4. Configuration Entry System
+
 - Credentials stored securely in Home Assistant config
 - Per-entry setup and teardown
 - Options flow for user configuration
@@ -266,6 +279,7 @@ sequenceDiagram
 ## Error Handling & Resilience
 
 ### API Error Handling
+
 ```mermaid
 graph TD
     A["API Call"] --> B{Success?}
@@ -283,12 +297,14 @@ graph TD
 ```
 
 **Patterns**:
+
 - Exponential backoff on transient failures
 - Token refresh on auth errors
 - Graceful degradation if API unavailable
 - Detailed logging for debugging
 
 ### Vehicle Sleep Logic
+
 - Coordinator monitors vehicle sleep state
 - Doesn't actively wake vehicles during polling
 - Respects user configuration for wake behavior
@@ -297,29 +313,34 @@ graph TD
 ## Home Assistant Integration Points
 
 ### Entity Framework
+
 - Inherits from `RestoreEntity` for state persistence
 - Uses `CoordinatorEntity` for automatic update handling
 - Registers with entity and device registries
 - Follows unique ID conventions
 
 ### State Machine
+
 - Entity state stored in Home Assistant state machine
 - Attributes for additional data (e.g., vehicle odometer)
 - Binary entities for on/off indicators
 - Numeric entities for sensors and controls
 
 ### Config Entry System
+
 - One config entry per Tesla account
 - Supports multiple accounts (multiple entries)
 - Options flow for configuration changes
 - Device and entity discovery
 
 ### Services
+
 - Custom services for Tesla-specific commands
 - Available for automations and scripts
 - Async/await for non-blocking execution
 
 ### Device & Entity Registry
+
 - Vehicles and sites as devices
 - Entities grouped by device
 - Supports device removal/grouping
@@ -328,22 +349,26 @@ graph TD
 ## Technology Stack Integration
 
 ### Home Assistant
+
 - `homeassistant` package for entity/device/config entry APIs
 - Async patterns and event bus
 - Logging and notification systems
 
 ### teslajsonpy Library
+
 - OAuth 2.0 authentication
 - Tesla API endpoint abstractions
 - Vehicle and site data structures
 - Command execution (lock, climate, etc.)
 
 ### asyncio
+
 - Concurrent operations (multiple vehicles)
 - Non-blocking I/O for HTTP requests
 - Event-driven architecture
 
 ### Python 3.13+
+
 - Type hints throughout codebase
 - Async/await syntax
 - Modern Python features
@@ -351,6 +376,7 @@ graph TD
 ## Deployment Model
 
 The integration runs within Home Assistant process:
+
 - Single coordinator instance per config entry
 - Entities created and managed by Home Assistant
 - Polling runs as background task

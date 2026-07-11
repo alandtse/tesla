@@ -139,11 +139,13 @@ pytest tests/test_sensor.py::test_battery_value
 Tests follow Home Assistant testing patterns:
 
 **Test Structure**:
+
 - One test file per entity type (test_sensor.py, test_switch.py, etc.)
 - Mock data in `tests/mock_data/` (car.py, energysite.py)
 - Utilities in `tests/common.py` for setup helpers
 
 **Example Test**:
+
 ```python
 @pytest.mark.asyncio
 async def test_battery_value(hass):
@@ -151,10 +153,10 @@ async def test_battery_value(hass):
     # Setup
     coordinator = setup_mock_controller(hass)
     await hass.async_block_till_done()
-    
+
     # Get entity
     battery_entity = hass.states.get("sensor.tesla_battery")
-    
+
     # Assert
     assert battery_entity.state == "42"
 ```
@@ -271,6 +273,7 @@ Use GitHub's [issue tracker](../../issues) to report bugs.
   - Any error logs/stack traces
 
 **Example**:
+
 ```
 Title: Battery level sensor not updating when charging
 
@@ -304,18 +307,19 @@ Environment:
    - Any relevant context or examples
 
 **Example**:
+
 ```
 Title: Add support for Powerwall backup reserve threshold
 
 Description:
-Currently I can see the backup reserve percentage, but can't set it 
-programmatically or in automations. Would be great to have a service 
+Currently I can see the backup reserve percentage, but can't set it
+programmatically or in automations. Would be great to have a service
 to adjust the reserve threshold.
 
-Use case: Automation to increase backup reserve during high wildfire 
+Use case: Automation to increase backup reserve during high wildfire
 season, reduce during winter.
 
-Proposed: Add `tesla_custom.set_backup_reserve` service similar to 
+Proposed: Add `tesla_custom.set_backup_reserve` service similar to
 existing `set_update_interval`.
 ```
 

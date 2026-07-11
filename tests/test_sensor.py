@@ -373,9 +373,10 @@ async def test_center_display_state_value(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.my_model_s_center_display_state")
 
-    assert int(state.state) == car_mock_data.VEHICLE_DATA["vehicle_state"][
-        "center_display_state"
-    ]
+    assert (
+        int(state.state)
+        == car_mock_data.VEHICLE_DATA["vehicle_state"]["center_display_state"]
+    )
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     """Tests outside_temp is getting the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)

@@ -23,6 +23,7 @@ A fork of the previous official Tesla integration in Home Assistant which has be
 This integration provides comprehensive Home Assistant support for Tesla vehicles and energy sites:
 
 **For Tesla Vehicles**:
+
 - Real-time state monitoring (battery, temperature, location, charging)
 - Climate control (HVAC, presets, temperature)
 - Vehicle commands (lock/unlock doors, horn, flash lights)
@@ -30,6 +31,7 @@ This integration provides comprehensive Home Assistant support for Tesla vehicle
 - Charging status and energy tracking
 
 **For Tesla Energy Sites (Powerwall)**:
+
 - Battery level and power flow monitoring
 - Grid connection status
 - Solar generation and load tracking
@@ -42,6 +44,7 @@ This integration provides comprehensive Home Assistant support for Tesla vehicle
 To use this integration, you need a Tesla refresh token (from your Tesla account, not your car).
 
 **Token Generator Apps**:
+
 - Android: [Tesla Tokens](https://play.google.com/store/apps/details?id=net.leveugle.teslatokens)
 - iOS: [Auth App for Tesla](https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613)
 - TeslaFi: [Tesla v3 API Tokens](https://support.teslafi.com/en/communities/1/topics/16979-tesla-v3-api-tokens)
@@ -87,12 +90,12 @@ To use this integration, you need a Tesla refresh token (from your Tesla account
 
 After adding the integration, open its options dialog:
 
-| Option | Default | Range | Purpose |
-|--------|---------|-------|---------|
-| **Polling Interval** | 660 sec | 60-3600 | How often to check for updates |
-| **Wake on Start** | Off | On/Off | Wake sleeping cars when HA starts |
-| **Polling Policy** | Always | Always / Connected Only / Conserve | Sleep optimization strategy |
-| **TeslaMate MQTT** | Off | On/Off | Sync data from TeslaMate (requires MQTT) |
+| Option               | Default | Range                              | Purpose                                  |
+| -------------------- | ------- | ---------------------------------- | ---------------------------------------- |
+| **Polling Interval** | 660 sec | 60-3600                            | How often to check for updates           |
+| **Wake on Start**    | Off     | On/Off                             | Wake sleeping cars when HA starts        |
+| **Polling Policy**   | Always  | Always / Connected Only / Conserve | Sleep optimization strategy              |
+| **TeslaMate MQTT**   | Off     | On/Off                             | Sync data from TeslaMate (requires MQTT) |
 
 ---
 
@@ -115,6 +118,7 @@ Sensors work without proxy; only commands (lock, climate, etc.) require it.
 ### Vehicle Entities
 
 **Sensors**:
+
 - Battery level, charge rate, estimated range
 - Inside/outside temperature, odometer
 - Energy added in charging session, charger power
@@ -122,61 +126,75 @@ Sensors work without proxy; only commands (lock, climate, etc.) require it.
 - Active route destination and arrival time
 
 **Binary Sensors**:
+
 - Charging status, online status, asleep status
 - Door open/closed, window open/closed
 - Parking brake, charger connection
 
 **Switches**:
+
 - Charger on/off, sentry mode
 - Polling enable/disable, valet mode
 - Heated steering wheel
 
 **Climate**:
+
 - HVAC mode (heat, cool, auto, off)
 - Target temperature and current temperature
 - Preset modes (defrost, keep on, dog mode, camp mode)
 
 **Covers**:
+
 - Frunk (front trunk), rear trunk
 - Windows, sunroof
 - Charger door
 
 **Locks**:
+
 - Door lock, charge port latch
 
 **Buttons**:
+
 - Horn, flash lights, wake up
 - Force data update, trigger HomeLink
 - Remote start
 
 **Selects**:
+
 - Seat heaters (left, right, rear)
 - Cabin overheat protection
 
 **Numbers**:
+
 - Charge limit %, charging amps
 
 **Device Tracker**:
+
 - Current location (latitude/longitude)
 - Active route destination
 
 **Updates**:
+
 - Software update status
 
 **Text**:
+
 - TeslaMate ID (for syncing)
 
 ### Energy Site Entities
 
 **Sensors**:
+
 - Battery level and reserve, solar power
 - Grid power, home load power
 - Battery remaining (Wh)
 
 **Binary Sensors**:
+
 - Grid connection status, battery charging status
 
 **Selects**:
+
 - Operation mode (self consumption, backup, autonomous)
 - Export rule (PV only, battery OK, PV and battery)
 - Grid charging enable/disable
@@ -188,18 +206,21 @@ Sensors work without proxy; only commands (lock, climate, etc.) require it.
 Tesla vehicles have a battery drain concern. This integration minimizes impact:
 
 **How Polling Works**:
+
 - Default polling interval: 660 seconds (11 minutes)
 - **Does NOT wake sleeping cars** during polling
 - Only wakes cars when you send commands (lock, climate, etc.)
 - After waking, fetches data based on polling interval
 
 **Your Battery Management**:
+
 - **Polling Interval**: Higher = fewer updates = less battery drain. Experiment with 660-1800 seconds.
 - **Wake on Start**: Disable to let cars sleep. Vehicles wake naturally on user actions.
 - **Polling Policy**: Use "Conserve" to skip polling for offline/sleeping vehicles.
 - **Polling Switch**: Disable polling completely via automations for extended idle periods.
 
 **Example Automation** - Ensure data is fresh every morning:
+
 ```yaml
 automation:
   - alias: "Tesla - Get fresh data in morning"
@@ -209,11 +230,11 @@ automation:
     action:
       - service: tesla_custom.set_update_interval
         data:
-          interval: 60  # Poll frequently for 1 minute
+          interval: 60 # Poll frequently for 1 minute
       - delay: "00:01:00"
       - service: tesla_custom.set_update_interval
         data:
-          interval: 660  # Back to normal
+          interval: 660 # Back to normal
 ```
 
 ---
@@ -221,18 +242,22 @@ automation:
 ## Tips & Troubleshooting
 
 ### "Command failed" Error
+
 - **Cause**: Fleet API required, proxy not set up
 - **Fix**: Install Tesla HTTP Proxy addon and configure in integration options
 
 ### Data not updating
+
 - **Cause**: Polling interval too high or car offline
 - **Fix**: Check polling interval setting, ensure car is online
 
 ### Token expired
+
 - **Cause**: Refresh token too old or credentials changed
 - **Fix**: Restart Home Assistant to trigger reauthentication
 
 ### High battery drain
+
 - **Cause**: Polling interval too low
 - **Fix**: Increase polling interval to 1200-1800 seconds
 
@@ -243,6 +268,7 @@ automation:
 ### Architecture Documentation
 
 For AI agents and developers working on this codebase:
+
 - **AGENTS.md** - AI agent quick reference and codebase navigation
 - **docs/index.md** - Documentation index and navigation guide
 - **docs/architecture.md** - System design and integration patterns
@@ -253,6 +279,7 @@ For AI agents and developers working on this codebase:
 ### Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+
 - Code style requirements (black formatting)
 - Testing procedures (pytest)
 - Pull request process
@@ -261,6 +288,7 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 ### Development Setup
 
 Quick start with Docker dev container:
+
 1. Install "Remote - Containers" extension in VS Code
 2. Reopen folder in container
 3. Home Assistant instance runs at `localhost:8123`

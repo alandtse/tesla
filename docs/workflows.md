@@ -8,11 +8,11 @@ graph TB
     B --> C["Coordinator Init"]
     C --> D["Entity Creation"]
     D --> E["Polling Loop"]
-    
+
     E --> F["Data Update"]
     F --> G["Entity Update"]
     G --> H["HA State Update"]
-    
+
     I["Command Execution"] --> J["API Call"]
     J --> K["Data Refresh"]
     K --> G
@@ -31,7 +31,7 @@ sequenceDiagram
     participant HA as Home Assistant
     participant Setup as async_setup
     participant Services as services
-    
+
     HA->>Setup: Call async_setup(hass, config)
     Setup->>Services: Register custom services
     Setup->>Services: Register event listeners
@@ -40,6 +40,7 @@ sequenceDiagram
 ```
 
 **Steps**:
+
 1. Home Assistant calls `async_setup()` at startup
 2. Register `tesla_custom.set_update_interval` service
 3. Return True to confirm platform readiness
@@ -56,24 +57,25 @@ sequenceDiagram
     participant TDC as TeslaDataUpdateCoordinator
     participant API as Tesla API
     participant Entity as Entity Platforms
-    
+
     HA->>Setup: Setup new config entry
     Setup->>Config: Read stored tokens
     Setup->>TDC: Create coordinator
     TDC->>API: Initialize API client
     TDC->>API: Fetch vehicles & sites
     API-->>TDC: Vehicle/site list
-    
+
     Setup->>Entity: Call async_setup_entry on all platforms
     Entity->>Entity: Create entities for each vehicle/site
     Entity-->>HA: Register entities
-    
+
     Setup->>TDC: Start polling loop
     TDC-->>Setup: Coordinator ready
     Setup-->>HA: Setup complete
 ```
 
 **Steps**:
+
 1. Read OAuth tokens from config entry storage
 2. Create `TeslaDataUpdateCoordinator` instance
 3. Initialize Tesla API client
@@ -87,6 +89,7 @@ sequenceDiagram
 **Code Location**: `custom_components/tesla_custom/__init__.py::async_setup_entry()`
 
 **Home Assistant Integration Points**:
+
 - Config entry stored at: `hass.data[DOMAIN][config_entry.entry_id]`
 - Device registry: `hass.data["device_registry"]`
 - Entity registry: `hass.data["entity_registry"]`
@@ -122,6 +125,7 @@ graph TD
 **Triggered**: User selects "Add Integration" → "Tesla Custom"
 
 **Process**:
+
 1. Show form requesting Tesla refresh token
 2. User provides token (from phone app or web generator)
 3. Call `validate_input()` with token
@@ -129,6 +133,7 @@ graph TD
 5. Redirect to options flow
 
 **Form Fields**:
+
 - `token`: Text field for Tesla refresh token
 
 ### Step 2: Validation (`validate_input`)
@@ -136,6 +141,7 @@ graph TD
 **Input**: `{CONF_TOKEN: "..."}`
 
 **Process**:
+
 1. Create temporary Tesla API client
 2. Authenticate with provided token
 3. Call `get_vehicles()` to verify token works
@@ -143,6 +149,7 @@ graph TD
 5. Raise `InvalidAuth` or `CannotConnect` on failure
 
 **Validation Checks**:
+
 - Token format valid
 - API endpoint reachable
 - Token accepted by Tesla API
@@ -153,6 +160,7 @@ graph TD
 **Triggered**: After config entry created
 
 **Process**:
+
 1. Show form with options fields
 2. User configures:
    - `polling_interval`: 60-3600 seconds
@@ -161,6 +169,7 @@ graph TD
    - `teslamate_enabled`: Enable MQTT sync
 
 **Default Values**:
+
 ```python
 polling_interval: 660
 wake_on_start: False
@@ -173,6 +182,7 @@ teslamate_enabled: False
 **Triggered**: Token expires or becomes invalid
 
 **Process**:
+
 1. Detect auth error in polling loop
 2. Call `async_step_reauth()`
 3. Show "reauthenticate" form
@@ -195,7 +205,7 @@ sequenceDiagram
     participant API as Tesla API
     participant Cache as Data Cache
     participant Entities as Entity Listeners
-    
+
     loop Every polling_interval seconds
         Timer->>Coordinator: Trigger update
         Coordinator->>API: Get vehicles
@@ -213,6 +223,7 @@ sequenceDiagram
 **Called**: Every `polling_interval` seconds by DataUpdateCoordinator
 
 **Steps**:
+
 1. Check if token refresh needed
 2. Call `_async_update_vehicles()`
    - For each vehicle, get latest state via API
@@ -223,11 +234,13 @@ sequenceDiagram
 4. Return data dict with updated vehicles/sites
 
 **Error Handling**:
+
 - On API error: Log error, return cached data
 - On auth error: Call `_async_save_tokens()` to refresh token
 - On repeated errors: Implement exponential backoff
 
 **Debouncing**:
+
 - `async_update_listeners_debounced()` called after update
 - Debounce window: 5 seconds (prevents rapid updates)
 - Only notifies if data actually changed
@@ -271,9 +284,9 @@ graph TD
 async def async_setup_entry(hass, config_entry, async_add_entities, discovery_info):
     # Get coordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    
+
     entities = []
-    
+
     # Create entities for each vehicle
     for vehicle_id in coordinator.data.get("vehicles", []):
         # Create battery sensor
@@ -283,12 +296,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities, discovery_in
         # Create temperature sensor
         entities.append(TeslaCarTemp(coordinator, vehicle_id))
         # ... more entities
-    
+
     # Create entities for each energy site
     for site_id in coordinator.data.get("energy_sites", []):
         entities.append(TeslaEnergyBattery(coordinator, site_id))
         # ... more energy entities
-    
+
     # Register with Home Assistant
     async_add_entities(entities)
 ```
@@ -296,6 +309,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities, discovery_in
 ### Entity Initialization
 
 **In Entity `__init__`**:
+
 ```python
 class TeslaCarBattery(TeslaCarEntity, SensorEntity):
     def __init__(self, coordinator, vehicle_id):
@@ -340,7 +354,7 @@ sequenceDiagram
     participant API as Tesla API
     participant Vehicle as Vehicle
     participant Polling as Coordinator Polling
-    
+
     UI->>Entity: Click Lock
     Entity->>API: Call lock_doors()
     API->>Vehicle: Send lock command
@@ -361,7 +375,7 @@ sequenceDiagram
     participant Climate as Climate Entity
     participant API as Tesla API
     participant Vehicle as Vehicle
-    
+
     UI->>Climate: Set temperature to 22°C
     Climate->>API: set_climate_temperature(22)
     API->>Vehicle: Send climate command
@@ -374,11 +388,12 @@ sequenceDiagram
 ### Generic Command Flow
 
 **In Entity Method**:
+
 ```python
 async def async_lock(self):
     # 1. Call Tesla API command
     result = await self.coordinator.api.lock_doors()
-    
+
     # 2. Check success
     if result:
         # 3. Request fresh data from polling
@@ -388,6 +403,7 @@ async def async_lock(self):
 ```
 
 **Steps**:
+
 1. Call Tesla API method via `coordinator.api`
 2. Tesla API wakes vehicle if sleeping (automatic)
 3. Command executed on vehicle
@@ -411,7 +427,7 @@ sequenceDiagram
     participant TeslaMate as TeslaMate Module
     participant MQTT as MQTT Broker
     participant Coordinator as TeslaDataUpdateCoordinator
-    
+
     TeslaMate->>MQTT: Subscribe to teslamate/cars/+ topics
     MQTT-->>TeslaMate: Subscribed
     MQTT->>TeslaMate: Vehicle state updates
@@ -424,6 +440,7 @@ sequenceDiagram
 ### Data Flow
 
 **Topics Listened To**:
+
 ```
 teslamate/cars/{car_id}/state
 teslamate/cars/{car_id}/charge_state
@@ -436,6 +453,7 @@ teslamate/cars/{car_id}/outside_temp
 ```
 
 **Transformation**:
+
 1. MQTT message received on topic
 2. Extract metric name and value
 3. Map to vehicle state field
@@ -443,6 +461,7 @@ teslamate/cars/{car_id}/outside_temp
 5. Notify listeners
 
 **Benefits vs Polling**:
+
 - Real-time updates (no polling delay)
 - Reduced battery drain (vehicle data already collected)
 - Works with TeslaMate instance running separately
@@ -468,18 +487,19 @@ graph TD
 ```
 
 **Check Logic**:
+
 ```python
 async def async_remove_config_entry_device(config_entry, device_entry):
     # Check if device is a live vehicle
     for vehicle_id, vehicle in coordinator.data["vehicles"].items():
         if device_entry.name == vehicle.get("display_name"):
             return False  # Can't remove live vehicle
-    
+
     # Check if device is a live site
     for site_id, site in coordinator.data["energy_sites"].items():
         if device_entry.name == site.get("name"):
             return False  # Can't remove live site
-    
+
     # Device is orphaned, safe to remove
     return True
 ```
@@ -552,23 +572,24 @@ graph TD
 ```
 
 **Steps**:
+
 ```python
 async def async_unload_entry(hass, config_entry):
     # Stop polling and close coordinator
     await hass.data[DOMAIN][config_entry.entry_id]["coordinator"].async_shutdown()
-    
+
     # Close API client
     await hass.data[DOMAIN][config_entry.entry_id]["api"].close()
-    
+
     # Unload all platforms
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
-    
+
     # Remove data
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
-    
+
     return unload_ok
 ```
 
@@ -592,11 +613,13 @@ elif vehicle_state["state"] == "online":
 ### Wake-Up Trigger
 
 Vehicles wake automatically when:
+
 - Commands sent (lock, climate, etc.)
 - User manually wakes via Tesla app
 - Scheduled wake (if configured)
 
 Integration respects wake by:
+
 - Not sending commands to asleep vehicles
 - Polling after command (expects vehicle to be awake)
 - Continuing without error if vehicle doesn't wake
@@ -604,11 +627,13 @@ Integration respects wake by:
 ### Polling Policy Application
 
 **Policy: `polling_policy_conserve`**
+
 - Skip polling for offline/asleep vehicles
 - Only poll online vehicles
 - Minimize API calls
 
 **Policy: `polling_policy_always`**
+
 - Poll all vehicles regardless of state
 - Detects vehicle transitions (online ↔ asleep)
 

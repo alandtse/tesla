@@ -13,6 +13,7 @@ This is a fork of the official Home Assistant Tesla integration, maintained as a
 ## Purpose
 
 Provides comprehensive Home Assistant integration for:
+
 - **Tesla Vehicles**: Real-time state, climate control, charging, vehicle commands
 - **Energy Sites**: Powerwall status, solar generation, grid interaction, load management
 
@@ -20,13 +21,13 @@ The integration uses cloud polling with intelligent sleep strategies to minimize
 
 ## Technology Stack
 
-| Component | Technology | Version/Source |
-|-----------|-----------|-----------------|
-| **Runtime** | Python | ^3.13.2 |
-| **Framework** | Home Assistant | >=2025.2.0 |
-| **API Client** | teslajsonpy | Custom fork (git branch: dev) |
-| **Async** | asyncio + async-timeout | >=4.0.0 |
-| **Testing** | pytest + Home Assistant test utils | >=0.13.107 |
+| Component      | Technology                         | Version/Source                |
+| -------------- | ---------------------------------- | ----------------------------- |
+| **Runtime**    | Python                             | ^3.13.2                       |
+| **Framework**  | Home Assistant                     | >=2025.2.0                    |
+| **API Client** | teslajsonpy                        | Custom fork (git branch: dev) |
+| **Async**      | asyncio + async-timeout            | >=4.0.0                       |
+| **Testing**    | pytest + Home Assistant test utils | >=0.13.107                    |
 
 ## Codebase Statistics
 
@@ -99,6 +100,7 @@ tesla/
 ## Key Entry Points
 
 ### Integration Setup
+
 - **File**: `custom_components/tesla_custom/__init__.py`
 - **Entry Functions**:
   - `async_setup()` - Initial platform setup
@@ -107,11 +109,13 @@ tesla/
 - **Main Class**: `TeslaDataUpdateCoordinator` - Manages all data fetching and state
 
 ### Configuration
+
 - **File**: `custom_components/tesla_custom/config_flow.py`
 - **Class**: `TeslaConfigFlow` - Handles user authentication and options
 - **Process**: OAuth token acquisition → account validation → entity creation
 
 ### Entities
+
 - **Base Classes** (`base.py`):
   - `TeslaBaseEntity` - Common functionality
   - `TeslaCarEntity` - Vehicle-specific
@@ -125,7 +129,9 @@ tesla/
 ## Core Components
 
 ### TeslaDataUpdateCoordinator
+
 The central hub for all data operations:
+
 - Manages Tesla API client lifecycle
 - Coordinates periodic polling of all vehicles/sites
 - Handles vehicle wake-up and sleep logic
@@ -134,6 +140,7 @@ The central hub for all data operations:
 - Supports TeslaMate MQTT sync as alternative to polling
 
 ### Entity Hierarchy
+
 ```
 TeslaBaseEntity (common methods & properties)
 ├── TeslaCarEntity (vehicle-specific)
@@ -159,6 +166,7 @@ TeslaBaseEntity (common methods & properties)
 ## Development Tools & Configuration
 
 ### Build & Testing
+
 ```bash
 poetry install              # Install dependencies
 pytest                     # Run test suite
@@ -169,11 +177,13 @@ prospector                # Full linting
 ```
 
 ### Pre-commit Hooks
+
 - File: `.pre-commit-config.yaml`
 - Hooks: black, mypy, prospector, bandit (security)
 - Runs automatically on commit
 
 ### Configuration Files
+
 - `pyproject.toml` - Poetry dependencies, pytest, black, mypy config
 - `.prospector.yml` - Linting rules
 - `manifest.json` - Home Assistant integration metadata
@@ -181,26 +191,28 @@ prospector                # Full linting
 
 ## Home Assistant Integration Details
 
-| Property | Value |
-|----------|-------|
-| **Domain** | tesla_custom |
-| **IoT Class** | cloud_polling |
-| **Config Flow** | Yes (OAuth-based) |
-| **Dependencies** | http |
-| **After Dependencies** | mqtt |
-| **Import Executor** | Yes |
-| **Min HA Version** | 2024.11.0 |
-| **DHCP Discovery** | Yes (Tesla network devices) |
+| Property               | Value                       |
+| ---------------------- | --------------------------- |
+| **Domain**             | tesla_custom                |
+| **IoT Class**          | cloud_polling               |
+| **Config Flow**        | Yes (OAuth-based)           |
+| **Dependencies**       | http                        |
+| **After Dependencies** | mqtt                        |
+| **Import Executor**    | Yes                         |
+| **Min HA Version**     | 2024.11.0                   |
+| **DHCP Discovery**     | Yes (Tesla network devices) |
 
 ## Dependencies & Versions
 
 ### Runtime Dependencies
+
 - **teslajsonpy** (custom fork) - Tesla API client library
   - Source: `git+https://github.com/grzesiek1711/teslajsonpy.git@dev`
   - Provides: OAuth, API endpoints, vehicle/site data structures
 - **async-timeout** >=4.0.0 - Timeout management for async operations
 
 ### Dev Dependencies
+
 - **pytest** + **pytest-homeassistant-custom-component** - Testing framework
 - **pytest-asyncio**, **pytest-httpx** - Async and HTTP mocking
 - **black**, **mypy**, **prospector** - Code quality
@@ -210,11 +222,13 @@ prospector                # Full linting
 ## Build & Release
 
 ### Version Management
+
 - Version sources: `pyproject.toml`, `custom_components/tesla_custom/const.py`, `manifest.json`
 - Automated via semantic-release on git tags
 - Changelog sections: feature, fix, breaking, documentation, performance, refactor
 
 ### Distribution
+
 - **HACS**: Home Assistant Community Store listing
 - **Release**: GitHub releases with zip archives
 - **No PyPI**: Project-mode in poetry (not published to PyPI)
@@ -222,31 +236,37 @@ prospector                # Full linting
 ## Known Configuration
 
 ### CI/CD
+
 - GitHub Actions workflows in `.github/workflows/`
 - Semantic versioning with automated changelog
 
 ### VS Code
+
 - Configuration in `.vscode/` for workspace settings
 - Recommended extensions for Python/Home Assistant development
 
 ### Development Container
+
 - Config: `.devcontainer.json`
 - Optional: Use for isolated development environment
 
 ## API & External Integrations
 
 ### Tesla API (via teslajsonpy)
+
 - OAuth 2.0 token-based authentication
 - REST API for vehicle commands and state
 - Polling interval configurable (default: 660 seconds)
 - Supports optional Tesla HTTP Proxy for Fleet API compatibility
 
 ### MQTT Integration (via TeslaMate)
+
 - Optional syncing from TeslaMate MQTT topics
 - Provides real-time updates alternative to polling
 - Requires MQTT configured in Home Assistant
 
 ### Home Assistant Framework
+
 - Entity creation and lifecycle management
 - Config entry system for credential storage
 - Data coordinator pattern for update coordination

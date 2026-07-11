@@ -3,21 +3,24 @@
 **Purpose**: This index guides AI assistants and developers through the codebase documentation. Use the file descriptions and relationships below to locate relevant information for your task.
 
 **Quick Links for Common Questions**:
-- *"How does the integration work?"* → `architecture.md`
-- *"Where is [component] implemented?"* → `components.md`
-- *"What are the API/interfaces?"* → `interfaces.md`
-- *"What data structures are used?"* → `data_models.md`
-- *"How does [process] work?"* → `workflows.md`
-- *"What are the dependencies?"* → `dependencies.md`
-- *"General codebase metrics and info"* → `codebase_info.md`
+
+- _"How does the integration work?"_ → `architecture.md`
+- _"Where is [component] implemented?"_ → `components.md`
+- _"What are the API/interfaces?"_ → `interfaces.md`
+- _"What data structures are used?"_ → `data_models.md`
+- _"How does [process] work?"_ → `workflows.md`
+- _"What are the dependencies?"_ → `dependencies.md`
+- _"General codebase metrics and info"_ → `codebase_info.md`
 
 ---
 
 ## Documentation File Reference
 
 ### 1. **codebase_info.md**
+
 **Purpose**: High-level project metadata and codebase statistics
 **Contains**:
+
 - Project summary and purpose
 - Technology stack and language info
 - File structure overview
@@ -30,8 +33,10 @@
 ---
 
 ### 2. **architecture.md**
+
 **Purpose**: System design patterns, architectural decisions, and design principles
 **Contains**:
+
 - Overall system architecture and data flow
 - Integration design with Home Assistant
 - Data coordination and polling strategy
@@ -45,8 +50,10 @@
 ---
 
 ### 3. **components.md**
+
 **Purpose**: Detailed breakdown of all major components and their responsibilities
 **Contains**:
+
 - Core coordinator (`TeslaDataUpdateCoordinator`)
 - Base entity classes and hierarchy
 - Platform modules (entities by domain):
@@ -70,8 +77,10 @@
 ---
 
 ### 4. **interfaces.md**
+
 **Purpose**: Public APIs, interfaces, and integration points
 **Contains**:
+
 - Entity base class interfaces and contracts
 - Coordinator interface and lifecycle hooks
 - Config flow interface and validation
@@ -86,8 +95,10 @@
 ---
 
 ### 5. **data_models.md**
+
 **Purpose**: Data structures, models, and type definitions
 **Contains**:
+
 - Entity data models (attributes, state types)
 - Coordinator data state management
 - Configuration data structures
@@ -101,8 +112,10 @@
 ---
 
 ### 6. **workflows.md**
+
 **Purpose**: Key processes, workflows, and execution flows
 **Contains**:
+
 - Integration setup and initialization flow
 - Device discovery and entity creation
 - Data polling and update coordination
@@ -117,8 +130,10 @@
 ---
 
 ### 7. **dependencies.md**
+
 **Purpose**: External dependencies and their usage in the codebase
 **Contains**:
+
 - Python dependencies (with versions and git sources)
 - Home Assistant framework usage
 - teslajsonpy library integration
@@ -135,24 +150,28 @@
 ### By Task Type
 
 **Adding a new entity type**:
+
 1. Read `components.md` to see existing entity patterns
 2. Check `interfaces.md` for entity base class contracts
 3. Review `workflows.md` for entity creation flow
 4. Look at a similar entity in components for implementation template
 
 **Fixing a bug in data coordination**:
+
 1. Start with `workflows.md` for update flow
 2. Review `components.md` for `TeslaDataUpdateCoordinator`
 3. Check `data_models.md` for data contracts
 4. Look at `architecture.md` for design patterns
 
 **Integrating new data source or API**:
+
 1. Review `interfaces.md` for API integration patterns
 2. Check `dependencies.md` for external libraries
 3. Look at `workflows.md` for data flow
 4. Review `architecture.md` for design principles
 
 **Understanding configuration**:
+
 1. Read `components.md` for config flow implementation
 2. Check `workflows.md` for config options flow
 3. Review `interfaces.md` for validation contracts
@@ -172,6 +191,7 @@
 ## Home Assistant Context
 
 This integration follows Home Assistant custom component conventions:
+
 - **Domain**: `tesla_custom`
 - **IoT Class**: Cloud polling
 - **Async Pattern**: Event-driven async/await throughout

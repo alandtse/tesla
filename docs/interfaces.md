@@ -7,9 +7,9 @@ graph TB
     HA["Home Assistant<br/>Framework"]
     TDC["TeslaDataUpdateCoordinator<br/>Public Interface"]
     Tesla["Tesla API<br/>via teslajsonpy"]
-    
+
     Entities["Entity Platforms<br/>Home Assistant Entity Types"]
-    
+
     HA --> TDC
     HA --> Entities
     TDC --> Tesla
@@ -48,18 +48,20 @@ coordinator.data: Dict = {
 
 ### Public Properties
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| `data` | dict | Cached state of all vehicles and sites |
-| `api` | `TeslaAPI` | Tesla API client from teslajsonpy |
-| `last_update_success` | bool | Whether last update succeeded |
+| Property              | Type       | Purpose                                |
+| --------------------- | ---------- | -------------------------------------- |
+| `data`                | dict       | Cached state of all vehicles and sites |
+| `api`                 | `TeslaAPI` | Tesla API client from teslajsonpy      |
+| `last_update_success` | bool       | Whether last update succeeded          |
 
 ### Public Methods
 
 #### `async_request_refresh()`
+
 **Purpose**: Request immediate update of data
 
 **Signature**:
+
 ```python
 async def async_request_refresh() -> None
 ```
@@ -67,6 +69,7 @@ async def async_request_refresh() -> None
 **Usage**: Called by entity actions (lock, climate, etc.) to fetch latest state
 
 **Example**:
+
 ```python
 async def async_lock(self):
     await self.coordinator.api.lock_doors()
@@ -74,22 +77,27 @@ async def async_lock(self):
 ```
 
 #### `async_update_listeners_debounced()`
+
 **Purpose**: Notify listening entities of updates with debouncing
 
 **Signature**:
+
 ```python
 async def async_update_listeners_debounced() -> None
 ```
 
 **Behavior**:
+
 - Called internally after data update
 - Debounces rapid multiple calls (default: 5 second window)
 - Triggers `_handle_coordinator_update()` on all listeners
 
 #### `async_remove_config_entry_device()`
+
 **Purpose**: Handle device removal from entity registry
 
 **Signature**:
+
 ```python
 async def async_remove_config_entry_device(
     config_entry: ConfigEntry,
@@ -100,6 +108,7 @@ async def async_remove_config_entry_device(
 **Returns**: True if device can be removed, False if protected
 
 **Behavior**:
+
 - Checks if device is actively used
 - Prevents removal of live vehicles/sites
 - Allows removal of orphaned devices
@@ -107,11 +116,13 @@ async def async_remove_config_entry_device(
 ### Internal Methods (Advanced)
 
 #### `_async_update_data()`
+
 **Purpose**: Main update loop - fetches all vehicle/site data
 
 **Called by**: DataUpdateCoordinator polling loop
 
 **Process**:
+
 1. Check if token refresh needed
 2. Fetch all vehicles via `api.get_vehicles()`
 3. Fetch all energy sites via `api.get_energy_sites()`
@@ -119,26 +130,31 @@ async def async_remove_config_entry_device(
 5. Return data dict
 
 **Error Handling**:
+
 - Logs errors
 - Implements exponential backoff
 - Continues with cached data on failure
 
 #### `_async_update_vehicles()`
+
 **Purpose**: Fetch current state of all vehicles
 
 **Returns**: List of vehicle data dicts
 
 **Logic**:
+
 - For each vehicle, fetch full state via `api.get_vehicle()`
 - Track sleep state
 - Handle wake-up delay
 
 #### `_async_save_tokens()`
+
 **Purpose**: Persist OAuth tokens to Home Assistant storage
 
 **Called after**: Token refresh or initial authentication
 
 #### `_async_close_client()`
+
 **Purpose**: Clean up API client on shutdown
 
 **Called by**: `async_unload_entry()`
@@ -160,11 +176,11 @@ async def async_remove_config_entry_device(
 @property
 def name(self) -> str:
     """Return entity name"""
-    
+
 @property
 def unique_id(self) -> str:
     """Return unique identifier for entity"""
-    
+
 @property
 def entity_description(self) -> EntityDescription:
     """Return entity metadata"""
@@ -173,7 +189,7 @@ def entity_description(self) -> EntityDescription:
 @property
 def coordinator(self) -> TeslaDataUpdateCoordinator:
     """Return the data coordinator"""
-    
+
 @property
 def should_poll(self) -> bool:
     """Don't poll, coordinator handles updates"""
@@ -191,7 +207,7 @@ async def _handle_coordinator_update(self) -> None:
 
 async def async_added_to_hass(self) -> None:
     """Register listener when entity added to HA"""
-    
+
 async def async_will_remove_from_hass(self) -> None:
     """Unregister listener when entity removed"""
 ```
@@ -220,19 +236,19 @@ def device_identifier(
 def vehicle(self) -> Dict:
     """Return vehicle data from coordinator"""
     # Access: self.vehicle["response"]["..."]
-    
+
 @property
 def vin(self) -> str:
     """Return vehicle VIN"""
-    
+
 @property
 def car_name(self) -> str:
     """Return user-friendly car name"""
-    
+
 @property
 def update_controller(self):
     """Return update controller (for TeslaMate)"""
-    
+
 @property
 def device_info(self) -> DeviceInfo:
     """Return device registration info"""
@@ -245,6 +261,7 @@ def device_info(self) -> DeviceInfo:
 ```
 
 **Usage Pattern**:
+
 ```python
 class TeslaCarSensorExample(TeslaCarEntity, SensorEntity):
     @property
@@ -262,21 +279,22 @@ class TeslaCarSensorExample(TeslaCarEntity, SensorEntity):
 @property
 def site(self) -> Dict:
     """Return energy site data from coordinator"""
-    
+
 @property
 def site_id(self) -> str:
     """Return energy site ID"""
-    
+
 @property
 def site_name(self) -> str:
     """Return user-friendly site name"""
-    
+
 @property
 def device_info(self) -> DeviceInfo:
     """Return device registration info"""
 ```
 
 **Usage Pattern**:
+
 ```python
 class TeslaEnergySensorExample(TeslaEnergyEntity, SensorEntity):
     @property
@@ -307,17 +325,17 @@ async def async_setup_entry(
 async def async_setup_entry(hass, config_entry, async_add_entities, discovery_info):
     # Get coordinator from home assistant data
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    
+
     entities = []
-    
+
     # Create vehicle entities
     for vehicle_id, vehicle_data in coordinator.data["vehicles"].items():
         entities.append(TeslaCarSensorClass(coordinator, vehicle_id, ...))
-    
+
     # Create energy site entities
     for site_id, site_data in coordinator.data["energy_sites"].items():
         entities.append(TeslaEnergySensorClass(coordinator, site_id, ...))
-    
+
     # Register with Home Assistant
     async_add_entities(entities)
 ```
@@ -338,10 +356,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities, discovery_in
 async def async_step_user(user_input=None):
     """Handle initial user config"""
     # Returns: self.async_show_form(...) or self.async_create_entry(...)
-    
+
 async def async_step_reauth(user_input=None):
     """Handle token refresh on expiration"""
-    
+
 async def async_get_options_flow(config_entry):
     """Return options flow handler"""
     return OptionsFlowHandler(config_entry)
@@ -379,16 +397,16 @@ def validate_input(hass: HomeAssistant, data: dict) -> dict:
 class TeslaAPI:
     async def authenticate(refresh_token: str) -> None:
         """Authenticate with Tesla OAuth"""
-    
+
     async def get_vehicles() -> List[Vehicle]:
         """Get all vehicles"""
-    
+
     async def get_vehicle(vehicle_id: str) -> Vehicle:
         """Get vehicle data"""
-    
+
     async def get_energy_sites() -> List[EnergySite]:
         """Get all energy sites"""
-    
+
     async def get_energy_site(site_id: str) -> EnergySite:
         """Get energy site data"""
 ```
@@ -399,11 +417,11 @@ class TeslaAPI:
 class Vehicle:
     id: str
     vin: str
-    
+
     # State properties
     charging_state: str  # "Charging", "Complete", "Stopped", "Disconnected"
     online_state: str  # "online", "offline", "asleep"
-    
+
     # Data accessors
     async def get_latest_vehicle_data() -> dict
     async def lock_doors() -> dict
@@ -419,7 +437,7 @@ class Vehicle:
 ```python
 class EnergySite:
     id: str
-    
+
     # Data accessors
     async def get_site_data() -> dict
     async def set_operation_mode(mode: str) -> dict
@@ -472,10 +490,10 @@ vehicle["response"] = {
     "id": int,
     "vin": str,
     "display_name": str,
-    
+
     # State
     "state": str,  # "online", "asleep", etc
-    
+
     # Charge state
     "charge_state": {
         "charging_state": str,
@@ -487,7 +505,7 @@ vehicle["response"] = {
         "energy_added": float,
         # ... more fields
     },
-    
+
     # Climate state
     "climate_state": {
         "inside_temp": float,
@@ -497,7 +515,7 @@ vehicle["response"] = {
         "climate_keeper_mode": str,
         # ... more fields
     },
-    
+
     # Vehicle state
     "vehicle_state": {
         "is_user_present": bool,
@@ -511,7 +529,7 @@ vehicle["response"] = {
         "odometer": float,
         # ... more fields
     },
-    
+
     # Drive state
     "drive_state": {
         "latitude": float,
@@ -524,7 +542,7 @@ vehicle["response"] = {
         "shift_state": str,  # "D", "R", "N", "P"
         # ... more fields
     },
-    
+
     # Other
     "software_update": {...},
     "tpms_pressure": {
@@ -543,7 +561,7 @@ site["response"] = {
     # Identity
     "id": int,
     "site_name": str,
-    
+
     # Battery state
     "battery_list": [
         {
@@ -553,7 +571,7 @@ site["response"] = {
             # ... more fields
         }
     ],
-    
+
     # Components & power
     "components": {
         "solar": {...},
@@ -561,7 +579,7 @@ site["response"] = {
         "grid": {...},
         "load": {...},
     },
-    
+
     # Operations
     "site_status": {
         "running": bool,
@@ -581,13 +599,13 @@ site["response"] = {
 class TeslaMate:
     async def enable() -> None:
         """Start MQTT listener"""
-    
+
     async def watch_cars(vehicles: List[dict]) -> None:
         """Subscribe to vehicle topics"""
-    
+
     async def get_car_from_id(car_id: str) -> str:
         """Get VIN from car ID"""
-    
+
     async def unload() -> None:
         """Stop MQTT listener and cleanup"""
 ```
@@ -597,6 +615,7 @@ class TeslaMate:
 **Topic Pattern**: `teslamate/cars/{car_id}/{metric}`
 
 **Metrics Updated**:
+
 - `state` - online/asleep
 - `charge_state` - charging/complete/stopped/disconnected
 - `latitude`, `longitude` - GPS location
@@ -614,6 +633,7 @@ class TeslaMate:
 #### `tesla_custom.set_update_interval`
 
 **Data Schema**:
+
 ```python
 {
     vol.Required("config_entry_id"): str,
@@ -624,6 +644,7 @@ class TeslaMate:
 **Effect**: Changes polling interval at runtime
 
 **Example**:
+
 ```yaml
 service: tesla_custom.set_update_interval
 data:
@@ -659,7 +680,7 @@ entity: TeslaCarEntity | TeslaEnergyEntity
 ```python
 # Config validation
 vol.Required(CONF_TOKEN): cv.string
-vol.Optional(CONF_POLLING_INTERVAL, default=660): 
+vol.Optional(CONF_POLLING_INTERVAL, default=660):
     vol.Range(min=60, max=3600)
 
 # Service validation
@@ -673,14 +694,14 @@ SERVICE_SCHEMA = vol.Schema({
 
 ## Integration Points Summary
 
-| System | Interface | Purpose |
-|--------|-----------|---------|
+| System         | Interface        | Purpose                           |
+| -------------- | ---------------- | --------------------------------- |
 | Home Assistant | Entity Framework | Entity creation, state management |
-| Home Assistant | Config Entry | Configuration storage, lifecycle |
-| Home Assistant | Data Coordinator | Update synchronization |
-| Tesla API | teslajsonpy | Vehicle/site data and commands |
-| TeslaMate | MQTT | Real-time data sync |
-| Automation | Services | Runtime configuration changes |
+| Home Assistant | Config Entry     | Configuration storage, lifecycle  |
+| Home Assistant | Data Coordinator | Update synchronization            |
+| Tesla API      | teslajsonpy      | Vehicle/site data and commands    |
+| TeslaMate      | MQTT             | Real-time data sync               |
+| Automation     | Services         | Runtime configuration changes     |
 
 ---
 
