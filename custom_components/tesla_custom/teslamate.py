@@ -101,6 +101,7 @@ MAP_VEHICLE_STATE = {
     "trunk_open": ("rt", cast_trunk_open),
     "frunk_open": ("ft", cast_trunk_open),
     "is_user_present": ("is_user_present", cast_bool),
+    "center_display_state": ("center_display_state", int),
 }
 
 MAP_CHARGE_STATE = {

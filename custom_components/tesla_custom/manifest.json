@@ -25,5 +25,5 @@
   "issue_tracker": "https://github.com/alandtse/tesla/issues",
   "loggers": ["teslajsonpy"],
   "requirements": ["git+https://github.com/grzesiek1711/teslajsonpy.git@dev"],
-  "version": "3.26.3"
+  "version": "3.27.0"
 }

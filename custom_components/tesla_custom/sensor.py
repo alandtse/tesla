@@ -65,6 +65,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         entities.append(TeslaCarChargerPower(car, coordinator))
         entities.append(TeslaCarOdometer(car, coordinator))
         entities.append(TeslaCarShiftState(car, coordinator))
+        entities.append(TeslaCarCenterDisplayState(car, coordinator))
         entities.append(TeslaCarRange(car, coordinator))
         entities.append(TeslaCarTemp(car, coordinator))
         entities.append(TeslaCarTemp(car, coordinator, inside=True))
@@ -287,6 +288,23 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
         return {
             "raw_state": self._car.shift_state,
         }
+
+
+class TeslaCarCenterDisplayState(TeslaCarEntity, SensorEntity):
+    """Representation of the Tesla car center display state sensor."""
+
+    type = "center display state"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:monitor"
+
+    @property
+    def native_value(self) -> Optional[int]:
+        """Return the center display state."""
+        value = self._car.center_display_state
+        if value is None:
+            return None
+        return int(value)
 
 
 class TeslaCarRange(TeslaCarEntity, SensorEntity):

@@ -88,6 +88,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("sensor.my_model_s_distance_to_arrival")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_distance_to_arrival"
 
+    entry = entity_registry.async_get("sensor.my_model_s_center_display_state")
+    assert entry.unique_id == f"{car_mock_data.VIN.lower()}_center_display_state"
+
 
 async def test_battery(hass: HomeAssistant) -> None:
     """Tests battery is getting the correct value."""
@@ -364,7 +367,16 @@ async def test_odometer_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
 
 
-async def test_outside_temp_value(hass: HomeAssistant) -> None:
+async def test_center_display_state_value(hass: HomeAssistant) -> None:
+    """Tests center display state is getting the correct value."""
+    await setup_platform(hass, SENSOR_DOMAIN)
+
+    state = hass.states.get("sensor.my_model_s_center_display_state")
+
+    assert int(state.state) == car_mock_data.VEHICLE_DATA["vehicle_state"][
+        "center_display_state"
+    ]
+    assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
     """Tests outside_temp is getting the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
 
