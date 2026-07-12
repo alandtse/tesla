@@ -54,9 +54,9 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
     def is_locked(self):
         """Return True if door is locked."""
         vehicle_state = self._car._vehicle_data.get("vehicle_state")
-        if not isinstance(vehicle_state, dict):
+        if not isinstance(vehicle_state, dict) or "locked" not in vehicle_state:
             return None
-        return self._car.is_locked
+        return vehicle_state["locked"]
 
 
 class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):

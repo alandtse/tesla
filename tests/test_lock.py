@@ -1,12 +1,14 @@
 """Tests for the Tesla lock."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, SERVICE_LOCK, SERVICE_UNLOCK
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 import pytest
+
+from custom_components.tesla_custom.lock import TeslaCarDoors
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data
@@ -75,6 +77,21 @@ async def test_car_door_unlock_without_vehicle_state(
         assert car._vehicle_data["vehicle_state"]["locked"] is False
     finally:
         car._vehicle_data["vehicle_state"] = original_vehicle_state
+
+
+def test_car_door_reports_unknown_without_locked_vehicle_state() -> None:
+    """Tests a missing lock value is exposed as an unknown state."""
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    car._vehicle_data = {"vehicle_state": {}}
+
+    entity = TeslaCarDoors(car, MagicMock())
+
+    assert entity.is_locked is None
 
 
 async def test_charge_port_latch(hass: HomeAssistant) -> None:
