@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
 
 class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
-    """Representation of a Tesla car charge limit number."""
+    """Representation of a Tesla car TeslaMate ID text."""
 
     type = "teslamate id"
     _attr_icon = "mdi:ev-station"
@@ -41,13 +41,13 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
         coordinator: TeslaDataUpdateCoordinator,
         teslamate: TeslaMate,
     ) -> None:
-        """Initialize charge limit entity."""
+        """Initialize TeslaMate ID text entity."""
         self.teslamate = teslamate
         self._state = None
         super().__init__(car, coordinator)
 
     async def async_set_value(self, value: str) -> None:
-        """Update charge limit."""
+        """Update TeslaMate ID."""
         if value.strip() == "":
             value = None
 
@@ -62,5 +62,5 @@ class TeslaCarTeslaMateID(TeslaCarEntity, TextEntity):
 
     @property
     def native_value(self) -> str:
-        """Return charge limit."""
+        """Return TeslaMate ID."""
         return self._state
