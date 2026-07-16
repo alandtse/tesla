@@ -3,10 +3,14 @@ name: Issue reaction reminder
 on:
   issues:
     types:
-      - opened
+      - labeled
 
 permissions:
   issues: write
+
+concurrency:
+  group: issue-reaction-reminder-${{ github.event.issue.number }}
+  cancel-in-progress: false
 
 jobs:
   reminder:
@@ -18,16 +22,14 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
+            const triggeringLabel = context.payload.label?.name;
+            const relevantLabels = ["bug", "car", "powerwall"];
 
-            const hasRelevantLabel = issue.labels.some(label =>
-              label.name === "car" || label.name === "powerwall"
-            );
-
-            if (!hasRelevantLabel) return;
+            if (!relevantLabels.includes(triggeringLabel)) return;
 
             const reminderText =
-            const reminderText =
-              "If you’re affected by this issue or see an existing comment that applies to you, please use 👍 reactions instead of commenting \"same here\". " +
+              "<!-- hidden-issue-reaction-reminder-marker -->\n" +
+              "If you're affected by this issue or see an existing comment that applies to you, please react with 👍 instead of commenting \"same here\". " +
               "Only add a comment if you have new information that can help investigate the issue. " +
               "This helps keep the thread clean and easier to track.";
 
@@ -38,8 +40,7 @@ jobs:
             });
 
             const alreadyPosted = comments.some(c =>
-              c.body?.includes("use 👍 reactions") &&
-              c.body?.includes("same here")
+              c.body?.includes("<!-- hidden-issue-reaction-reminder-marker -->")
             );
 
             if (alreadyPosted) return;
