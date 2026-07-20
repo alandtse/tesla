@@ -405,20 +405,22 @@ async def test_range_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
 
-    est_range_miles = car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"]
 
-    assert state.attributes.get("est_battery_range_miles") == est_range_miles
+async def test_distance_to_arrival_none(hass: HomeAssistant) -> None:
+    """Tests distance to arrival returns unknown state when no active route."""
+    original = car_mock_data.VEHICLE_DATA["drive_state"][
+        "active_route_miles_to_arrival"
+    ]
+    car_mock_data.VEHICLE_DATA["drive_state"]["active_route_miles_to_arrival"] = None
+    await setup_platform(hass, SENSOR_DOMAIN)
 
-    if est_range_miles is not None:
-        est_range_km = DistanceConverter.convert(
-            car_mock_data.VEHICLE_DATA["charge_state"]["est_battery_range"],
-            UnitOfLength.MILES,
-            UnitOfLength.KILOMETERS,
-        )
-    else:
-        est_range_km = None
+    state = hass.states.get("sensor.my_model_s_distance_to_arrival")
+    assert state
+    assert state.state == STATE_UNKNOWN
 
-    assert state.attributes.get("est_battery_range_km") == est_range_km
+    car_mock_data.VEHICLE_DATA["drive_state"][
+        "active_route_miles_to_arrival"
+    ] = original
 
 
 async def test_range_attributes_not_available(hass: HomeAssistant) -> None:

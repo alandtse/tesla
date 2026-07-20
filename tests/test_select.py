@@ -34,6 +34,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
     entry = entity_registry.async_get("select.battery_home_operation_mode")
     assert entry.unique_id == "67890_operation_mode"
 
+    entry = entity_registry.async_get("select.battery_home_powerwall_mode")
+    assert entry.unique_id == "67890_powerwall_mode"
+
     entry = entity_registry.async_get("select.my_model_s_heated_steering_wheel")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_heated_steering_wheel"
 
@@ -423,6 +426,58 @@ async def test_operation_mode(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_set_operation_mode.assert_awaited_with("backup")
+
+
+async def test_powerwall_mode(hass: HomeAssistant) -> None:
+    """Tests powerwall combined charge/discharge/hold mode select."""
+    await setup_platform(hass, SELECT_DOMAIN)
+
+    with (
+        patch(
+            "teslajsonpy.energy.SolarPowerwallSite.set_operation_mode"
+        ) as mock_set_operation_mode,
+        patch(
+            "teslajsonpy.energy.SolarPowerwallSite.set_grid_charging"
+        ) as mock_set_grid_charging,
+    ):
+        # Test selecting "Charge from Grid"
+        await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: "select.battery_home_powerwall_mode",
+                "option": "Charge from Grid",
+            },
+            blocking=True,
+        )
+        mock_set_operation_mode.assert_awaited_with("self_consumption")
+        mock_set_grid_charging.assert_awaited_with(True)
+
+        # Test selecting "Discharge"
+        await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: "select.battery_home_powerwall_mode",
+                "option": "Discharge",
+            },
+            blocking=True,
+        )
+        mock_set_operation_mode.assert_awaited_with("self_consumption")
+        mock_set_grid_charging.assert_awaited_with(False)
+
+        # Test selecting "Hold (use Grid)"
+        await hass.services.async_call(
+            SELECT_DOMAIN,
+            SERVICE_SELECT_OPTION,
+            {
+                ATTR_ENTITY_ID: "select.battery_home_powerwall_mode",
+                "option": "Hold (use Grid)",
+            },
+            blocking=True,
+        )
+        mock_set_operation_mode.assert_awaited_with("autonomous")
+        mock_set_grid_charging.assert_awaited_with(True)
 
 
 async def test_car_heated_steering_wheel_select(hass: HomeAssistant) -> None:
