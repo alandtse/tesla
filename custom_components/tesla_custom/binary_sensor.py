@@ -41,6 +41,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBatteryCharging(energysite, coordinator))
             entities.append(TeslaEnergyGridStatus(energysite, coordinator))
+            if (
+                getattr(energysite, "storm_mode_capable", False)
+                or energysite.has_battery
+            ):
+                entities.append(TeslaEnergyStormWatchActive(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)
 
@@ -298,3 +303,31 @@ class TeslaCarUserPresent(TeslaCarEntity, BinarySensorEntity):
         user_id = str(self._car._vehicle_data.get("user_id"))
 
         return {"user_id": user_id}
+
+
+class TeslaEnergyStormWatchActive(TeslaEnergyEntity, BinarySensorEntity):
+    """Implement a binary sensor for Tesla Energy Storm Watch active state."""
+
+    type = "storm watch"
+    _attr_icon = "mdi:weather-lightning"
+    _attr_device_class = None
+
+    @property
+    def is_on(self) -> bool:
+        """Return True if Storm Watch is currently active."""
+        return bool(getattr(self._energysite, "storm_mode_active", False))
+
+    @property
+    def extra_state_attributes(self):
+        """Return Storm Watch state attributes."""
+        states = getattr(self._energysite, "storm_mode_states", None) or []
+        return {
+            "storm_mode_enabled": getattr(self._energysite, "storm_mode_enabled", None),
+            "storm_mode_capable": getattr(self._energysite, "storm_mode_capable", None),
+            "storm_mode_states": states,
+            "active_storm_types": [
+                s.get("storm_type")
+                for s in states
+                if isinstance(s, dict) and s.get("storm_type")
+            ],
+        }
