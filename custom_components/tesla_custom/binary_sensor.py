@@ -41,10 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
         if energysite.resource_type == RESOURCE_TYPE_BATTERY:
             entities.append(TeslaEnergyBatteryCharging(energysite, coordinator))
             entities.append(TeslaEnergyGridStatus(energysite, coordinator))
-            if (
-                getattr(energysite, "storm_mode_capable", False)
-                or energysite.has_battery
-            ):
+            if getattr(energysite, "storm_mode_capable", False):
                 entities.append(TeslaEnergyStormWatchActive(energysite, coordinator))
 
     async_add_entities(entities, update_before_add=True)

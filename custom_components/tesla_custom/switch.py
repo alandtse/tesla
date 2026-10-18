@@ -4,6 +4,7 @@ import logging
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
 from teslajsonpy.const import RESOURCE_TYPE_BATTERY
@@ -25,8 +26,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
-        if energysite.resource_type == RESOURCE_TYPE_BATTERY and (
-            getattr(energysite, "storm_mode_capable", False) or energysite.has_battery
+        if energysite.resource_type == RESOURCE_TYPE_BATTERY and getattr(
+            energysite, "storm_mode_capable", False
         ):
             entities.append(TeslaEnergyStormWatchSwitch(energysite, coordinator))
 
@@ -211,12 +212,14 @@ class TeslaEnergyStormWatchSwitch(TeslaEnergyEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Enable Storm Watch."""
-        await self._energysite.set_storm_mode(True)
+        if not await self._energysite.set_storm_mode(True):
+            raise HomeAssistantError("Failed to enable Storm Watch")
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Disable Storm Watch."""
-        await self._energysite.set_storm_mode(False)
+        if not await self._energysite.set_storm_mode(False):
+            raise HomeAssistantError("Failed to disable Storm Watch")
         self.async_write_ha_state()
 
     @property
