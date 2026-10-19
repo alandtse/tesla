@@ -1,8 +1,10 @@
 """Test the Tesla config flow."""
 
+import asyncio
 from http import HTTPStatus
 import os
-from unittest.mock import patch
+from threading import Event
+from unittest.mock import Mock, patch
 
 from homeassistant import config_entries, data_entry_flow, setup
 from homeassistant.const import (
@@ -179,6 +181,68 @@ async def test_form_with_proxy(hass, httpx_mock):
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
+
+
+async def test_proxy_discovery_does_not_block_event_loop(hass, monkeypatch):
+    """Test Supervisor requests run outside the event loop."""
+    from custom_components.tesla_custom.config_flow import TeslaConfigFlow
+
+    monkeypatch.setenv("SUPERVISOR_TOKEN", "test-token")
+    request_started = Event()
+    event_loop_progress = Event()
+    responses = [
+        Mock(
+            json=Mock(
+                return_value={
+                    "data": {
+                        "addons": [
+                            {"name": "Tesla HTTP Proxy", "slug": "tesla_http_proxy"}
+                        ]
+                    }
+                }
+            )
+        ),
+        Mock(
+            json=Mock(
+                return_value={
+                    "data": {
+                        "hostname": "http-proxy",
+                        "options": {"client_id": "test"},
+                    }
+                }
+            )
+        ),
+    ]
+
+    def blocking_get(*args, **kwargs):
+        request_started.set()
+        assert event_loop_progress.wait(timeout=5)
+        return responses.pop(0)
+
+    async def mark_event_loop_progress():
+        while not request_started.is_set():
+            await asyncio.sleep(0.001)
+        event_loop_progress.set()
+
+    flow = TeslaConfigFlow()
+    flow.hass = hass
+    progress_task = asyncio.create_task(mark_event_loop_progress())
+    try:
+        with patch(
+            "custom_components.tesla_custom.config_flow.httpx.get",
+            side_effect=blocking_get,
+        ) as mock_get:
+            schema = await flow._async_schema(api_proxy_enable=True)
+    finally:
+        progress_task.cancel()
+        try:
+            await progress_task
+        except asyncio.CancelledError:
+            pass
+
+    assert schema is not None
+    assert mock_get.call_count == 2
+    assert event_loop_progress.is_set()
 
 
 async def test_form_invalid_auth(hass):
