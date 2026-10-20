@@ -3,9 +3,16 @@
 from unittest.mock import patch
 
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, SERVICE_TURN_ON
+from homeassistant.const import (
+    ATTR_ENTITY_ID,
+    SERVICE_TURN_OFF,
+    SERVICE_TURN_ON,
+    STATE_ON,
+)
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+import pytest
 
 from .common import setup_platform
 from .mock_data import car as car_mock_data
@@ -30,6 +37,9 @@ async def test_registry_entries(hass: HomeAssistant) -> None:
 
     entry = entity_registry.async_get("switch.my_model_s_valet_mode")
     assert entry.unique_id == f"{car_mock_data.VIN.lower()}_valet_mode"
+
+    entry = entity_registry.async_get("switch.battery_home_storm_watch")
+    assert entry.unique_id == "67890_storm_watch"
 
 
 async def test_enabled_by_default(hass: HomeAssistant) -> None:
@@ -207,3 +217,53 @@ async def test_valet_mode(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_pin_required.assert_not_awaited()
+
+
+async def test_storm_watch(hass: HomeAssistant) -> None:
+    """Tests energy site Storm Watch switch."""
+    await setup_platform(hass, SWITCH_DOMAIN)
+
+    state = hass.states.get("switch.battery_home_storm_watch")
+    assert state.state == STATE_ON
+    assert state.attributes.get("storm_mode_capable") is True
+    assert state.attributes.get("storm_mode_states") == []
+
+    with patch(
+        "teslajsonpy.energy.PowerwallSite.set_storm_mode", return_value=True
+    ) as mock_set_storm_mode:
+        await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_ON,
+            {ATTR_ENTITY_ID: "switch.battery_home_storm_watch"},
+            blocking=True,
+        )
+        mock_set_storm_mode.assert_awaited_once_with(True)
+
+        await hass.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_OFF,
+            {ATTR_ENTITY_ID: "switch.battery_home_storm_watch"},
+            blocking=True,
+        )
+        mock_set_storm_mode.assert_awaited_with(False)
+
+    with patch(
+        "teslajsonpy.energy.PowerwallSite.set_storm_mode", return_value=False
+    ) as mock_set_storm_mode_fail:
+        with pytest.raises(HomeAssistantError):
+            await hass.services.async_call(
+                SWITCH_DOMAIN,
+                SERVICE_TURN_ON,
+                {ATTR_ENTITY_ID: "switch.battery_home_storm_watch"},
+                blocking=True,
+            )
+        mock_set_storm_mode_fail.assert_awaited_once_with(True)
+
+        with pytest.raises(HomeAssistantError):
+            await hass.services.async_call(
+                SWITCH_DOMAIN,
+                SERVICE_TURN_OFF,
+                {ATTR_ENTITY_ID: "switch.battery_home_storm_watch"},
+                blocking=True,
+            )
+        mock_set_storm_mode_fail.assert_awaited_with(False)

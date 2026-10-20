@@ -26,8 +26,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
 
     for energy_site_id, energysite in energysites.items():
         coordinator = coordinators[energy_site_id]
-        if energysite.resource_type == RESOURCE_TYPE_BATTERY and getattr(
-            energysite, "storm_mode_capable", False
+        if (
+            energysite.resource_type == RESOURCE_TYPE_BATTERY
+            and energysite.storm_mode_capable
         ):
             entities.append(TeslaEnergyStormWatchSwitch(energysite, coordinator))
 
@@ -208,7 +209,7 @@ class TeslaEnergyStormWatchSwitch(TeslaEnergyEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return True if Storm Watch is enabled."""
-        return bool(getattr(self._energysite, "storm_mode_enabled", False))
+        return bool(self._energysite.storm_mode_enabled)
 
     async def async_turn_on(self, **kwargs):
         """Enable Storm Watch."""
@@ -226,8 +227,7 @@ class TeslaEnergyStormWatchSwitch(TeslaEnergyEntity, SwitchEntity):
     def extra_state_attributes(self):
         """Return Storm Watch state attributes."""
         return {
-            "storm_mode_active": getattr(self._energysite, "storm_mode_active", None),
-            "storm_mode_capable": getattr(self._energysite, "storm_mode_capable", None),
-            "storm_mode_states": getattr(self._energysite, "storm_mode_states", None)
-            or [],
+            "storm_mode_active": self._energysite.storm_mode_active,
+            "storm_mode_capable": self._energysite.storm_mode_capable,
+            "storm_mode_states": self._energysite.storm_mode_states or [],
         }
