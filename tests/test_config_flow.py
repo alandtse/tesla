@@ -188,8 +188,13 @@ async def test_proxy_discovery_does_not_block_event_loop(hass, monkeypatch):
     from custom_components.tesla_custom.config_flow import TeslaConfigFlow
 
     monkeypatch.setenv("SUPERVISOR_TOKEN", "test-token")
-    request_started = Event()
-    event_loop_progress = Event()
+
+    async def async_add_executor_job(target, *args):
+        return await asyncio.get_running_loop().run_in_executor(None, target, *args)
+
+    monkeypatch.setattr(hass, "async_add_executor_job", async_add_executor_job)
+    request_started = [Event(), Event()]
+    event_loop_progress = [Event(), Event()]
     responses = [
         Mock(
             json=Mock(
@@ -214,15 +219,20 @@ async def test_proxy_discovery_does_not_block_event_loop(hass, monkeypatch):
         ),
     ]
 
+    request_count = 0
+
     def blocking_get(*args, **kwargs):
-        request_started.set()
-        assert event_loop_progress.wait(timeout=5)
+        nonlocal request_count
+        request_started[request_count].set()
+        assert event_loop_progress[request_count].wait(timeout=5)
+        request_count += 1
         return responses.pop(0)
 
     async def mark_event_loop_progress():
-        while not request_started.is_set():
-            await asyncio.sleep(0.001)
-        event_loop_progress.set()
+        for index in range(len(request_started)):
+            while not request_started[index].is_set():
+                await asyncio.sleep(0.001)
+            event_loop_progress[index].set()
 
     flow = TeslaConfigFlow()
     flow.hass = hass
@@ -242,7 +252,7 @@ async def test_proxy_discovery_does_not_block_event_loop(hass, monkeypatch):
 
     assert schema is not None
     assert mock_get.call_count == 2
-    assert event_loop_progress.is_set()
+    assert all(event.is_set() for event in event_loop_progress)
 
 
 async def test_form_invalid_auth(hass):
