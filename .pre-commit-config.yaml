@@ -42,7 +42,7 @@ repos:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.16.4
+    rev: v4.19.2
   # --- Linters ---
   - hooks:
       - id: dockerfile_lint
@@ -61,7 +61,7 @@ repos:
           )$
     rev: v4.0.0-alpha.8
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+    rev: v3.22.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -80,7 +80,7 @@ repos:
           - --configfile=tests/bandit.yaml
         files: ^(tests)/.+\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 9.0.0b1
+    rev: 10.0.0b1
     hooks:
       - id: isort
   #  - repo: local
