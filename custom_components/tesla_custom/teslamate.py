@@ -212,20 +212,21 @@ class TeslaMate:
 
         await self.async_load()
 
-        found_vin = None
-
         car_map = self._data.get("car_map", {})
         for vin, tm_id in car_map.items():
-            if tm_id == teslamate_id:
-                found_vin = vin
-                break
+            if tm_id != teslamate_id:
+                continue
 
-        if found_vin is None:
-            return None
+            if car := self.cars.get(vin):
+                return car
 
-        car = self.cars.get(found_vin)
+            logger.debug(
+                "TeslaMate_id %s is mapped to stale VIN %s that is not loaded",
+                teslamate_id,
+                vin,
+            )
 
-        return car
+        return None
 
     async def enable(self, enable=True):
         """Start Listening to MQTT topics."""

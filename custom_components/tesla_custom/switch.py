@@ -4,11 +4,13 @@ import logging
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity import EntityCategory
 from teslajsonpy.car import TeslaCar
+from teslajsonpy.const import RESOURCE_TYPE_BATTERY
 
 from . import TeslaDataUpdateCoordinator
-from .base import TeslaCarEntity
+from .base import TeslaCarEntity, TeslaEnergyEntity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,7 +21,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     entry_data = hass.data[DOMAIN][config_entry.entry_id]
     coordinators = entry_data["coordinators"]
     cars = entry_data["cars"]
+    energysites = entry_data["energysites"]
     entities = []
+
+    for energy_site_id, energysite in energysites.items():
+        coordinator = coordinators[energy_site_id]
+        if (
+            energysite.resource_type == RESOURCE_TYPE_BATTERY
+            and energysite.storm_mode_capable
+        ):
+            entities.append(TeslaEnergyStormWatchSwitch(energysite, coordinator))
 
     for vin, car in cars.items():
         coordinator = coordinators[vin]
@@ -187,3 +198,36 @@ class TeslaCarValetMode(TeslaCarEntity, SwitchEntity):
         else:
             await self._car.valet_mode(False)
             self.async_write_ha_state()
+
+
+class TeslaEnergyStormWatchSwitch(TeslaEnergyEntity, SwitchEntity):
+    """Representation of a Tesla Energy Storm Watch switch."""
+
+    type = "storm watch"
+    _attr_icon = "mdi:weather-lightning"
+
+    @property
+    def is_on(self) -> bool:
+        """Return True if Storm Watch is enabled."""
+        return bool(self._energysite.storm_mode_enabled)
+
+    async def async_turn_on(self, **kwargs):
+        """Enable Storm Watch."""
+        if not await self._energysite.set_storm_mode(True):
+            raise HomeAssistantError("Failed to enable Storm Watch")
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs):
+        """Disable Storm Watch."""
+        if not await self._energysite.set_storm_mode(False):
+            raise HomeAssistantError("Failed to disable Storm Watch")
+        self.async_write_ha_state()
+
+    @property
+    def extra_state_attributes(self):
+        """Return Storm Watch state attributes."""
+        return {
+            "storm_mode_active": self._energysite.storm_mode_active,
+            "storm_mode_capable": self._energysite.storm_mode_capable,
+            "storm_mode_states": self._energysite.storm_mode_states or [],
+        }

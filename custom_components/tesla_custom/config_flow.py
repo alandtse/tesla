@@ -1,8 +1,10 @@
 """Tesla Config Flow."""
 
+from functools import partial
 from http import HTTPStatus
 import logging
 import os
+import ssl
 
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import (
@@ -42,7 +44,7 @@ from .const import (
     DOMAIN,
     MIN_SCAN_INTERVAL,
 )
-from .util import SSL_CONTEXT
+from .util import create_tesla_ssl_context
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -115,7 +117,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="credentials",
-            data_schema=self._async_schema(api_proxy_enable=self.use_proxy),
+            data_schema=await self._async_schema(api_proxy_enable=self.use_proxy),
             errors=errors,
             description_placeholders={},
         )
@@ -132,8 +134,7 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Get the options flow for this handler."""
         return OptionsFlowHandler()
 
-    @callback
-    def _async_schema(self, api_proxy_enable: bool):
+    async def _async_schema(self, api_proxy_enable: bool):
         """Fetch schema with defaults."""
 
         schema = vol.Schema(
@@ -152,11 +153,14 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if "SUPERVISOR_TOKEN" in os.environ:
                 _LOGGER.debug("Running in supervised environment")
                 # find out if addon is running from normal repo or local
-                req = httpx.get(
-                    "http://supervisor/addons",
-                    headers={
-                        "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
-                    },
+                req = await self.hass.async_add_executor_job(
+                    partial(
+                        httpx.get,
+                        "http://supervisor/addons",
+                        headers={
+                            "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
+                        },
+                    )
                 )
                 for addon in req.json()["data"]["addons"]:
                     if addon["name"] == "Tesla HTTP Proxy":
@@ -165,11 +169,14 @@ class TeslaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                 try:
                     # read Client ID from addon
-                    req = httpx.get(
-                        f"http://supervisor/addons/{addon_slug}/info",
-                        headers={
-                            "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
-                        },
+                    req = await self.hass.async_add_executor_job(
+                        partial(
+                            httpx.get,
+                            f"http://supervisor/addons/{addon_slug}/info",
+                            headers={
+                                "Authorization": f"Bearer {os.environ['SUPERVISOR_TOKEN']}"
+                            },
+                        )
                     )
                     client_id = req.json()["data"]["options"]["client_id"]
                     api_proxy_url = "https://" + req.json()["data"]["hostname"]
@@ -248,8 +255,21 @@ async def validate_input(hass: core.HomeAssistant, data) -> dict:
     """
 
     config = {}
+    tesla_ssl_context = create_tesla_ssl_context()
+
+    if api_proxy_cert := data.get(CONF_API_PROXY_CERT):
+        try:
+            await hass.async_add_executor_job(
+                tesla_ssl_context.load_verify_locations, api_proxy_cert
+            )
+        except (FileNotFoundError, ssl.SSLError):
+            _LOGGER.warning(
+                "Unable to load custom SSL certificate from %s",
+                api_proxy_cert,
+            )
+
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=tesla_ssl_context
     )
 
     try:

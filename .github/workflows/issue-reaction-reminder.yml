@@ -1,0 +1,53 @@
+name: Issue reaction reminder
+
+on:
+  issues:
+    types:
+      - labeled
+
+permissions:
+  issues: write
+
+concurrency:
+  group: issue-reaction-reminder-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post reminder comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const triggeringLabel = context.payload.label?.name;
+            const relevantLabels = ["bug", "car", "powerwall"];
+
+            if (!relevantLabels.includes(triggeringLabel)) return;
+
+            const reminderText =
+              "<!-- hidden-issue-reaction-reminder-marker -->\n" +
+              "If you're affected by this issue or see an existing comment that applies to you, please react with 👍 instead of commenting \"same here\". " +
+              "Only add a comment if you have new information that can help investigate the issue. " +
+              "This helps keep the thread clean and easier to track.";
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number
+            });
+
+            const alreadyPosted = comments.some(c =>
+              c.body?.includes("<!-- hidden-issue-reaction-reminder-marker -->")
+            );
+
+            if (alreadyPosted) return;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: reminderText
+            });

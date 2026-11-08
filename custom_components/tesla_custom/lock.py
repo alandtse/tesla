@@ -31,22 +31,32 @@ class TeslaCarDoors(TeslaCarEntity, LockEntity):
 
     type = "doors"
 
+    def _ensure_vehicle_state(self) -> None:
+        """Ensure vehicle_state can be updated after lock commands."""
+        if not isinstance(self._car._vehicle_data.get("vehicle_state"), dict):
+            self._car._vehicle_data["vehicle_state"] = {}
+
     async def async_lock(self, **kwargs):
         """Send lock command."""
         _LOGGER.debug("Locking: %s", self.name)
+        self._ensure_vehicle_state()
         await self._car.lock()
         self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Send unlock command."""
         _LOGGER.debug("Unlocking: %s", self.name)
+        self._ensure_vehicle_state()
         await self._car.unlock()
         self.async_write_ha_state()
 
     @property
     def is_locked(self):
         """Return True if door is locked."""
-        return self._car.is_locked
+        vehicle_state = self._car._vehicle_data.get("vehicle_state")
+        if not isinstance(vehicle_state, dict) or "locked" not in vehicle_state:
+            return None
+        return vehicle_state["locked"]
 
 
 class TeslaCarChargePortLatch(TeslaCarEntity, LockEntity):

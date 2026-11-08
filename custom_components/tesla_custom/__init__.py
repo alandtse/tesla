@@ -9,7 +9,7 @@ import ssl
 from typing import Any
 
 import async_timeout
-from homeassistant.config_entries import SOURCE_IMPORT
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
     CONF_CLIENT_ID,
@@ -19,9 +19,9 @@ from homeassistant.const import (
     CONF_USERNAME,
     EVENT_HOMEASSISTANT_CLOSE,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.httpx_client import SERVER_SOFTWARE, USER_AGENT
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -51,7 +51,7 @@ from .const import (
 )
 from .services import async_setup_services, async_unload_services
 from .teslamate import TeslaMate
-from .util import SSL_CONTEXT
+from .util import create_tesla_ssl_context
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,13 +142,15 @@ async def async_setup_entry(hass, config_entry):
     # Because users can have multiple accounts, we always
     # create a new session so they have separate cookies
 
+    tesla_ssl_context = create_tesla_ssl_context()
+
     if api_proxy_cert := config.get(CONF_API_PROXY_CERT):
         try:
             await hass.async_add_executor_job(
-                SSL_CONTEXT.load_verify_locations, api_proxy_cert
+                tesla_ssl_context.load_verify_locations, api_proxy_cert
             )
             if _LOGGER.isEnabledFor(logging.DEBUG):
-                _LOGGER.debug("Trusting CA: %s", SSL_CONTEXT.get_ca_certs()[-1])
+                _LOGGER.debug("Trusting CA: %s", tesla_ssl_context.get_ca_certs()[-1])
         except (FileNotFoundError, ssl.SSLError):
             _LOGGER.warning(
                 "Unable to load custom SSL certificate from %s",
@@ -156,7 +158,7 @@ async def async_setup_entry(hass, config_entry):
             )
 
     async_client = httpx.AsyncClient(
-        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=SSL_CONTEXT
+        headers={USER_AGENT: SERVER_SOFTWARE}, timeout=60, verify=tesla_ssl_context
     )
     email = config_entry.title
 
@@ -383,6 +385,32 @@ async def async_unload_entry(hass, config_entry) -> bool:
     return False
 
 
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+) -> bool:
+    """Remove a tesla_custom config entry from a device.
+
+    Allow removal only for devices that are no longer provided by the
+    integration (e.g. a vehicle that was removed from the Tesla account). The
+    live car(s) and energy site(s) are protected from deletion. Removal is
+    refused while the entry is not loaded, since we cannot then confirm what is
+    currently provided.
+    """
+    # Imported lazily to avoid a circular import: base imports
+    # TeslaDataUpdateCoordinator from this module at top level.
+    from .base import device_identifier
+
+    entry_data = hass.data.get(DOMAIN, {}).get(config_entry.entry_id)
+    if not entry_data:
+        return False
+    provided = {
+        device_identifier(tesla_device)
+        for tesla_device in list((entry_data.get("cars") or {}).values())
+        + list((entry_data.get("energysites") or {}).values())
+    }
+    return not device_entry.identifiers.intersection(provided)
+
+
 async def update_listener(hass, config_entry):
     """Update when config_entry options update."""
     entry_data = hass.data[DOMAIN][config_entry.entry_id]
@@ -438,6 +466,7 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=config_entry,
             name=DOMAIN,
             update_interval=update_interval,
         )
@@ -475,6 +504,15 @@ class TeslaDataUpdateCoordinator(DataUpdateCoordinator):
                 # another coordinator is already reloading.
                 _LOGGER.debug("Config entry is already being reloaded")
                 return
+            async with self.reload_lock:
+                await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+        except KeyError as err:
+            if not self.update_vehicles:
+                raise
+            if self.reload_lock.locked():
+                _LOGGER.debug("Config entry is already being reloaded")
+                return
+            _LOGGER.info("Reloading config entry after vehicle list changed")
             async with self.reload_lock:
                 await self.hass.config_entries.async_reload(self.config_entry.entry_id)
         except TeslaException as err:
