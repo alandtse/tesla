@@ -10,7 +10,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v7"
 
       - name: HACS validation
         uses: "hacs/action@main"
@@ -25,8 +25,8 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-      - uses: "actions/checkout@v4"
-      - uses: "actions/setup-python@v1"
+      - uses: "actions/checkout@v7"
+      - uses: "actions/setup-python@v7"
         with:
           python-version: "3.x"
       - run: python3 -m pip install black
@@ -36,18 +36,21 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Setup TODO issues
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@v7"
       - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@v4"
+        uses: "alstr/todo-to-issue-action@v5"
+        with:
+          # v5 no longer labels issues "todo" by default (v4 did); keep v4 behavior.
+          IDENTIFIERS: '[{"name": "TODO", "labels": ["todo"]}]'
 
   tests:
     runs-on: "ubuntu-latest"
     name: Run tests
     steps:
       - name: Check out code from GitHub
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
       - name: Set up Python 3.13
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - name: Install Poetry
@@ -62,7 +65,7 @@ jobs:
       #----------------------------------------------
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
