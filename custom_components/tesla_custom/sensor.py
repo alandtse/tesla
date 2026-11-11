@@ -52,6 +52,8 @@ TPMS_SENSOR_ATTR = {
     "TPMS rear right": "tpms_last_seen_pressure_time_rr",
 }
 
+ENERGY_RESET_THRESHOLD_RATIO = 0.9
+
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
@@ -152,13 +154,25 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:lightning-bolt"
+    _last_value: float | None = None
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the charge energy added."""
         # The car will reset this to 0 automatically when charger
         # goes from disconnected to connected
-        return self._car.charge_energy_added
+        value = self._car.charge_energy_added
+        if value is None:
+            return None
+        # The state only decreases when a reading drops below the reset threshold.
+        last_value = self._last_value
+        if (
+            last_value is not None
+            and ENERGY_RESET_THRESHOLD_RATIO * last_value <= value < last_value
+        ):
+            return last_value
+        self._last_value = value
+        return value
 
     @property
     def extra_state_attributes(self):

@@ -1,6 +1,7 @@
 """Tests for the Tesla sensor device."""
 
 from datetime import datetime, timedelta, timezone
+from unittest.mock import MagicMock
 
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
@@ -29,6 +30,11 @@ from homeassistant.util.unit_conversion import (
 )
 import pytest
 from pytest import MonkeyPatch
+
+from custom_components.tesla_custom.sensor import (
+    ENERGY_RESET_THRESHOLD_RATIO,
+    TeslaCarChargerEnergy,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -178,6 +184,35 @@ async def test_charger_energy_value(hass: HomeAssistant) -> None:
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.TOTAL_INCREASING
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
+
+
+async def test_charger_energy_ignores_small_decrease() -> None:
+    """Tests a small decrease reported by the API does not decrease the sensor."""
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    entity = TeslaCarChargerEnergy(car, MagicMock())
+
+    car.charge_energy_added = 21.38
+    assert entity.native_value == 21.38
+    car.charge_energy_added = 21.36
+    assert entity.native_value == 21.38
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
+    # A reading exactly at the reset threshold keeps the last value
+    car.charge_energy_added = ENERGY_RESET_THRESHOLD_RATIO * 21.4
+    assert entity.native_value == 21.4
+    # A reading below the reset threshold is a reset
+    car.charge_energy_added = 18.0
+    assert entity.native_value == 18.0
+    # A new charging session restarts the counter
+    car.charge_energy_added = 0.0
+    assert entity.native_value == 0.0
+    car.charge_energy_added = None
+    assert entity.native_value is None
 
 
 async def test_charger_power_value(hass: HomeAssistant) -> None:
