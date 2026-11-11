@@ -31,7 +31,10 @@ from homeassistant.util.unit_conversion import (
 import pytest
 from pytest import MonkeyPatch
 
-from custom_components.tesla_custom.sensor import TeslaCarChargerEnergy
+from custom_components.tesla_custom.sensor import (
+    ENERGY_RESET_THRESHOLD_RATIO,
+    TeslaCarChargerEnergy,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -199,6 +202,12 @@ async def test_charger_energy_ignores_small_decrease() -> None:
     assert entity.native_value == 21.38
     car.charge_energy_added = 21.4
     assert entity.native_value == 21.4
+    # A reading exactly at the reset threshold keeps the last value
+    car.charge_energy_added = ENERGY_RESET_THRESHOLD_RATIO * 21.4
+    assert entity.native_value == 21.4
+    # A reading below the reset threshold is a reset
+    car.charge_energy_added = 18.0
+    assert entity.native_value == 18.0
     # A new charging session restarts the counter
     car.charge_energy_added = 0.0
     assert entity.native_value == 0.0

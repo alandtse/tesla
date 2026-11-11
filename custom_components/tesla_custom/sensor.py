@@ -52,6 +52,8 @@ TPMS_SENSOR_ATTR = {
     "TPMS rear right": "tpms_last_seen_pressure_time_rr",
 }
 
+ENERGY_RESET_THRESHOLD_RATIO = 0.9
+
 
 async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
     """Set up the Tesla Sensors by config_entry."""
@@ -162,11 +164,12 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         value = self._car.charge_energy_added
         if value is None:
             return None
-        # The API sometimes reports a slightly lower value than before. A
-        # total_increasing sensor must not decrease unless it was reset, and the
-        # recorder only treats a drop below 90% as a reset, so keep the last value.
+        # The state only decreases when a reading drops below the reset threshold.
         last_value = self._last_value
-        if last_value is not None and 0.9 * last_value <= value < last_value:
+        if (
+            last_value is not None
+            and ENERGY_RESET_THRESHOLD_RATIO * last_value <= value < last_value
+        ):
             return last_value
         self._last_value = value
         return value
