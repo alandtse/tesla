@@ -152,13 +152,24 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:lightning-bolt"
+    _last_value: float | None = None
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the charge energy added."""
         # The car will reset this to 0 automatically when charger
         # goes from disconnected to connected
-        return self._car.charge_energy_added
+        value = self._car.charge_energy_added
+        if value is None:
+            return None
+        # The API sometimes reports a slightly lower value than before. A
+        # total_increasing sensor must not decrease unless it was reset, and the
+        # recorder only treats a drop below 90% as a reset, so keep the last value.
+        last_value = self._last_value
+        if last_value is not None and 0.9 * last_value <= value < last_value:
+            return last_value
+        self._last_value = value
+        return value
 
     @property
     def extra_state_attributes(self):
