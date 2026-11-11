@@ -22,6 +22,8 @@ def create_tesla_ssl_context() -> ssl.SSLContext:
     call, causing the last loaded CA certificate to overwrite all earlier
     entries. Using a factory ensures each account gets its own isolated
     context object.
+
+    Loading the CA bundle reads from disk, call this from an executor.
     """
     ctx = httpx.create_ssl_context()
     ctx.maximum_version = ssl.TLSVersion.TLSv1_2
