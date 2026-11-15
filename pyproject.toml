@@ -35,12 +35,13 @@ version_variables = [
   "custom_components/tesla_custom/const.py:VERSION",
   "custom_components/tesla_custom/manifest.json:version"
 ]
-upload_to_pypi = false
-upload_to_release = false
-changelog_sections = "feature,fix,breaking,documentation,performance,refactor"
 build_command = "echo"
-branch = "main"
-commit_subject = "[skip ci] {version}"
+
+[tool.semantic_release.branches.main]
+match = "main"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = false
 
 [tool.black]
 line-length = 88

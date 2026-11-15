@@ -4,69 +4,87 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: semantic_release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: main
           token: ${{ secrets.GH_TOKEN }}
-      # - name: Download lokalise translations
-      #   run: |
-      #     docker run -v /tmp/lokalise:/opt/dest lokalise/lokalise-cli-2 lokalise2 \
-      #     --token "${{ secrets.lokalise_token }}" \
-      #     --project-id 465185555eee18dd537ca6.39714580 file download \
-      #     --format json \
-      #     --unzip-to /opt/dest \
-      #     --original-filenames=false \
-      #     --export-sort a_z \
-      #     --placeholder-format icu \
-      #     --json-unescaped-slashes=true \
-      #     --indentation 2sp \
-      #     --export-empty-as base \
-      #     --add-newline-eof \
-      #     --replace-breaks=false
-      # - name: Move new translations
-      #   run: |
-      #     cp /tmp/lokalise/locale/* /home/runner/work/alexa_media_player/alexa_media_player/custom_components/alexa_media/translations/
       - name: Setup Git
         run: |
           git config --global user.name "semantic-release"
           git config --global user.email "semantic-release@GitHub"
-      # - name: Commit translation files
-      #   run: |
-      #     git commit -m "docs: update localization" -a
       - name: Python Semantic Release
-        uses: python-semantic-release/python-semantic-release@v10.2.0
+        id: release
+        uses: python-semantic-release/python-semantic-release@v10.7.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           commit: true
           push: true
       - name: Zip tesla dir
+        if: steps.release.outputs.released == 'true'
         run: |
-          cd /home/runner/work/tesla/tesla/custom_components/tesla_custom
+          cd "$GITHUB_WORKSPACE/custom_components/tesla_custom"
           zip tesla_custom.zip -r ./
       - name: Set release variable
+        if: steps.release.outputs.released == 'true'
         run: |
-          echo "release_version=`git describe --abbrev=0`" >> $GITHUB_ENV
+          echo "release_version=$(git describe --abbrev=0)" >> "$GITHUB_ENV"
       - name: Sleep
+        if: steps.release.outputs.released == 'true'
         # add delay so upload does not kill the release notes from semantic-release
         run: |
           sleep 5
       - name: Upload zip to release
-        uses: svenstaro/upload-release-action@v1-release
+        if: steps.release.outputs.released == 'true'
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GH_TOKEN }}
-          file: /home/runner/work/tesla/tesla/custom_components/tesla_custom/tesla_custom.zip
+          file: ${{ github.workspace }}/custom_components/tesla_custom/tesla_custom.zip
           asset_name: tesla_custom.zip
           tag: ${{ env.release_version }}
           overwrite: true
       - name: Push changes to dev
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          # dev must keep the release commit SHA, or a later dev -> main merge can conflict.
+          RELEASE_SHA=$(git rev-parse HEAD)
+          for attempt in 1 2 3 4 5; do
+            if ! git fetch origin dev; then
+              echo "Fetch of dev failed on attempt $attempt, retrying..."
+              sleep $((attempt * 3))
+              continue
+            fi
+            if git merge-base --is-ancestor origin/dev "$RELEASE_SHA"; then
+              git push origin "$RELEASE_SHA":refs/heads/dev && { echo "Fast-forwarded dev on attempt $attempt"; exit 0; }
+            else
+              git checkout -B dev-sync origin/dev
+              if git merge --no-edit -m "chore: merge main into dev after release" "$RELEASE_SHA" \
+                 && git push origin HEAD:dev; then
+                echo "Merged main into dev on attempt $attempt"
+                exit 0
+              fi
+              git merge --abort 2>/dev/null || true
+              git checkout -q --detach "$RELEASE_SHA"
+            fi
+            echo "Push to dev failed on attempt $attempt, retrying..."
+            sleep $((attempt * 3))
+          done
+          echo "::error::Failed to push release commits to dev after retries"
+          exit 1

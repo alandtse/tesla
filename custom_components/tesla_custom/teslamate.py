@@ -6,6 +6,7 @@ with the latest data.
 
 import asyncio
 import logging
+import math
 import time
 from typing import TYPE_CHECKING
 
@@ -59,7 +60,15 @@ def cast_trunk_open(val: str) -> int:
     return 255 if cast_bool(val) else 0
 
 
-def cast_speed(speed: int) -> int:
+def cast_int(val: str | int | float) -> int:
+    """Safely cast integer or float-formatted string payloads to int."""
+    num = float(val)
+    if not math.isfinite(num):
+        raise ValueError("Non-finite numeric value")
+    return int(num)
+
+
+def cast_speed(speed: int | str) -> int:
     """Convert KM to Miles.
 
     The Tesla API natively returns the Speed in Miles M/H.
@@ -67,12 +76,14 @@ def cast_speed(speed: int) -> int:
     We need to convert to Miles so the speed calculates
     properly.
     """
-    speed_km = int(speed)
+    speed_km = float(speed)
+    if not math.isfinite(speed_km):
+        raise ValueError("Non-finite speed value")
     speed_miles = SpeedConverter.convert(
         speed_km, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.MILES_PER_HOUR
     )
 
-    return int(speed_miles)
+    return round(speed_miles)
 
 
 MAP_DRIVE_STATE = {
@@ -80,7 +91,7 @@ MAP_DRIVE_STATE = {
     "longitude": ("longitude", float),
     "shift_state": ("shift_state", str),
     "speed": ("speed", cast_speed),
-    "heading": ("heading", int),
+    "heading": ("heading", cast_int),
 }
 
 MAP_CLIMATE_STATE = {
@@ -110,14 +121,14 @@ MAP_CHARGE_STATE = {
     "ideal_battery_range_km": ("ideal_battery_range", cast_km_to_miles),
     "usable_battery_level": ("usable_battery_level", float),
     "charge_energy_added": ("charge_energy_added", float),
-    "charger_actual_current": ("charger_actual_current", int),
-    "charger_power": ("charger_power", int),
-    "charger_voltage": ("charger_voltage", int),
+    "charger_actual_current": ("charger_actual_current", cast_int),
+    "charger_power": ("charger_power", cast_int),
+    "charger_voltage": ("charger_voltage", cast_int),
     "time_to_full_charge": ("time_to_full_charge", float),
-    "charge_limit_soc": ("charge_limit_soc", int),
+    "charge_limit_soc": ("charge_limit_soc", cast_int),
     "charge_port_door_open": ("charge_port_door_open", cast_bool),
-    "charge_current_request": ("charge_current_request", int),
-    "charge_current_request_max": ("charge_current_request_max", int),
+    "charge_current_request": ("charge_current_request", cast_int),
+    "charge_current_request_max": ("charge_current_request_max", cast_int),
     "charging_state": ("charging_state", str),
 }
 
@@ -318,24 +329,48 @@ class TeslaMate:
             teslamate_id,
         )
 
-        if mqtt_attr in MAP_DRIVE_STATE:
+        payload = msg.payload.strip() if isinstance(msg.payload, str) else msg.payload
+        if payload in ("", None):
+            if mqtt_attr == "shift_state":
+                self.update_car_state(car, "drive_state", "shift_state", None)
+            elif mqtt_attr == "speed":
+                self.update_car_state(car, "drive_state", "speed", 0)
+            else:
+                return
+        elif mqtt_attr in MAP_DRIVE_STATE:
             attr, cast = MAP_DRIVE_STATE[mqtt_attr]
-            self.update_car_state(car, "drive_state", attr, cast(msg.payload))
+            try:
+                val = cast(payload)
+            except (ValueError, TypeError, OverflowError):
+                return
+            self.update_car_state(car, "drive_state", attr, val)
 
         elif mqtt_attr in MAP_VEHICLE_STATE:
             attr, cast = MAP_VEHICLE_STATE[mqtt_attr]
-            self.update_car_state(car, "vehicle_state", attr, cast(msg.payload))
+            try:
+                val = cast(payload)
+            except (ValueError, TypeError, OverflowError):
+                return
+            self.update_car_state(car, "vehicle_state", attr, val)
 
         elif mqtt_attr in MAP_CLIMATE_STATE:
             attr, cast = MAP_CLIMATE_STATE[mqtt_attr]
-            self.update_car_state(car, "climate_state", attr, cast(msg.payload))
+            try:
+                val = cast(payload)
+            except (ValueError, TypeError, OverflowError):
+                return
+            self.update_car_state(car, "climate_state", attr, val)
 
         elif mqtt_attr in MAP_CHARGE_STATE:
             attr, cast = MAP_CHARGE_STATE[mqtt_attr]
-            self.update_car_state(car, "charge_state", attr, cast(msg.payload))
+            try:
+                val = cast(payload)
+            except (ValueError, TypeError, OverflowError):
+                return
+            self.update_car_state(car, "charge_state", attr, val)
 
         elif mqtt_attr == "state":
-            state = msg.payload
+            state = payload
             self.update_car_state(car, None, "state", state)
 
         else:
