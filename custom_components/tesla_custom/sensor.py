@@ -272,7 +272,7 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
         value = self._car.shift_state
 
         # When car is parked and off, Tesla API reports shift_state None
-        if value is None or value == "":
+        if value not in self.options:
             return "P"
 
         return value
