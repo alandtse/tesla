@@ -49,8 +49,8 @@ jobs:
             echo "upload=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if ! assets=$(gh release view "$tag" --json assets --jq '.assets[].name' 2>&1); then
-            if grep -qi "release not found" <<< "$assets"; then
+          if ! assets=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.assets[].name' 2>&1); then
+            if grep -q "HTTP 404" <<< "$assets"; then
               echo "No GitHub release for $tag, skipping upload"
               echo "upload=false" >> "$GITHUB_OUTPUT"
               exit 0
