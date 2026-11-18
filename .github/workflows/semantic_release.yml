@@ -50,6 +50,11 @@ jobs:
             exit 0
           fi
           if ! assets=$(gh release view "$tag" --json assets --jq '.assets[].name' 2>&1); then
+            if grep -qi "release not found" <<< "$assets"; then
+              echo "No GitHub release for $tag, skipping upload"
+              echo "upload=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
             echo "::error::Could not look up release $tag: $assets"
             exit 1
           fi
