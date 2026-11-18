@@ -164,6 +164,11 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         value = self._car.charge_energy_added
         if value is None:
             return None
+        # A disconnected charger means the previous session is over, so never
+        # carry its total into the next one, even if the zero reading was missed.
+        if self._car.charging_state == "Disconnected":
+            self._last_value = None
+            return value
         # The state only decreases when a reading drops below the reset threshold.
         last_value = self._last_value
         if (
@@ -281,13 +286,17 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
     _attr_icon = "mdi:car-shift-pattern"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> str | None:
         """Return the shift state."""
         value = self._car.shift_state
 
         # When car is parked and off, Tesla API reports shift_state None
-        if value not in self.options:
+        if value is None or value == "":
             return "P"
+
+        # Unsupported values (e.g. from MQTT) are reported as unknown
+        if value not in self.options:
+            return None
 
         return value
 
