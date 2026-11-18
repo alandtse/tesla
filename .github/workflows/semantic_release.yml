@@ -40,13 +40,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          # A rerun after a failed upload reports released=false (the version
-          # already exists), so also recover when the latest release has no zip.
-          tag=$(git describe --abbrev=0 --tags)
+          if ! tag=$(git describe --abbrev=0 --tags 2>/dev/null); then
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           if [ "${{ steps.release.outputs.released }}" = "true" ]; then
             echo "upload=true" >> "$GITHUB_OUTPUT"
-          elif gh release view "$tag" --json assets --jq '.assets[].name' | grep -qx tesla_custom.zip; then
+            exit 0
+          fi
+          if ! assets=$(gh release view "$tag" --json assets --jq '.assets[].name' 2>&1); then
+            echo "::error::Could not look up release $tag: $assets"
+            exit 1
+          fi
+          if grep -qx tesla_custom.zip <<< "$assets"; then
             echo "upload=false" >> "$GITHUB_OUTPUT"
           else
             echo "Release $tag is missing tesla_custom.zip, uploading it"

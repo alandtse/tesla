@@ -162,13 +162,12 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         # The car will reset this to 0 automatically when charger
         # goes from disconnected to connected
         value = self._car.charge_energy_added
-        if value is None:
-            return None
-        # A disconnected charger means the previous session is over, so never
-        # carry its total into the next one, even if the zero reading was missed.
+        # A disconnected charger ends the session, even if the zero was missed.
         if self._car.charging_state == "Disconnected":
             self._last_value = None
             return value
+        if value is None:
+            return None
         # The state only decreases when a reading drops below the reset threshold.
         last_value = self._last_value
         if (
@@ -294,7 +293,6 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
         if value is None or value == "":
             return "P"
 
-        # Unsupported values (e.g. from MQTT) are reported as unknown
         if value not in self.options:
             return None
 
