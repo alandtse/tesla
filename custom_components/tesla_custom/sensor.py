@@ -155,6 +155,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:lightning-bolt"
     _last_value: float | None = None
+    _was_disconnected = False
 
     @property
     def native_value(self) -> float | None:
@@ -162,10 +163,12 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         # The car will reset this to 0 automatically when charger
         # goes from disconnected to connected
         value = self._car.charge_energy_added
-        # A disconnected charger ends the session, even if the zero was missed.
         if self._car.charging_state == "Disconnected":
+            self._was_disconnected = True
+        elif self._was_disconnected:
+            # The next session started, so drop the previous session's total.
+            self._was_disconnected = False
             self._last_value = None
-            return value
         if value is None:
             return None
         # The state only decreases when a reading drops below the reset threshold.
