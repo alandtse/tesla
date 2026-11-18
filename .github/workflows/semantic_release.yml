@@ -58,7 +58,7 @@ jobs:
             echo "::error::Could not look up release $tag: $assets"
             exit 1
           fi
-          if grep -qx tesla_custom.zip <<< "$assets"; then
+          if grep -Fqx tesla_custom.zip <<< "$assets"; then
             echo "upload=false" >> "$GITHUB_OUTPUT"
           else
             echo "Release $tag is missing tesla_custom.zip, uploading it"
