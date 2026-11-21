@@ -66,10 +66,12 @@ jobs:
           fi
       - name: Zip tesla dir
         if: steps.package.outputs.upload == 'true'
+        env:
+          PACKAGE_TAG: ${{ steps.package.outputs.tag }}
         run: |
           git archive --format=zip \
             -o "$RUNNER_TEMP/tesla_custom.zip" \
-            "${{ steps.package.outputs.tag }}:custom_components/tesla_custom"
+            "${PACKAGE_TAG}:custom_components/tesla_custom"
       - name: Sleep
         if: steps.package.outputs.upload == 'true' && steps.release.outputs.released == 'true'
         # add delay so upload does not kill the release notes from semantic-release
