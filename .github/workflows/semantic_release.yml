@@ -35,28 +35,54 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
           commit: true
           push: true
+      - name: Find release needing a package
+        id: package
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          if ! tag=$(git describe --abbrev=0 --tags 2>/dev/null); then
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ "${{ steps.release.outputs.released }}" = "true" ]; then
+            echo "upload=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! assets=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.assets[].name' 2>&1); then
+            if grep -q "HTTP 404" <<< "$assets"; then
+              echo "No GitHub release for $tag, skipping upload"
+              echo "upload=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::error::Could not look up release $tag: $assets"
+            exit 1
+          fi
+          if grep -Fqx tesla_custom.zip <<< "$assets"; then
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Release $tag is missing tesla_custom.zip, uploading it"
+            echo "upload=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Zip tesla dir
-        if: steps.release.outputs.released == 'true'
+        if: steps.package.outputs.upload == 'true'
         run: |
-          cd "$GITHUB_WORKSPACE/custom_components/tesla_custom"
-          zip tesla_custom.zip -r ./
-      - name: Set release variable
-        if: steps.release.outputs.released == 'true'
-        run: |
-          echo "release_version=$(git describe --abbrev=0)" >> "$GITHUB_ENV"
+          git archive --format=zip \
+            -o "$RUNNER_TEMP/tesla_custom.zip" \
+            "${{ steps.package.outputs.tag }}:custom_components/tesla_custom"
       - name: Sleep
-        if: steps.release.outputs.released == 'true'
+        if: steps.package.outputs.upload == 'true' && steps.release.outputs.released == 'true'
         # add delay so upload does not kill the release notes from semantic-release
         run: |
           sleep 5
       - name: Upload zip to release
-        if: steps.release.outputs.released == 'true'
+        if: steps.package.outputs.upload == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GH_TOKEN }}
-          file: ${{ github.workspace }}/custom_components/tesla_custom/tesla_custom.zip
+          file: ${{ runner.temp }}/tesla_custom.zip
           asset_name: tesla_custom.zip
-          tag: ${{ env.release_version }}
+          tag: ${{ steps.package.outputs.tag }}
           overwrite: true
       - name: Push changes to dev
         env:

@@ -308,6 +308,20 @@ class TeslaMate:
 
         logger.info("Created mqtt Topic for: %s", mqtt_topic)
 
+    def _cast_payload(self, car, mqtt_attr, cast, payload):
+        """Cast an MQTT payload, logging and returning None if it is invalid."""
+        try:
+            return cast(payload)
+        except (ValueError, TypeError, OverflowError) as err:
+            logger.debug(
+                "Ignoring invalid MQTT payload %r for %s on VIN:%s: %s",
+                payload,
+                mqtt_attr,
+                car.vin,
+                err,
+            )
+            return None
+
     async def async_handle_new_data(self, msg: ReceiveMessage):
         """Update Car Data from MQTT msg."""
         logger.debug("MQTT Topic Recieved: %s", msg.topic)
@@ -339,33 +353,29 @@ class TeslaMate:
                 return
         elif mqtt_attr in MAP_DRIVE_STATE:
             attr, cast = MAP_DRIVE_STATE[mqtt_attr]
-            try:
-                val = cast(payload)
-            except (ValueError, TypeError, OverflowError):
+            val = self._cast_payload(car, mqtt_attr, cast, payload)
+            if val is None:
                 return
             self.update_car_state(car, "drive_state", attr, val)
 
         elif mqtt_attr in MAP_VEHICLE_STATE:
             attr, cast = MAP_VEHICLE_STATE[mqtt_attr]
-            try:
-                val = cast(payload)
-            except (ValueError, TypeError, OverflowError):
+            val = self._cast_payload(car, mqtt_attr, cast, payload)
+            if val is None:
                 return
             self.update_car_state(car, "vehicle_state", attr, val)
 
         elif mqtt_attr in MAP_CLIMATE_STATE:
             attr, cast = MAP_CLIMATE_STATE[mqtt_attr]
-            try:
-                val = cast(payload)
-            except (ValueError, TypeError, OverflowError):
+            val = self._cast_payload(car, mqtt_attr, cast, payload)
+            if val is None:
                 return
             self.update_car_state(car, "climate_state", attr, val)
 
         elif mqtt_attr in MAP_CHARGE_STATE:
             attr, cast = MAP_CHARGE_STATE[mqtt_attr]
-            try:
-                val = cast(payload)
-            except (ValueError, TypeError, OverflowError):
+            val = self._cast_payload(car, mqtt_attr, cast, payload)
+            if val is None:
                 return
             self.update_car_state(car, "charge_state", attr, val)
 
