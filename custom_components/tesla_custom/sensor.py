@@ -176,7 +176,10 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
             # and ignore readings still equal to it, as the car may not have
             # reported the new session's energy yet.
             self._was_disconnected = False
-            self._stale_value = self._last_value
+            if self._last_value is not None:
+                # Keep a pending stale value if no fresh reading arrived since
+                # the previous reconnect.
+                self._stale_value = self._last_value
             self._last_value = None
         if value is None:
             return None

@@ -759,3 +759,27 @@ async def test_shift_state_unsupported_value_is_unknown() -> None:
     for raw, expected in ((None, "P"), ("", "P"), ("D", "D"), ("X", None)):
         car.shift_state = raw
         assert entity.native_value == expected
+
+
+async def test_charger_energy_repeated_reconnect_keeps_stale_value() -> None:
+    """Tests a second reconnect before fresh energy arrives keeps the stale value."""
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    entity = TeslaCarChargerEnergy(car, MagicMock())
+
+    car.charging_state = "Charging"
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
+    for _ in range(2):
+        car.charging_state = "Disconnected"
+        assert entity.native_value == 21.4
+        # Reconnected but the delayed reading is still the previous total
+        car.charging_state = "Charging"
+        assert entity.native_value == 21.4
+    # The fresh reading is published, not suppressed as a small dip
+    car.charge_energy_added = 20.0
+    assert entity.native_value == 20.0
