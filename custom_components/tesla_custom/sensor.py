@@ -155,6 +155,8 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:lightning-bolt"
     _last_value: float | None = None
+    _was_disconnected = False
+    _stale_value: float | None = None
 
     @property
     def native_value(self) -> float | None:
@@ -162,8 +164,29 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         # The car will reset this to 0 automatically when charger
         # goes from disconnected to connected
         value = self._car.charge_energy_added
+        if self._car.charging_state == "Disconnected":
+            self._was_disconnected = True
+            if value is None:
+                return None
+            if self._last_value is not None:
+                # Nothing is charging, so hold the last session's total.
+                return self._last_value
+        elif self._was_disconnected:
+            # The next session started. Drop the previous total as the baseline
+            # and ignore readings still equal to it, as the car may not have
+            # reported the new session's energy yet.
+            self._was_disconnected = False
+            if self._last_value is not None:
+                # Keep a pending stale value if no fresh reading arrived since
+                # the previous reconnect.
+                self._stale_value = self._last_value
+            self._last_value = None
         if value is None:
             return None
+        if self._stale_value is not None:
+            if value == self._stale_value:
+                return value
+            self._stale_value = None
         # The state only decreases when a reading drops below the reset threshold.
         last_value = self._last_value
         if (
@@ -281,13 +304,16 @@ class TeslaCarShiftState(TeslaCarEntity, SensorEntity):
     _attr_icon = "mdi:car-shift-pattern"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> str | None:
         """Return the shift state."""
         value = self._car.shift_state
 
         # When car is parked and off, Tesla API reports shift_state None
-        if value not in self.options:
+        if value is None or value == "":
             return "P"
+
+        if value not in self.options:
+            return None
 
         return value
 

@@ -65,7 +65,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         return HVACMode.OFF
 
     @property
-    def temperature_unit(self):
+    def native_temperature_unit(self):
         """Return unit of measurement.
 
         Tesla API always returns in Celsius.
@@ -73,7 +73,7 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         return UnitOfTemperature.CELSIUS
 
     @property
-    def current_temperature(self):
+    def native_current_temperature(self):
         """Return current temperature."""
         return self._car.inside_temp
 
@@ -94,9 +94,15 @@ class TeslaCarClimate(TeslaCarEntity, ClimateEntity):
         return DEFAULT_MIN_TEMP
 
     @property
-    def target_temperature(self):
+    def native_target_temperature(self):
         """Return target temperature."""
         return self._car.driver_temp_setting
+
+    # Home Assistant before 2026.11 only reads the names without the native_
+    # prefix. Newer versions use the native_ names when a class provides both.
+    temperature_unit = native_temperature_unit
+    current_temperature = native_current_temperature
+    target_temperature = native_target_temperature
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""

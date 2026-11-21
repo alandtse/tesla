@@ -215,6 +215,37 @@ async def test_charger_energy_ignores_small_decrease() -> None:
     assert entity.native_value is None
 
 
+async def test_charger_energy_does_not_carry_over_sessions() -> None:
+    """Tests a missed zero reading does not keep the previous session's total."""
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    entity = TeslaCarChargerEnergy(car, MagicMock())
+
+    car.charging_state = "Charging"
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
+    # The charger is unplugged and the zero reading is never polled
+    car.charging_state = "Disconnected"
+    car.charge_energy_added = None
+    assert entity.native_value is None
+    # A small decrease while disconnected is not published
+    car.charge_energy_added = 21.36
+    assert entity.native_value == 21.4
+    # A zero reading while disconnected does not replace the held total
+    car.charge_energy_added = 0.0
+    assert entity.native_value == 21.4
+    # Reconnected but the new session's energy has not been reported yet
+    car.charging_state = "Charging"
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
+    car.charge_energy_added = 20.0
+    assert entity.native_value == 20.0
+
+
 async def test_charger_power_value(hass: HomeAssistant) -> None:
     """Tests charger_power is getting the correct value."""
     await setup_platform(hass, SENSOR_DOMAIN)
@@ -711,3 +742,44 @@ async def test_distance_to_arrival(hass: HomeAssistant) -> None:
 
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.DISTANCE
     assert state.attributes.get(ATTR_STATE_CLASS) == SensorStateClass.MEASUREMENT
+
+
+async def test_shift_state_unsupported_value_is_unknown() -> None:
+    """Tests unsupported shift values are unknown, while empty means parked."""
+    from custom_components.tesla_custom.sensor import TeslaCarShiftState
+
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    entity = TeslaCarShiftState(car, MagicMock())
+
+    for raw, expected in ((None, "P"), ("", "P"), ("D", "D"), ("X", None)):
+        car.shift_state = raw
+        assert entity.native_value == expected
+
+
+async def test_charger_energy_repeated_reconnect_keeps_stale_value() -> None:
+    """Tests a second reconnect before fresh energy arrives keeps the stale value."""
+    car = MagicMock()
+    car.vin = car_mock_data.VIN
+    car.display_name = "My Model S"
+    car.car_type = "models"
+    car.car_version = "2026.20"
+    car.id = 1
+    entity = TeslaCarChargerEnergy(car, MagicMock())
+
+    car.charging_state = "Charging"
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
+    for _ in range(2):
+        car.charging_state = "Disconnected"
+        assert entity.native_value == 21.4
+        # Reconnected but the delayed reading is still the previous total
+        car.charging_state = "Charging"
+        assert entity.native_value == 21.4
+    # The fresh reading is published, not suppressed as a small dip
+    car.charge_energy_added = 20.0
+    assert entity.native_value == 20.0
