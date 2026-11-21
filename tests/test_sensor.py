@@ -235,7 +235,13 @@ async def test_charger_energy_does_not_carry_over_sessions() -> None:
     # A small decrease while disconnected is not published
     car.charge_energy_added = 21.36
     assert entity.native_value == 21.4
+    # A zero reading while disconnected does not replace the held total
+    car.charge_energy_added = 0.0
+    assert entity.native_value == 21.4
+    # Reconnected but the new session's energy has not been reported yet
     car.charging_state = "Charging"
+    car.charge_energy_added = 21.4
+    assert entity.native_value == 21.4
     car.charge_energy_added = 20.0
     assert entity.native_value == 20.0
 

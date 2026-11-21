@@ -156,6 +156,7 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
     _attr_icon = "mdi:lightning-bolt"
     _last_value: float | None = None
     _was_disconnected = False
+    _stale_value: float | None = None
 
     @property
     def native_value(self) -> float | None:
@@ -165,12 +166,24 @@ class TeslaCarChargerEnergy(TeslaCarEntity, SensorEntity):
         value = self._car.charge_energy_added
         if self._car.charging_state == "Disconnected":
             self._was_disconnected = True
+            if value is None:
+                return None
+            if self._last_value is not None:
+                # Nothing is charging, so hold the last session's total.
+                return self._last_value
         elif self._was_disconnected:
-            # The next session started, so drop the previous session's total.
+            # The next session started. Drop the previous total as the baseline
+            # and ignore readings still equal to it, as the car may not have
+            # reported the new session's energy yet.
             self._was_disconnected = False
+            self._stale_value = self._last_value
             self._last_value = None
         if value is None:
             return None
+        if self._stale_value is not None:
+            if value == self._stale_value:
+                return value
+            self._stale_value = None
         # The state only decreases when a reading drops below the reset threshold.
         last_value = self._last_value
         if (
